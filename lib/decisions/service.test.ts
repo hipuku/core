@@ -122,6 +122,23 @@ describe("DecisionService", () => {
     expect(trail.at(-1)?.toStatus).toBe("superseded");
   });
 
+  it("lets a maintainer invite a member and lists them", async () => {
+    const ws = await workspaceWithAuthor(service);
+    await service.inviteMember(ws.id, MAINTAINER, "user_new", "maintainer");
+    const members = await service.listMembers(ws.id);
+    expect(members.map((m) => m.userId).sort()).toEqual(
+      [MAINTAINER, AUTHOR, "user_new"].sort(),
+    );
+    expect(members.find((m) => m.userId === "user_new")?.role).toBe("maintainer");
+  });
+
+  it("refuses to let an author invite a member", async () => {
+    const ws = await workspaceWithAuthor(service);
+    await expect(
+      service.inviteMember(ws.id, AUTHOR, "user_new", "author"),
+    ).rejects.toThrow("only a maintainer");
+  });
+
   it("refuses to supersede with a decision that is not accepted", async () => {
     const ws = await workspaceWithAuthor(service);
     const old = await service.propose(ws.id, AUTHOR, { title: "old", body: {} });

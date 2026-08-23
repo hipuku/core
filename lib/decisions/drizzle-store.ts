@@ -60,6 +60,14 @@ export class DrizzleDecisionStore implements DecisionStore {
     return row ?? null;
   }
 
+  async listMembers(workspaceId: string): Promise<MembershipRecord[]> {
+    return db
+      .select()
+      .from(memberships)
+      .where(eq(memberships.workspaceId, workspaceId))
+      .orderBy(asc(memberships.createdAt));
+  }
+
   async insertDecision(input: {
     decision: Omit<DecisionRecord, "number">;
     transition: TransitionRecord;

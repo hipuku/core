@@ -49,6 +49,12 @@ export class MemoryDecisionStore implements DecisionStore {
     return record ? { ...record } : null;
   }
 
+  async listMembers(workspaceId: string): Promise<MembershipRecord[]> {
+    return [...this.members.values()]
+      .filter((m) => m.workspaceId === workspaceId)
+      .map((m) => ({ ...m }));
+  }
+
   async insertDecision(input: {
     decision: Omit<DecisionRecord, "number">;
     transition: TransitionRecord;

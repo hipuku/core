@@ -75,6 +75,28 @@ export class DecisionService {
     });
   }
 
+  /**
+   * Add someone to a workspace with a role. Managing membership is a maintainer-only
+   * act — distinct from the decision capabilities, which is why it is a direct role
+   * check rather than one of the lifecycle guards.
+   */
+  async inviteMember(
+    workspaceId: string,
+    actorId: string,
+    targetUserId: string,
+    role: Role,
+  ) {
+    const actorRole = await this.roleOf(workspaceId, actorId);
+    if (actorRole !== "maintainer") {
+      throw new DecisionError("only a maintainer can manage members");
+    }
+    return this.addMember(workspaceId, targetUserId, role);
+  }
+
+  listMembers(workspaceId: string) {
+    return this.store.listMembers(workspaceId);
+  }
+
   /** Open a new ADR as a proposal, seeding its body into a versioned document. */
   async propose(
     workspaceId: string,

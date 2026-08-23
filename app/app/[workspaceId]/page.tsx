@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/StatusBadge";
 import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
-import { propose } from "../actions";
+import { usersById } from "@/lib/users";
+import { inviteMember, propose } from "../actions";
 import styles from "../app.module.css";
 
 export default async function WorkspacePage({
@@ -23,6 +24,10 @@ export default async function WorkspacePage({
   const decisions = await decisionService.listDecisions(workspaceId);
   const proposeHere = propose.bind(null, workspaceId);
 
+  const members = await decisionService.listMembers(workspaceId);
+  const memberUsers = await usersById(members.map((m) => m.userId));
+  const inviteHere = inviteMember.bind(null, workspaceId);
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -32,7 +37,9 @@ export default async function WorkspacePage({
           </p>
           <h1 className={styles.h1}>Decisions</h1>
         </div>
-        <p className={styles.crumbs}>you are a {role}</p>
+        <p className={styles.crumbs}>
+          you are {role === "author" ? "an" : "a"} {role}
+        </p>
       </header>
 
       {decisions.length === 0 ? (
@@ -81,6 +88,52 @@ export default async function WorkspacePage({
             </button>
           </div>
         </form>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Members</h2>
+        <ul className={styles.list}>
+          {members.map((member) => {
+            const person = memberUsers.get(member.userId);
+            return (
+              <li key={member.userId} className={styles.row}>
+                <span className={styles.rowTitle}>
+                  {person?.name ?? "Unknown"}
+                  <span className={styles.num}> {person?.email}</span>
+                </span>
+                <span className={styles.badge}>{member.role}</span>
+              </li>
+            );
+          })}
+        </ul>
+
+        {role === "maintainer" && (
+          <form action={inviteHere} className={styles.form} style={{ marginTop: "1rem" }}>
+            <label>
+              <span>Add a member by email</span>
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="teammate@example.com"
+              />
+            </label>
+            <label>
+              <span>Role</span>
+              <select name="role" defaultValue="author">
+                <option value="author">author — can propose and revise</option>
+                <option value="maintainer">
+                  maintainer — can also accept, reject, supersede
+                </option>
+              </select>
+            </label>
+            <div className={styles.actionRow}>
+              <button type="submit" className={styles.btn}>
+                Add member
+              </button>
+            </div>
+          </form>
+        )}
       </section>
     </div>
   );

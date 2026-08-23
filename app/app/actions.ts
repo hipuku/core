@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { decisionService } from "@/lib/decisions";
-import type { DecisionStatus } from "@/lib/decisions";
+import { decisionService, DecisionError } from "@/lib/decisions";
+import type { DecisionStatus, Role } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
+import { findUserByEmail } from "@/lib/users";
 
 function adrBody(formData: FormData) {
   return {
@@ -20,6 +21,21 @@ export async function createWorkspace(formData: FormData) {
   if (!name) return;
   const workspace = await decisionService.createWorkspace(user.id, name);
   redirect(`/app/${workspace.id}`);
+}
+
+export async function inviteMember(workspaceId: string, formData: FormData) {
+  const user = await requireUser();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const role = (String(formData.get("role") ?? "author") as Role) ?? "author";
+  if (!email) return;
+  const target = await findUserByEmail(email);
+  if (!target) {
+    throw new DecisionError(
+      `No account with the email ${email}. They need to sign up first.`,
+    );
+  }
+  await decisionService.inviteMember(workspaceId, user.id, target.id, role);
+  revalidatePath(`/app/${workspaceId}`);
 }
 
 export async function propose(workspaceId: string, formData: FormData) {
