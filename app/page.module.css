@@ -1,0 +1,51 @@
+.main {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.card {
+  max-width: 42rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.kicker {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.body {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.stack {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.stack li {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid color-mix(in oklch, var(--foreground) 18%, transparent);
+  border-radius: 999px;
+  opacity: 0.85;
+}
