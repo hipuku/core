@@ -1,49 +1,56 @@
 /* ============================================================================
    core — design system
-   A refined dark tool. One accent hue on a cool neutral ramp, tight spacing,
-   crisp focus rings, mono for identifiers. Committed dark; no light theme.
+   Notion-inspired paper: warm off-white surfaces, warm-grey ink, quiet borders,
+   Gabarito for type. Colour appears only where it earns its place, drawn from a
+   retro-print palette — vermilion, mustard, teal, cobalt: saturated but
+   medium-lightness "ink", never neon. Committed light.
    ============================================================================ */
 
 :root {
-  /* neutrals — cool near-black ramp */
-  --bg: oklch(0.17 0.008 275);
-  --surface: oklch(0.2 0.009 275);
-  --surface-2: oklch(0.235 0.01 275);
-  --surface-3: oklch(0.27 0.011 275);
-  --border: oklch(0.3 0.011 275);
-  --border-strong: oklch(0.4 0.012 275);
+  /* neutrals — warm paper ramp */
+  --bg: oklch(0.976 0.006 85);
+  --surface: oklch(0.995 0.003 85);
+  --surface-2: oklch(0.955 0.007 82);
+  --surface-3: oklch(0.928 0.009 82);
+  --border: oklch(0.9 0.008 80);
+  --border-strong: oklch(0.82 0.01 80);
 
-  --text: oklch(0.97 0.004 275);
-  --text-dim: oklch(0.74 0.008 275);
-  --text-faint: oklch(0.56 0.01 275);
+  --text: oklch(0.27 0.012 60);
+  --text-dim: oklch(0.46 0.012 60);
+  --text-faint: oklch(0.6 0.012 65);
 
-  /* accent — indigo/violet (the 'void' hue) */
-  --accent: oklch(0.62 0.19 278);
-  --accent-hover: oklch(0.68 0.19 278);
-  --accent-fg: oklch(0.99 0 0);
-  --accent-tint: oklch(0.62 0.19 278 / 0.14);
-  --ring: oklch(0.7 0.17 278 / 0.65);
+  /* accent — retro cobalt */
+  --accent: oklch(0.5 0.16 260);
+  --accent-hover: oklch(0.44 0.16 260);
+  --accent-fg: oklch(0.995 0 0);
+  --accent-tint: oklch(0.5 0.16 260 / 0.1);
+  --ring: oklch(0.5 0.16 260 / 0.32);
 
-  /* status hues */
-  --st-proposed: oklch(0.72 0.13 250);
-  --st-accepted: oklch(0.76 0.15 155);
-  --st-rejected: oklch(0.7 0.19 25);
-  --st-deprecated: oklch(0.66 0.02 275);
-  --st-superseded: oklch(0.8 0.13 85);
+  /* status — retro poster inks */
+  --st-proposed: oklch(0.5 0.16 260);
+  --st-accepted: oklch(0.5 0.12 165);
+  --st-rejected: oklch(0.55 0.19 30);
+  --st-deprecated: oklch(0.55 0.02 70);
+  --st-superseded: oklch(0.6 0.13 74);
 
-  --danger: oklch(0.66 0.19 25);
+  --danger: oklch(0.55 0.19 30);
 
-  /* radii */
-  --r-sm: 6px;
-  --r: 9px;
-  --r-lg: 13px;
+  /* radii — tight, paper-like */
+  --r-sm: 5px;
+  --r: 7px;
+  --r-lg: 11px;
   --r-full: 999px;
 
+  /* soft warm shadows */
+  --shadow-sm: 0 1px 2px oklch(0.3 0.03 60 / 0.06), 0 1px 3px oklch(0.3 0.03 60 / 0.08);
+  --shadow: 0 4px 14px oklch(0.3 0.03 60 / 0.09);
+  --shadow-lg: 0 14px 40px oklch(0.3 0.03 60 / 0.16);
+
   /* type */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-gabarito), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -61,8 +68,9 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 15.5px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -77,25 +85,28 @@ a {
   background: var(--accent-tint);
 }
 
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
+}
+
 /* ---- shared primitives ------------------------------------------------- */
 
 .mono {
   font-family: var(--font-mono);
-  font-feature-settings: "ss01";
 }
 
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
 
 /* buttons */
 .btn {
-  --btn-bg: var(--surface-2);
-  --btn-border: var(--border);
+  --btn-bg: var(--surface);
+  --btn-border: var(--border-strong);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -110,12 +121,12 @@ a {
   background: var(--btn-bg);
   color: var(--text);
   cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
   white-space: nowrap;
+  box-shadow: var(--shadow-sm);
 }
 .btn:hover {
-  --btn-bg: var(--surface-3);
-  --btn-border: var(--border-strong);
+  --btn-bg: var(--surface-2);
 }
 .btn:focus-visible {
   outline: 2px solid var(--ring);
@@ -124,6 +135,7 @@ a {
 .btn:disabled {
   opacity: 0.5;
   cursor: default;
+  box-shadow: none;
 }
 .btn--primary {
   --btn-bg: var(--accent);
@@ -140,18 +152,18 @@ a {
   --btn-border: transparent;
   color: var(--text-dim);
   padding: 0.4rem 0.55rem;
+  box-shadow: none;
 }
 .btn--ghost:hover {
   --btn-bg: var(--surface-2);
-  --btn-border: transparent;
   color: var(--text);
 }
 .btn--danger {
   color: var(--danger);
 }
 .btn--danger:hover {
-  --btn-border: color-mix(in oklch, var(--danger) 55%, transparent);
-  --btn-bg: color-mix(in oklch, var(--danger) 12%, transparent);
+  --btn-border: color-mix(in oklch, var(--danger) 55%, var(--border));
+  --btn-bg: color-mix(in oklch, var(--danger) 8%, var(--surface));
 }
 
 /* inputs */
@@ -163,6 +175,7 @@ a {
 .field > span {
   font-size: 0.8rem;
   color: var(--text-dim);
+  font-weight: 500;
 }
 .input,
 .textarea,
@@ -172,14 +185,14 @@ a {
   width: 100%;
   padding: 0.55rem 0.7rem;
   border-radius: var(--r-sm);
-  border: 1px solid var(--border);
-  background: oklch(0.15 0.008 275);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
   color: var(--text);
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 .textarea {
   resize: vertical;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 .input::placeholder,
 .textarea::placeholder {
@@ -198,6 +211,7 @@ a {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 /* status pills */
@@ -209,13 +223,13 @@ a {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   padding: 0.22rem 0.5rem;
   border-radius: var(--r-full);
-  color: var(--pc);
-  background: color-mix(in oklch, var(--pc) 12%, transparent);
-  border: 1px solid color-mix(in oklch, var(--pc) 30%, transparent);
+  color: color-mix(in oklch, var(--pc) 78%, black);
+  background: color-mix(in oklch, var(--pc) 13%, var(--surface));
+  border: 1px solid color-mix(in oklch, var(--pc) 32%, transparent);
   white-space: nowrap;
 }
 .pill::before {
@@ -223,7 +237,7 @@ a {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--pc);
 }
 .pill--proposed { --pc: var(--st-proposed); }
 .pill--accepted { --pc: var(--st-accepted); }
