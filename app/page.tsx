@@ -25,15 +25,15 @@ export default async function Home() {
         </ul>
         <div className={styles.cta}>
           {session ? (
-            <Link href="/app" className={styles.ctaPrimary}>
+            <Link href="/app" className="btn btn--primary">
               Open your workspaces
             </Link>
           ) : (
             <>
-              <Link href="/sign-up" className={styles.ctaPrimary}>
+              <Link href="/sign-up" className="btn btn--primary">
                 Create an account
               </Link>
-              <Link href="/sign-in" className={styles.ctaSecondary}>
+              <Link href="/sign-in" className="btn">
                 Sign in
               </Link>
             </>

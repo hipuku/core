@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SignOutButton } from "@/components/SignOutButton";
 import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import { createWorkspace } from "./actions";
@@ -10,26 +9,28 @@ export default async function WorkspacesPage() {
   const workspaces = await decisionService.listWorkspaces(user.id);
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
+    <div>
+      <div className={styles.pageHead}>
         <div>
-          <p className={styles.crumbs}>core · decision log</p>
-          <h1 className={styles.h1}>Workspaces</h1>
+          <p className={styles.crumbs}>workspaces</p>
+          <h1 className={styles.title}>Your workspaces</h1>
+          <p className={styles.sub}>
+            Each workspace is a team with its own decision log.
+          </p>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <p className={styles.crumbs}>{user.email}</p>
-          <SignOutButton className={styles.linkBtn} />
-        </div>
-      </header>
+      </div>
 
       {workspaces.length === 0 ? (
-        <p className={styles.empty}>No workspaces yet. Create one to start recording decisions.</p>
+        <p className={styles.empty}>
+          No workspaces yet. Create one below to start recording decisions.
+        </p>
       ) : (
         <ul className={styles.list}>
           {workspaces.map((workspace) => (
             <li key={workspace.id}>
-              <Link href={`/app/${workspace.id}`} className={styles.row}>
-                <span className={styles.rowTitle}>{workspace.name}</span>
+              <Link href={`/app/${workspace.id}`} className={styles.card}>
+                <span className={styles.cardTitle}>{workspace.name}</span>
+                <span className={styles.crumbs}>Open →</span>
               </Link>
             </li>
           ))}
@@ -37,14 +38,16 @@ export default async function WorkspacesPage() {
       )}
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>New workspace</h2>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>New workspace</h2>
+        </div>
         <form action={createWorkspace} className={styles.form}>
-          <label>
+          <label className="field">
             <span>Name</span>
-            <input name="name" required placeholder="Platform team" />
+            <input className="input" name="name" required placeholder="Platform team" />
           </label>
-          <div className={styles.actionRow}>
-            <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`}>
+          <div className={styles.actions}>
+            <button type="submit" className="btn btn--primary">
               Create workspace
             </button>
           </div>

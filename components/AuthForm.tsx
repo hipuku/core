@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { signIn, signUp } from "@/lib/auth-client";
+import { PasswordField } from "@/components/PasswordField";
 import styles from "./AuthForm.module.css";
 
 export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
@@ -36,12 +37,22 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
 
   return (
     <form className={styles.form} onSubmit={onSubmit}>
-      <h1 className={styles.title}>{isSignUp ? "Create an account" : "Sign in"}</h1>
+      <div className={styles.head}>
+        <h2 className={styles.title}>
+          {isSignUp ? "Create your account" : "Welcome back"}
+        </h2>
+        <p className={styles.subtitle}>
+          {isSignUp
+            ? "Start recording decisions in minutes."
+            : "Sign in to your decision log."}
+        </p>
+      </div>
 
       {isSignUp && (
-        <label className={styles.field}>
+        <label className="field">
           <span>Name</span>
           <input
+            className="input"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -50,9 +61,10 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         </label>
       )}
 
-      <label className={styles.field}>
+      <label className="field">
         <span>Email</span>
         <input
+          className="input"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -61,21 +73,17 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         />
       </label>
 
-      <label className={styles.field}>
-        <span>Password</span>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
-          autoComplete={isSignUp ? "new-password" : "current-password"}
-        />
-      </label>
+      <PasswordField
+        value={password}
+        onChange={setPassword}
+        showMeter={isSignUp}
+        minLength={isSignUp ? 10 : undefined}
+        autoComplete={isSignUp ? "new-password" : "current-password"}
+      />
 
       {error && <p className={styles.error}>{error}</p>}
 
-      <button type="submit" className={styles.submit} disabled={pending}>
+      <button type="submit" className="btn btn--primary" disabled={pending} style={{ width: "100%" }}>
         {pending ? "…" : isSignUp ? "Create account" : "Sign in"}
       </button>
 

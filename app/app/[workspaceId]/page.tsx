@@ -22,25 +22,28 @@ export default async function WorkspacePage({
   if (!workspace) notFound();
 
   const decisions = await decisionService.listDecisions(workspaceId);
-  const proposeHere = propose.bind(null, workspaceId);
-
   const members = await decisionService.listMembers(workspaceId);
   const memberUsers = await usersById(members.map((m) => m.userId));
+
+  const proposeHere = propose.bind(null, workspaceId);
   const inviteHere = inviteMember.bind(null, workspaceId);
+  const article = role === "author" ? "an" : "a";
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
+    <div>
+      <div className={styles.pageHead}>
         <div>
           <p className={styles.crumbs}>
-            <Link href="/app">workspaces</Link> / {workspace.name}
+            <Link href="/app">workspaces</Link>
+            <span className={styles.sep}>/</span>
+            {workspace.name}
           </p>
-          <h1 className={styles.h1}>Decisions</h1>
+          <h1 className={styles.title}>Decisions</h1>
         </div>
-        <p className={styles.crumbs}>
-          you are {role === "author" ? "an" : "a"} {role}
-        </p>
-      </header>
+        <span className={styles.roleTag}>
+          you are {article} {role}
+        </span>
+      </div>
 
       {decisions.length === 0 ? (
         <p className={styles.empty}>No decisions recorded yet.</p>
@@ -50,12 +53,12 @@ export default async function WorkspacePage({
             <li key={decision.id}>
               <Link
                 href={`/app/${workspaceId}/${decision.id}`}
-                className={styles.row}
+                className={styles.card}
               >
-                <span className={styles.num}>
+                <span className={styles.cardNum}>
                   ADR-{String(decision.number).padStart(3, "0")}
                 </span>
-                <span className={styles.rowTitle}>{decision.title}</span>
+                <span className={styles.cardTitle}>{decision.title}</span>
                 <StatusBadge status={decision.status} />
               </Link>
             </li>
@@ -64,26 +67,48 @@ export default async function WorkspacePage({
       )}
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Propose a decision</h2>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>Propose a decision</h2>
+        </div>
         <form action={proposeHere} className={styles.form}>
-          <label>
+          <label className="field">
             <span>Title</span>
-            <input name="title" required placeholder="Use Postgres for primary storage" />
+            <input
+              className="input"
+              name="title"
+              required
+              placeholder="Use Postgres for primary storage"
+            />
           </label>
-          <label>
+          <label className="field">
             <span>Context</span>
-            <textarea name="context" rows={3} placeholder="What is the situation that forces a decision?" />
+            <textarea
+              className="textarea"
+              name="context"
+              rows={3}
+              placeholder="What situation forces a decision?"
+            />
           </label>
-          <label>
+          <label className="field">
             <span>Decision</span>
-            <textarea name="decision" rows={3} placeholder="What have we decided to do?" />
+            <textarea
+              className="textarea"
+              name="decision"
+              rows={3}
+              placeholder="What have we decided to do?"
+            />
           </label>
-          <label>
+          <label className="field">
             <span>Consequences</span>
-            <textarea name="consequences" rows={3} placeholder="What becomes easier or harder as a result?" />
+            <textarea
+              className="textarea"
+              name="consequences"
+              rows={3}
+              placeholder="What becomes easier or harder as a result?"
+            />
           </label>
-          <div className={styles.actionRow}>
-            <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`}>
+          <div className={styles.actions}>
+            <button type="submit" className="btn btn--primary">
               Propose
             </button>
           </div>
@@ -91,17 +116,19 @@ export default async function WorkspacePage({
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Members</h2>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>Members</h2>
+        </div>
         <ul className={styles.list}>
           {members.map((member) => {
             const person = memberUsers.get(member.userId);
             return (
-              <li key={member.userId} className={styles.row}>
-                <span className={styles.rowTitle}>
+              <li key={member.userId} className={styles.memberRow}>
+                <span className={styles.memberName}>
                   {person?.name ?? "Unknown"}
-                  <span className={styles.num}> {person?.email}</span>
+                  <span className={styles.memberEmail}>{person?.email}</span>
                 </span>
-                <span className={styles.badge}>{member.role}</span>
+                <span className="pill">{member.role}</span>
               </li>
             );
           })}
@@ -109,26 +136,27 @@ export default async function WorkspacePage({
 
         {role === "maintainer" && (
           <form action={inviteHere} className={styles.form} style={{ marginTop: "1rem" }}>
-            <label>
+            <label className="field">
               <span>Add a member by email</span>
               <input
+                className="input"
                 type="email"
                 name="email"
                 required
                 placeholder="teammate@example.com"
               />
             </label>
-            <label>
+            <label className="field">
               <span>Role</span>
-              <select name="role" defaultValue="author">
+              <select className="select" name="role" defaultValue="author">
                 <option value="author">author — can propose and revise</option>
                 <option value="maintainer">
                   maintainer — can also accept, reject, supersede
                 </option>
               </select>
             </label>
-            <div className={styles.actionRow}>
-              <button type="submit" className={styles.btn}>
+            <div className={styles.actions}>
+              <button type="submit" className="btn">
                 Add member
               </button>
             </div>

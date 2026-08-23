@@ -1,0 +1,113 @@
+.shell {
+  min-height: 100dvh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  background: color-mix(in oklch, var(--bg) 82%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.mark {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 5px;
+  background: linear-gradient(140deg, var(--accent), oklch(0.55 0.2 300));
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent) 40%, transparent);
+}
+
+.main {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2.25rem 1.25rem 6rem;
+}
+
+/* user menu */
+.userWrap {
+  position: relative;
+}
+
+.avatarBtn {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--r-full);
+}
+.avatarBtn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-full);
+  background: var(--accent-tint);
+  border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  box-shadow: 0 12px 32px oklch(0 0 0 / 0.45);
+  overflow: hidden;
+}
+
+.menuHead {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+.menuName {
+  font-size: 0.875rem;
+  font-weight: 550;
+}
+.menuEmail {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  margin-top: 0.1rem;
+}
+
+.menuItem {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.menuItem:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}

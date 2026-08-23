@@ -3,72 +3,60 @@
   display: grid;
   place-items: center;
   padding: 2rem;
+  background:
+    radial-gradient(120% 80% at 50% -10%, color-mix(in oklch, var(--accent) 12%, transparent), transparent 55%),
+    var(--bg);
 }
 
 .card {
-  max-width: 42rem;
+  max-width: 40rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.1rem;
+  text-align: center;
+  align-items: center;
 }
 
 .kicker {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.8125rem;
-  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.6;
+  color: var(--text-faint);
 }
 
 .title {
-  font-size: clamp(2rem, 5vw, 3rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  line-height: 1.03;
+  letter-spacing: -0.03em;
   font-weight: 600;
 }
 
 .body {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  opacity: 0.8;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-dim);
 }
 
 .stack {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
 }
-
 .stack li {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
   padding: 0.35rem 0.7rem;
-  border: 1px solid color-mix(in oklch, var(--foreground) 18%, transparent);
-  border-radius: 999px;
-  opacity: 0.85;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  color: var(--text-dim);
 }
 
 .cta {
   display: flex;
   gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.ctaPrimary,
-.ctaSecondary {
-  font-size: 0.9375rem;
-  font-weight: 550;
-  padding: 0.6rem 1.1rem;
-  border-radius: 0.5rem;
-}
-
-.ctaPrimary {
-  background: var(--foreground);
-  color: var(--background);
-}
-
-.ctaSecondary {
-  border: 1px solid color-mix(in oklch, var(--foreground) 22%, transparent);
+  margin-top: 1.25rem;
 }
