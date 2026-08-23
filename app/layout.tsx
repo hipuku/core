@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "core",
+  title: "core — decision log",
   description:
-    "A signed-in, multi-user product with version history at its core.",
+    "A team decision log for architecture decision records, with a permission-gated lifecycle and full history.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
