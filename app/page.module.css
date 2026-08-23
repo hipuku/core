@@ -3,9 +3,7 @@
   display: grid;
   place-items: center;
   padding: 2rem;
-  background:
-    radial-gradient(120% 80% at 50% -10%, color-mix(in oklch, var(--accent) 12%, transparent), transparent 55%),
-    var(--bg);
+  background: var(--bg);
 }
 
 .card {

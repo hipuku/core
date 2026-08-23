@@ -26,14 +26,14 @@
   --accent-tint: oklch(0.5 0.16 260 / 0.1);
   --ring: oklch(0.5 0.16 260 / 0.32);
 
-  /* status — retro poster inks */
+  /* status — retro poster inks (independent of the brand accent) */
   --st-proposed: oklch(0.5 0.16 260);
   --st-accepted: oklch(0.5 0.12 165);
-  --st-rejected: oklch(0.55 0.19 30);
+  --st-rejected: oklch(0.53 0.2 28);
   --st-deprecated: oklch(0.55 0.02 70);
   --st-superseded: oklch(0.6 0.13 74);
 
-  --danger: oklch(0.55 0.19 30);
+  --danger: oklch(0.5 0.2 26);
 
   /* radii — tight, paper-like */
   --r-sm: 5px;
@@ -146,6 +146,16 @@ h1, h2, h3, h4 {
 .btn--primary:hover {
   --btn-bg: var(--accent-hover);
   --btn-border: var(--accent-hover);
+}
+.btn--accept {
+  --btn-bg: var(--st-accepted);
+  --btn-border: var(--st-accepted);
+  color: var(--accent-fg);
+  font-weight: 550;
+}
+.btn--accept:hover {
+  --btn-bg: color-mix(in oklch, var(--st-accepted) 86%, black);
+  --btn-border: color-mix(in oklch, var(--st-accepted) 86%, black);
 }
 .btn--ghost {
   --btn-bg: transparent;

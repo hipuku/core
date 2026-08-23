@@ -166,13 +166,10 @@
   align-items: center;
   flex-wrap: wrap;
 }
-/* prominent: awaiting the viewer's approval */
+/* prominent: awaiting the viewer's approval — neutral card, coloured buttons */
 .reviewAction {
-  border-color: color-mix(in oklch, var(--accent) 35%, var(--border));
-  background:
-    linear-gradient(color-mix(in oklch, var(--accent) 5%, transparent), color-mix(in oklch, var(--accent) 5%, transparent)),
-    var(--surface);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
 }
 .reviewOk {
   border-color: color-mix(in oklch, var(--st-accepted) 30%, var(--border));

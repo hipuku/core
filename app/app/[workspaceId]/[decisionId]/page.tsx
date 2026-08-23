@@ -263,7 +263,7 @@ export default async function DecisionPage({
               )}
               {canAccept && (
                 <form action={accept}>
-                  <button type="submit" className="btn btn--primary">Approve</button>
+                  <button type="submit" className="btn btn--accept">Approve</button>
                 </form>
               )}
             </div>
