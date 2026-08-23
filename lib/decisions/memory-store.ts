@@ -61,6 +61,22 @@ export class MemoryDecisionStore implements DecisionStore {
     return { ...record };
   }
 
+  async getWorkspace(id: string): Promise<WorkspaceRecord | null> {
+    const record = this.workspaces.get(id);
+    return record ? { ...record } : null;
+  }
+
+  async listWorkspacesForUser(userId: string): Promise<WorkspaceRecord[]> {
+    const workspaceIds = new Set(
+      [...this.members.values()]
+        .filter((m) => m.userId === userId)
+        .map((m) => m.workspaceId),
+    );
+    return [...this.workspaces.values()]
+      .filter((w) => workspaceIds.has(w.id))
+      .map((w) => ({ ...w }));
+  }
+
   async getDecision(id: string): Promise<DecisionRecord | null> {
     const record = this.decisions.get(id);
     return record ? { ...record } : null;

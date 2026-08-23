@@ -188,6 +188,20 @@ export class DecisionService {
     });
   }
 
+  listWorkspaces(userId: string) {
+    return this.store.listWorkspacesForUser(userId);
+  }
+
+  getWorkspace(id: string) {
+    return this.store.getWorkspace(id);
+  }
+
+  /** The acting user's role in a workspace, or null if they are not a member. */
+  async roleOf(workspaceId: string, userId: string): Promise<Role | null> {
+    const membership = await this.store.getMembership(workspaceId, userId);
+    return membership?.role ?? null;
+  }
+
   getDecision(id: string): Promise<DecisionRecord | null> {
     return this.store.getDecision(id);
   }

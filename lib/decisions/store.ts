@@ -67,6 +67,9 @@ export interface DecisionStore {
     transition: TransitionRecord;
   }): Promise<DecisionRecord>;
 
+  getWorkspace(id: string): Promise<WorkspaceRecord | null>;
+  listWorkspacesForUser(userId: string): Promise<WorkspaceRecord[]>;
+
   getDecision(id: string): Promise<DecisionRecord | null>;
   listDecisions(workspaceId: string): Promise<DecisionRecord[]>;
 

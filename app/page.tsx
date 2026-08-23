@@ -1,6 +1,10 @@
+import Link from "next/link";
+import { getSession } from "@/lib/session";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getSession();
+
   return (
     <main className={styles.main}>
       <div className={styles.card}>
@@ -19,6 +23,22 @@ export default function Home() {
           <li>version history</li>
           <li>Postgres · Drizzle · auth</li>
         </ul>
+        <div className={styles.cta}>
+          {session ? (
+            <Link href="/app" className={styles.ctaPrimary}>
+              Open your workspaces
+            </Link>
+          ) : (
+            <>
+              <Link href="/sign-up" className={styles.ctaPrimary}>
+                Create an account
+              </Link>
+              <Link href="/sign-in" className={styles.ctaSecondary}>
+                Sign in
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </main>
   );

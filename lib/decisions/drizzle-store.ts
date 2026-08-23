@@ -80,6 +80,29 @@ export class DrizzleDecisionStore implements DecisionStore {
     });
   }
 
+  async getWorkspace(id: string): Promise<WorkspaceRecord | null> {
+    const [row] = await db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.id, id))
+      .limit(1);
+    return row ?? null;
+  }
+
+  async listWorkspacesForUser(userId: string): Promise<WorkspaceRecord[]> {
+    return db
+      .select({
+        id: workspaces.id,
+        name: workspaces.name,
+        ownerId: workspaces.ownerId,
+        createdAt: workspaces.createdAt,
+      })
+      .from(workspaces)
+      .innerJoin(memberships, eq(memberships.workspaceId, workspaces.id))
+      .where(eq(memberships.userId, userId))
+      .orderBy(asc(workspaces.createdAt));
+  }
+
   async getDecision(id: string): Promise<DecisionRecord | null> {
     const [row] = await db
       .select()

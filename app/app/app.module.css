@@ -1,0 +1,246 @@
+.page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+}
+
+.crumbs {
+  font-size: 0.8125rem;
+  font-family: var(--font-geist-mono), monospace;
+  opacity: 0.6;
+}
+
+.crumbs a {
+  text-decoration: underline;
+}
+
+.h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 0.35rem;
+}
+
+.linkBtn {
+  font: inherit;
+  font-size: 0.85rem;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.linkBtn:hover {
+  opacity: 1;
+}
+
+/* lists */
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  border-radius: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.row:hover {
+  border-color: color-mix(in oklch, var(--foreground) 28%, transparent);
+}
+
+.num {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.8125rem;
+  opacity: 0.55;
+  min-width: 4rem;
+}
+
+.rowTitle {
+  flex: 1;
+  font-weight: 500;
+}
+
+.empty {
+  opacity: 0.6;
+  font-size: 0.95rem;
+  padding: 1rem 0;
+}
+
+/* status badges */
+.badge {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.proposed { color: oklch(0.7 0.13 250); }
+.accepted { color: oklch(0.68 0.15 150); }
+.rejected { color: oklch(0.66 0.19 25); }
+.deprecated { color: oklch(0.7 0.03 260); opacity: 0.8; }
+.superseded { color: oklch(0.72 0.12 85); }
+
+/* forms */
+.section {
+  margin-top: 2.5rem;
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 0.85rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 40rem;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.form label span {
+  opacity: 0.7;
+}
+
+.form input,
+.form textarea,
+.form select {
+  font: inherit;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklch, var(--foreground) 20%, transparent);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  color: inherit;
+  resize: vertical;
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.btn {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklch, var(--foreground) 22%, transparent);
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  color: inherit;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+/* ADR body */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.bodyBlock h3 {
+  font-size: 0.8rem;
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 0.4rem;
+}
+
+.bodyBlock p {
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* history */
+.trail {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.trailItem {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: 0.9rem;
+}
+
+.trailMeta {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+.changes {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+.opAdd { color: oklch(0.68 0.15 150); }
+.opRemove { color: oklch(0.66 0.19 25); }
+.opReplace { color: oklch(0.72 0.12 85); }
+
+.supersedeNote {
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklch, var(--foreground) 15%, transparent);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  margin-top: 1rem;
+}
+
+.supersedeNote a {
+  text-decoration: underline;
+}

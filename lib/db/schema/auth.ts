@@ -37,6 +37,9 @@ export const account = pgTable("account", {
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
+  // better-auth 1.7 scopes account identity by issuer; set for credential and
+  // OAuth accounts alike. Nullable so existing rows and backfill are tolerated.
+  issuer: text("issuer"),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
