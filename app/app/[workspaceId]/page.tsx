@@ -4,7 +4,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
-import { inviteMember, propose } from "../actions";
+import { inviteMember } from "../actions";
 import styles from "../app.module.css";
 
 export default async function WorkspacePage({
@@ -25,7 +25,6 @@ export default async function WorkspacePage({
   const members = await decisionService.listMembers(workspaceId);
   const memberUsers = await usersById(members.map((m) => m.userId));
 
-  const proposeHere = propose.bind(null, workspaceId);
   const inviteHere = inviteMember.bind(null, workspaceId);
   const article = role === "author" ? "an" : "a";
 
@@ -39,22 +38,24 @@ export default async function WorkspacePage({
             {workspace.name}
           </p>
           <h1 className={styles.title}>Decisions</h1>
+          <p className={styles.sub}>
+            You are {article} {role} in this workspace.
+          </p>
         </div>
-        <span className={styles.roleTag}>
-          you are {article} {role}
-        </span>
+        <Link href={`/app/${workspaceId}/new`} className="btn btn--primary">
+          New decision
+        </Link>
       </div>
 
       {decisions.length === 0 ? (
-        <p className={styles.empty}>No decisions recorded yet.</p>
+        <p className={styles.empty}>
+          No decisions yet. Propose the first one to start the log.
+        </p>
       ) : (
         <ul className={styles.list}>
           {decisions.map((decision) => (
             <li key={decision.id}>
-              <Link
-                href={`/app/${workspaceId}/${decision.id}`}
-                className={styles.card}
-              >
+              <Link href={`/app/${workspaceId}/${decision.id}`} className={styles.card}>
                 <span className={styles.cardNum}>
                   ADR-{String(decision.number).padStart(3, "0")}
                 </span>
@@ -65,55 +66,6 @@ export default async function WorkspacePage({
           ))}
         </ul>
       )}
-
-      <section className={styles.section}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Propose a decision</h2>
-        </div>
-        <form action={proposeHere} className={styles.form}>
-          <label className="field">
-            <span>Title</span>
-            <input
-              className="input"
-              name="title"
-              required
-              placeholder="Use Postgres for primary storage"
-            />
-          </label>
-          <label className="field">
-            <span>Context</span>
-            <textarea
-              className="textarea"
-              name="context"
-              rows={3}
-              placeholder="What situation forces a decision?"
-            />
-          </label>
-          <label className="field">
-            <span>Decision</span>
-            <textarea
-              className="textarea"
-              name="decision"
-              rows={3}
-              placeholder="What have we decided to do?"
-            />
-          </label>
-          <label className="field">
-            <span>Consequences</span>
-            <textarea
-              className="textarea"
-              name="consequences"
-              rows={3}
-              placeholder="What becomes easier or harder as a result?"
-            />
-          </label>
-          <div className={styles.actions}>
-            <button type="submit" className="btn btn--primary">
-              Propose
-            </button>
-          </div>
-        </form>
-      </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHead}>
@@ -128,7 +80,9 @@ export default async function WorkspacePage({
                   {person?.name ?? "Unknown"}
                   <span className={styles.memberEmail}>{person?.email}</span>
                 </span>
-                <span className="pill">{member.role}</span>
+                <span className={`pill pill--${member.role === "maintainer" ? "accepted" : "proposed"}`}>
+                  {member.role}
+                </span>
               </li>
             );
           })}
@@ -138,27 +92,17 @@ export default async function WorkspacePage({
           <form action={inviteHere} className={styles.form} style={{ marginTop: "1rem" }}>
             <label className="field">
               <span>Add a member by email</span>
-              <input
-                className="input"
-                type="email"
-                name="email"
-                required
-                placeholder="teammate@example.com"
-              />
+              <input className="input" type="email" name="email" required placeholder="teammate@example.com" />
             </label>
             <label className="field">
               <span>Role</span>
               <select className="select" name="role" defaultValue="author">
                 <option value="author">author — can propose and revise</option>
-                <option value="maintainer">
-                  maintainer — can also accept, reject, supersede
-                </option>
+                <option value="maintainer">maintainer — can also accept, reject, supersede</option>
               </select>
             </label>
             <div className={styles.actions}>
-              <button type="submit" className="btn">
-                Add member
-              </button>
+              <button type="submit" className="btn">Add member</button>
             </div>
           </form>
         )}

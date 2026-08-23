@@ -1,4 +1,4 @@
-/* page header */
+/* ---- page header ------------------------------------------------------- */
 .pageHead {
   display: flex;
   align-items: flex-start;
@@ -6,15 +6,13 @@
   gap: 1rem;
   margin-bottom: 2rem;
 }
-
 .crumbs {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--text-faint);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.55rem;
 }
 .crumbs a:hover {
   color: var(--text-dim);
@@ -22,51 +20,46 @@
 .sep {
   opacity: 0.5;
 }
-
 .title {
-  font-size: 1.6rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
 }
-
 .sub {
   color: var(--text-dim);
-  font-size: 0.9rem;
-  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  margin-top: 0.4rem;
 }
-
 .roleTag {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-faint);
 }
 
-/* lists */
+/* ---- lists ------------------------------------------------------------- */
 .list {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
-
 .card {
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 0.8rem 1rem;
+  padding: 0.85rem 1rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  transition: border-color 0.12s ease, background 0.12s ease;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 .card:hover {
   border-color: var(--border-strong);
-  background: var(--surface-2);
+  box-shadow: var(--shadow);
 }
-
 .cardNum {
-  font-family: var(--font-mono);
   font-size: 0.78rem;
+  font-weight: 600;
   color: var(--text-faint);
   min-width: 4.2rem;
 }
@@ -74,16 +67,16 @@
   flex: 1;
   font-weight: 500;
 }
-
 .empty {
-  padding: 2rem;
+  padding: 2.5rem;
   text-align: center;
   color: var(--text-faint);
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--border-strong);
   border-radius: var(--r-lg);
+  background: var(--surface);
 }
 
-/* sections */
+/* ---- sections ---------------------------------------------------------- */
 .section {
   margin-top: 2.75rem;
 }
@@ -94,18 +87,15 @@
   margin-bottom: 1rem;
 }
 .sectionTitle {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-faint);
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--text);
 }
-
 .form {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  max-width: 40rem;
+  max-width: 42rem;
 }
 .actions {
   display: flex;
@@ -114,141 +104,157 @@
   align-items: center;
 }
 
-/* ADR detail: two columns */
-.detail {
-  display: grid;
-  grid-template-columns: 1fr 15rem;
-  gap: 2.5rem;
-  align-items: start;
-}
-@media (max-width: 720px) {
-  .detail {
-    grid-template-columns: 1fr;
-  }
-}
-
-.adrBody {
+/* ---- ADR detail: properties row ---------------------------------------- */
+.props {
   display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-}
-.adrBlock h3 {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  margin-bottom: 0.5rem;
-}
-.adrBlock p {
-  line-height: 1.65;
-  white-space: pre-wrap;
-  color: var(--text);
-}
-
-/* right rail */
-.rail {
-  position: sticky;
-  top: 76px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-.railCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 1rem;
-}
-.railLabel {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  margin-bottom: 0.7rem;
-}
-.metaRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  font-size: 0.82rem;
-  padding: 0.3rem 0;
-}
-.metaRow dt {
-  color: var(--text-faint);
-}
-.metaRow dd {
-  color: var(--text-dim);
-  text-align: right;
-}
-.railActions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.railActions .form {
-  gap: 0.6rem;
-}
-
-.supersedeNote {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  font-size: 0.88rem;
-  padding: 0.7rem 0.9rem;
-  border-radius: var(--r);
-  border: 1px solid color-mix(in oklch, var(--st-superseded) 30%, transparent);
-  background: color-mix(in oklch, var(--st-superseded) 8%, transparent);
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   margin-bottom: 1.75rem;
 }
-.supersedeNote a {
+.prop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.propLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.propValue {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.propValue a:hover {
+  color: var(--accent);
+}
+
+/* ---- review banner ----------------------------------------------------- */
+.review {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.15rem;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 2rem;
+}
+.reviewText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.reviewTitle {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.reviewSub {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.reviewActions {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+/* prominent: awaiting the viewer's approval */
+.reviewAction {
+  border-color: color-mix(in oklch, var(--accent) 35%, var(--border));
+  background:
+    linear-gradient(color-mix(in oklch, var(--accent) 5%, transparent), color-mix(in oklch, var(--accent) 5%, transparent)),
+    var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.reviewOk {
+  border-color: color-mix(in oklch, var(--st-accepted) 30%, var(--border));
+  background: color-mix(in oklch, var(--st-accepted) 6%, var(--surface));
+}
+.reviewTerminal {
+  background: var(--surface-2);
+  color: var(--text-dim);
+}
+.reviewTerminal .reviewTitle {
+  color: var(--text-dim);
+}
+.reviewLink {
   color: var(--st-superseded);
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-/* lifecycle stepper */
-.stepper {
+/* ---- tabs -------------------------------------------------------------- */
+.tabs {
   display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin: 0.4rem 0 0.2rem;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.75rem;
 }
-.step {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.78rem;
-  color: var(--text-faint);
+.tab {
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
-.stepDot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: var(--border-strong);
-}
-.stepOn {
+.tab:hover {
   color: var(--text);
 }
-.stepOn .stepDot {
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-tint);
+.tabOn {
+  color: var(--text);
+  border-bottom-color: var(--accent);
 }
-.stepLine {
-  width: 1.1rem;
-  height: 1px;
-  background: var(--border);
+.tabCount {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin-left: 0.3rem;
 }
 
-/* timeline (history) */
+/* ---- document body ----------------------------------------------------- */
+.doc {
+  display: flex;
+  flex-direction: column;
+  gap: 1.9rem;
+  max-width: 44rem;
+}
+.docBlock h3 {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.5rem;
+}
+.docBlock p {
+  line-height: 1.7;
+  white-space: pre-wrap;
+  color: var(--text);
+  font-size: 1rem;
+}
+.docEmpty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* ---- activity: timeline ------------------------------------------------ */
 .timeline {
   display: flex;
   flex-direction: column;
+  max-width: 44rem;
 }
 .tlItem {
   position: relative;
-  padding: 0 0 1.1rem 1.4rem;
+  padding: 0 0 1.35rem 1.5rem;
   border-left: 1px solid var(--border);
 }
 .tlItem:last-child {
@@ -258,13 +264,13 @@
 .tlItem::before {
   content: "";
   position: absolute;
-  left: -0.31rem;
-  top: 0.25rem;
-  width: 0.6rem;
-  height: 0.6rem;
+  left: -0.33rem;
+  top: 0.2rem;
+  width: 0.62rem;
+  height: 0.62rem;
   border-radius: 50%;
-  background: var(--surface-3);
-  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
 }
 .tlHead {
   display: flex;
@@ -273,42 +279,57 @@
   flex-wrap: wrap;
 }
 .tlMsg {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 .tlMeta {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--text-faint);
+  margin-top: 0.15rem;
 }
 .changes {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  margin-top: 0.45rem;
+  margin-top: 0.5rem;
   font-family: var(--font-mono);
-  font-size: 0.76rem;
+  font-size: 0.78rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 0.55rem 0.7rem;
 }
-.opAdd { color: var(--st-accepted); }
-.opRemove { color: var(--st-rejected); }
-.opReplace { color: var(--st-superseded); }
+.opAdd { color: color-mix(in oklch, var(--st-accepted) 80%, black); }
+.opRemove { color: color-mix(in oklch, var(--st-rejected) 85%, black); }
+.opReplace { color: color-mix(in oklch, var(--st-superseded) 80%, black); }
 
-/* members */
+/* ---- members ----------------------------------------------------------- */
 .memberRow {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.65rem 0.9rem;
+  padding: 0.7rem 0.95rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
 }
 .memberName {
   flex: 1;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
+  font-weight: 500;
 }
 .memberEmail {
   color: var(--text-faint);
   font-size: 0.82rem;
   margin-left: 0.4rem;
+  font-weight: 400;
+}
+
+/* ---- compose ----------------------------------------------------------- */
+.compose {
+  max-width: 42rem;
+}
+.hint {
+  font-size: 0.82rem;
+  color: var(--text-faint);
 }

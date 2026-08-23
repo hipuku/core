@@ -96,9 +96,9 @@ h1, h2, h3, h4 {
 }
 
 .eyebrow {
-  font-family: var(--font-mono);
   font-size: 0.72rem;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
@@ -220,10 +220,9 @@ h1, h2, h3, h4 {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   padding: 0.22rem 0.5rem;
   border-radius: var(--r-full);
