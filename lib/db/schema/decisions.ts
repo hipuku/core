@@ -5,6 +5,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
@@ -53,24 +54,31 @@ export const memberships = pgTable(
  * replaced this one — present only once this decision is superseded — which makes
  * "superseded by" a column read and "supersedes" its inverse query.
  */
-export const decisions = pgTable("decisions", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  workspaceId: uuid("workspace_id")
-    .notNull()
-    .references(() => workspaces.id, { onDelete: "cascade" }),
-  number: integer("number").notNull(),
-  title: text("title").notNull(),
-  status: decisionStatus("status").notNull().default("proposed"),
-  authorId: text("author_id")
-    .notNull()
-    .references(() => user.id),
-  documentId: uuid("document_id")
-    .notNull()
-    .references(() => documents.id, { onDelete: "cascade" }),
-  supersededById: uuid("superseded_by_id"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+export const decisions = pgTable(
+  "decisions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    status: decisionStatus("status").notNull().default("proposed"),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => user.id),
+    documentId: uuid("document_id")
+      .notNull()
+      .references(() => documents.id, { onDelete: "cascade" }),
+    supersededById: uuid("superseded_by_id"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  // ADR numbers are unique per workspace. If two proposals race for the same number,
+  // one insert loses on this constraint and retries — the integrity guarantee the
+  // application-level max()+1 cannot make on its own.
+  (table) => [unique("decisions_workspace_number_key").on(table.workspaceId, table.number)],
+);
 
 /**
  * The append-only status audit trail — the decision's own history, distinct from the
