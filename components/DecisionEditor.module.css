@@ -1,0 +1,365 @@
+/* ============================================================================
+   Compose / revise a decision.
+
+   The governing idea: writing and reading are the same surface. Previously the
+   write mode was three grey form fields and only Preview looked like a
+   document, so the product's own promise — this is a document, not a ticket —
+   was broken during the activity that takes the longest. Now the fields carry
+   no fill and no border, the type scale matches the rendered prose exactly, and
+   Preview is a check on rendering rather than a mode you have to live in.
+   ============================================================================ */
+
+.editor {
+  max-width: 54rem;
+  margin: 0 auto;
+}
+
+/* ---- properties strip ---------------------------------------------------
+   The governance is the product; the compose screen used to say nothing about
+   it. This is what the document becomes the moment it is proposed. */
+.props {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  padding: 0 0.25rem 0.9rem;
+}
+.propGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.propLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.propDivider {
+  width: 1px;
+  height: 14px;
+  background: var(--border-strong);
+}
+.headingTitle {
+  font-size: 0.92rem;
+  font-weight: 550;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.propNote {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  margin-left: auto;
+}
+
+/* ---- sticky action bar --------------------------------------------------
+   Sits directly under the 60px topbar so the mode switch, the formatting tools
+   and Propose stay reachable however long the document gets. */
+.bar {
+  position: sticky;
+  top: 60px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0 0.7rem;
+  margin-bottom: 1rem;
+  /* The bar overlaps the document as it scrolls under, so it needs the desk
+     colour behind it — and a hairline to separate the two once they meet. */
+  background: var(--bg);
+  border-bottom: 1px solid transparent;
+}
+.barLeft,
+.barRight {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Write / Preview */
+.seg {
+  display: inline-flex;
+  padding: 0.2rem;
+  border-radius: var(--r);
+  background: var(--surface-3);
+  flex: none;
+}
+.segBtn {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border: none;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.segBtn:hover {
+  color: var(--text);
+}
+.segOn {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- formatting toolbar -------------------------------------------------
+   Its real job is to *say* this is markdown. Someone who has never typed a `#`
+   can still write a heading, and in doing so watches the syntax appear in the
+   text — the toolbar teaches the shortcut it is replacing. */
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--border);
+}
+/* The shared icon affordance, one notch larger — a toolbar is scanned at
+   arm's length and its targets are pressed repeatedly. */
+.tool {
+  --ib-size: 30px;
+  color: var(--text-dim);
+}
+
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.confirmText {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* ---- recovered draft ----------------------------------------------------
+   Offered, never applied silently: replacing what someone sees with older text
+   is its own kind of loss. */
+.recovered {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1rem;
+  border-radius: var(--r);
+  background: color-mix(in oklch, var(--st-deprecated) 12%, var(--surface));
+  border: 1px solid color-mix(in oklch, var(--st-deprecated) 30%, transparent);
+  color: color-mix(in oklch, var(--st-deprecated) 80%, black);
+}
+.recoveredIcon {
+  flex: none;
+}
+.recoveredActions {
+  display: inline-flex;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+/* ---- the document sheet -------------------------------------------------- */
+.sheet {
+  padding: 2.75rem 3rem 3rem;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The title is the H1 it becomes, not a form control. */
+.title {
+  font: inherit;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.15;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 2rem;
+  border: none;
+  background: none;
+  color: var(--text);
+}
+.title::placeholder {
+  color: var(--text-faint);
+}
+.title:focus-visible {
+  outline: none;
+}
+
+/* ---- blocks -------------------------------------------------------------
+   The section label sits in the gutter's left rule rather than on a filled
+   box, so the ADR's structure stays legible without the page reading as a
+   form. On focus the rule takes the accent: the only chrome the editor has. */
+.block {
+  border: none;
+  padding: 0 0 0 1.1rem;
+  margin: 0 0 2rem;
+  border-left: 2px solid var(--border);
+  transition: border-color 0.14s ease;
+}
+.block:last-of-type {
+  margin-bottom: 0;
+}
+.block:focus-within {
+  border-left-color: var(--accent);
+}
+.blockLabel {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.45rem;
+  padding: 0;
+}
+.block:focus-within > .blockLabel {
+  color: var(--accent);
+}
+
+.blockHint {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-faint);
+  margin: -0.15rem 0 0.6rem;
+  max-width: 44rem;
+}
+
+/* No fill, no border, no rounded box. Type identical to `.prose` in Markdown
+   .module.css, so a paragraph does not reflow or resize between Write and
+   Preview — the strongest signal that these are one surface, not two. */
+.area {
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.7;
+  display: block;
+  width: 100%;
+  min-height: 3.4rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  overflow: hidden;
+  resize: none;
+  /* Markdown is whitespace-significant; a tab must render as a tab. */
+  tab-size: 2;
+}
+.area::placeholder {
+  color: var(--text-faint);
+}
+.area:focus,
+.area:focus-visible {
+  outline: none;
+}
+
+.hidden {
+  display: none;
+}
+
+
+
+
+/* ---- preview ------------------------------------------------------------
+   Deliberately the same metrics as the write pane above. */
+.pvTitle {
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.15;
+  margin-bottom: 2rem;
+}
+.pvUntitled {
+  color: var(--text-faint);
+}
+.pvRefs {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.pvEmpty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* ---- footer -------------------------------------------------------------- */
+.footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.9rem 0.25rem 0;
+}
+.syntax {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+.syntax kbd {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.1rem 0.3rem;
+  margin: 0 0.1rem;
+  border-radius: 4px;
+  background: var(--surface-3);
+  color: var(--text-dim);
+}
+.note {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+/* ---- narrow screens ------------------------------------------------------
+   The bar wraps to two rows on a phone, which would let the document scroll
+   underneath a taller sticky element — so it stops being sticky there. */
+@media (max-width: 720px) {
+  .bar {
+    position: static;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet {
+    padding: 1.5rem 1.25rem 1.75rem;
+  }
+  .title,
+  .pvTitle {
+    font-size: 1.5rem;
+  }
+  .block {
+    padding-left: 0.8rem;
+  }
+  .recoveredActions,
+  .note {
+    margin-left: 0;
+  }
+}
+
+/* ---- unsaved-work modal -------------------------------------------------- */
+.modalText {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin-bottom: 1.4rem;
+}
+
+/* One right-aligned cluster, weighted left to right: the destructive option
+   lowest, the safe dismissal next, the recommended action last and filled.
+   Splitting them to opposite edges made the dialog read as two decisions. */
+.modalActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,54 @@
+/* Drafts head the decisions list and share its card, so the two read as one
+   sequence. The metrics here deliberately match `.list` / `.card` in
+   app.module.css — the difference between a draft and a decision is the tag it
+   carries, not the box it sits in. */
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.14s ease, transform 0.14s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.cardNum {
+  flex: none;
+  min-width: 5.2rem;
+}
+.cardTitle {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* A name taken from the body rather than typed as a title — shown dimmer, so a
+   list of drafts still tells you which ones you have actually named. */
+.derived {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.when {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
