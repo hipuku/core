@@ -1,0 +1,111 @@
+/* One card holding the decision's current state and, on request, the history
+   behind it. It grows downwards rather than pushing a second surface onto the
+   page — the history is this record at greater depth, not a neighbour of it. */
+.card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.14s ease;
+}
+/* Open, it holds more of the page's attention, so it lifts slightly. */
+.cardOpen {
+  box-shadow: var(--shadow);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.75rem;
+  padding: 1.1rem 1.25rem;
+  min-width: 0;
+}
+
+/* ---- the handle ---------------------------------------------------------
+   A band of its own, and the whole width of it is the target — far easier to
+   hit than a 36px button, and it makes the card visibly continue past its
+   properties. */
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  padding: 0.7rem 1.25rem;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.handle:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.handle:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+/* Open, the panel below owns the card's bottom corners. */
+.cardOpen .handle {
+  border-radius: 0;
+}
+
+.summary {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+.when {
+  color: inherit;
+}
+.dot,
+.events {
+  color: var(--text-faint);
+}
+
+.affordance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.chevron {
+  transition: transform 0.16s ease;
+}
+.cardOpen .chevron {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
+/* No rule of its own: the handle above already draws the line, and a second
+   one would box the history in rather than let it hang off the handle. */
+.panel {
+  padding: 0.5rem 1.25rem 1.5rem;
+}
+
+@media (max-width: 720px) {
+  .head {
+    padding: 1rem;
+    gap: 1.1rem;
+  }
+  .handle {
+    padding: 0.7rem 1rem;
+  }
+  .panel {
+    padding: 0.5rem 1rem 1.25rem;
+  }
+}

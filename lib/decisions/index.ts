@@ -5,10 +5,18 @@ import { DrizzleDecisionStore } from "./drizzle-store";
 export * from "./types";
 export * from "./lifecycle";
 export { referenceDrift, isStale, type DriftStatus } from "./drift";
+export {
+  compareSnippet,
+  extractRange,
+  formatRange,
+  parseRange,
+  type LineRange,
+} from "./snippet";
 export { decisionLabel, deriveWorkspaceKey } from "./key";
 export type {
   DecisionRecord,
   DecisionStore,
+  DraftRecord,
   MembershipRecord,
   ReferenceKind,
   ReferenceRecord,

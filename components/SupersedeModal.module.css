@@ -1,0 +1,13 @@
+.text {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin-bottom: 1.1rem;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}

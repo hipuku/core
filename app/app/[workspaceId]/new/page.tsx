@@ -1,17 +1,18 @@
-import { Send } from "lucide-react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DecisionEditor } from "@/components/DecisionEditor";
 import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
-import { propose } from "../../actions";
-import styles from "../../app.module.css";
+import { discardDraft, propose, saveDraft } from "../../actions";
 
 export default async function NewDecisionPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ workspaceId: string }>;
+  searchParams: Promise<{ draft?: string }>;
 }) {
   const { workspaceId } = await params;
+  const { draft: draftId } = await searchParams;
   const user = await requireUser();
 
   const role = await decisionService.roleOf(workspaceId, user.id);
@@ -20,46 +21,35 @@ export default async function NewDecisionPage({
   const workspace = await decisionService.getWorkspace(workspaceId);
   if (!workspace) notFound();
 
-  return (
-    <div className={styles.compose}>
-      <div className={styles.pageHead}>
-        <div>
-          <h1 className={styles.title}>Propose a decision</h1>
-          <p className={styles.sub}>
-            It starts as a proposal. A maintainer reviews and accepts it.
-          </p>
-        </div>
-      </div>
+  const nextKey = await decisionService.peekNextLabel(workspaceId);
+  const repos = await decisionService.listWorkspaceRepos(workspaceId);
 
-      <form action={propose.bind(null, workspaceId)} className={styles.form}>
-        <p className={styles.hint}>
-          Context, Decision, and Consequences support Markdown — including code
-          blocks and <code>```mermaid</code> diagrams.
-        </p>
-        <label className="field">
-          <span>Title</span>
-          <input className="input" name="title" required placeholder="Use Postgres for primary storage" />
-        </label>
-        <label className="field">
-          <span>Context</span>
-          <textarea className="textarea" name="context" rows={4} placeholder="What situation forces a decision? What constraints matter?" />
-        </label>
-        <label className="field">
-          <span>Decision</span>
-          <textarea className="textarea" name="decision" rows={4} placeholder="What are we deciding to do?" />
-        </label>
-        <label className="field">
-          <span>Consequences</span>
-          <textarea className="textarea" name="consequences" rows={4} placeholder="What becomes easier or harder? What do we accept as a trade-off?" />
-        </label>
-        <div className={styles.actions}>
-          <button type="submit" className="btn btn--primary">
-            <Send size={16} />
-            Propose decision
-          </button>
-          <Link href={`/app/${workspaceId}`} className="btn btn--ghost">Cancel</Link>
-        </div>
-      </form>
-    </div>
+  // Only ever the acting user's own draft — `getDraft` returns null otherwise,
+  // so a guessed id opens an empty compose screen rather than someone's work.
+  const draft = draftId ? await decisionService.getDraft(draftId, user.id) : null;
+
+  return (
+    <DecisionEditor
+      action={propose.bind(null, workspaceId)}
+      onSaveDraft={saveDraft.bind(null, workspaceId)}
+      cancelHref={`/app/${workspaceId}`}
+      submitLabel="Propose decision"
+      withTitle
+      defaultTitle={draft?.title ?? ""}
+      defaults={draft?.body ?? { context: "", decision: "", consequences: "" }}
+      defaultCited={draft?.refs ?? []}
+      workspaceId={workspaceId}
+      citable={repos.map((r) => ({
+        repo: `${r.owner}/${r.name}`,
+        branch: r.defaultBranch,
+      }))}
+      draftId={draft?.id}
+      onDiscardDraft={async (id) => {
+        "use server";
+        await discardDraft(workspaceId, id);
+      }}
+      draftKey={`${workspaceId}:${draft?.id ?? "new"}`}
+      nextKey={nextKey ?? undefined}
+    />
   );
 }

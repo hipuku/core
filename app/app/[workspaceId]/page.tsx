@@ -2,8 +2,9 @@ import { Plus, Settings } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
+import { DraftList } from "@/components/DraftList";
 import { StatusBadge } from "@/components/StatusBadge";
-import { brandColor } from "@/lib/brand";
+import { repoChipColor } from "@/lib/brand";
 import { decisionLabel, decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "../app.module.css";
@@ -22,8 +23,13 @@ export default async function WorkspacePage({
   const workspace = await decisionService.getWorkspace(workspaceId);
   if (!workspace) notFound();
 
-  const decisions = await decisionService.listDecisions(workspaceId);
+  // Newest first: a decision log is read from the current state backwards, and
+  // the number already carries the chronology, so no separate sort is needed.
+  const decisions = (await decisionService.listDecisions(workspaceId))
+    .slice()
+    .reverse();
   const repos = await decisionService.listWorkspaceRepos(workspaceId);
+  const drafts = await decisionService.listDrafts(workspaceId, user.id);
   const article = role === "author" ? "an" : "a";
 
   return (
@@ -56,9 +62,27 @@ export default async function WorkspacePage({
         </div>
       </div>
 
-      {decisions.length === 0 ? (
+      {/* Drafts head the list: same card, told apart by their tag. */}
+      <DraftList
+        workspaceId={workspaceId}
+        workspaceKey={workspace.key}
+        drafts={drafts.map((d) => ({
+          id: d.id,
+          title: d.title,
+          body: d.body,
+          // Dates do not survive the server/client boundary as Dates.
+          updatedAt: d.updatedAt.toISOString(),
+        }))}
+      />
+
+      {decisions.length === 0 && drafts.length === 0 ? (
         <p className={styles.empty}>
           No decisions yet. Propose the first one to start the log.
+        </p>
+      ) : decisions.length === 0 ? (
+        <p className={styles.empty}>
+          Nothing proposed yet — your draft above is not visible to anyone else
+          until you propose it.
         </p>
       ) : (
         <ul className={styles.list}>
@@ -66,7 +90,9 @@ export default async function WorkspacePage({
             <li key={decision.id}>
               <Link href={`/app/${workspaceId}/${decision.id}`} className={styles.card}>
                 <span className={styles.cardNum}>
-                  {decisionLabel(workspace.key, decision.number)}
+                  <span className="key-chip">
+                    {decisionLabel(workspace.key, decision.number)}
+                  </span>
                 </span>
                 <span className={styles.cardTitle}>{decision.title}</span>
                 <StatusBadge status={decision.status} />
@@ -86,7 +112,7 @@ export default async function WorkspacePage({
               <span
                 key={repo.id}
                 className={styles.wsRepo}
-                style={{ "--chip": brandColor(i) } as CSSProperties}
+                style={{ "--chip": repoChipColor(i) } as CSSProperties}
               >
                 {repo.owner}/{repo.name}
               </span>

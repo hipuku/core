@@ -6,6 +6,13 @@
   gap: 1rem;
   margin-bottom: 2rem;
 }
+.headMain {
+  flex: 1;
+  min-width: 0;
+}
+.headKey {
+  margin-bottom: 0.5rem;
+}
 .title {
   font-size: 1.7rem;
   font-weight: 700;
@@ -53,10 +60,8 @@
   transform: translateY(-1px);
 }
 .cardNum {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-faint);
-  min-width: 4.2rem;
+  flex: none;
+  min-width: 5.2rem;
 }
 .cardTitle {
   flex: 1;
@@ -150,18 +155,34 @@
   gap: 0.6rem;
   align-items: center;
 }
-
-/* ---- ADR detail: properties row ---------------------------------------- */
-.props {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.75rem;
-  padding: 1rem 1.15rem;
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 1.75rem;
+.headMain {
+  flex: 1;
+  min-width: 0;
 }
+.headKey {
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================================================
+   The decision page
+
+   One rule holds it together: **only the document is paper.** The white sheet
+   is the decision itself; everything else — its properties, its notices, its
+   tabs — is annotation *about* the document and sits directly on the desk. That
+   is what stops the page becoming five cards of varying width arguing about
+   which one matters.
+
+   And one measure. Every region shares the sheet's 54rem column, so the page
+   has two vertical edges rather than six.
+   ============================================================================ */
+
+.decisionPage {
+  max-width: 54rem;
+}
+
+/* ---- property values ----------------------------------------------------
+   The properties row itself lives in DecisionMeta.module.css, which owns the
+   card they sit in. These are the value-level styles the page still renders. */
 .prop {
   display: flex;
   flex-direction: column;
@@ -181,139 +202,160 @@
 .propValue a:hover {
   color: var(--accent);
 }
+/* A secondary fact inside a property — "3 days ago" beside a date. */
+.propAside {
+  color: var(--text-faint);
+  margin-left: 0.4rem;
+}
 
-/* ---- review banner ----------------------------------------------------- */
-.review {
+/* ---- notice -------------------------------------------------------------
+   One shape, one job: something is wrong with this decision that the reader
+   should know before reading it. Tinted, never elevated — raising it would put
+   it in competition with the sheet, and what makes a notice urgent is what it
+   says, not how far off the page it floats.
+
+   Everything else that used to be a banner is now a property in the meta card,
+   because state and authorship are facts about the record, not warnings. */
+.notice {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  padding: 1rem 1.15rem;
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 2rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--r);
+  margin-bottom: 1.5rem;
+  background: var(--surface-2);
+  border-left: 3px solid var(--border-strong);
 }
-.reviewText {
+.noticeText {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  min-width: 0;
 }
-.reviewTitle {
+.noticeTitle {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
-.reviewSub {
+.noticeSub {
   font-size: 0.85rem;
   color: var(--text-dim);
 }
-.reviewActions {
-  display: flex;
-  gap: 0.55rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-/* prominent: awaiting the viewer's approval — raised card, coloured buttons */
-.reviewAction {
-  box-shadow: var(--shadow);
-}
-.reviewOk {
-  background: color-mix(in oklch, var(--st-accepted) 9%, var(--surface));
-}
-.reviewTerminal {
-  background: var(--surface-3);
-  color: var(--text-dim);
-  box-shadow: none;
-}
-.reviewTerminal .reviewTitle {
-  color: var(--text-dim);
-}
-.reviewLink {
-  color: var(--st-superseded);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+
+.noticeWarn {
+  background: color-mix(in oklch, var(--st-superseded) 12%, var(--surface));
+  border-left-color: var(--st-superseded);
 }
 
-/* ---- staleness banner -------------------------------------------------- */
-.staleBanner {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.7rem;
-  padding: 0.9rem 1.1rem;
-  margin-bottom: 2rem;
+
+
+/* ---- the sheet ----------------------------------------------------------
+   The one piece of paper on the page, and what the tabs swap the contents of.
+   Same padding, radius and measure as the editor's sheet, so Edit changes what
+   you can do and not what you are looking at. */
+.sheet {
+  padding: 2.75rem 3rem;
+  background: var(--surface);
   border-radius: var(--r-lg);
-  background: color-mix(in oklch, var(--st-superseded) 15%, var(--surface));
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-.staleDot {
-  flex: none;
-  width: 0.55rem;
-  height: 0.55rem;
-  margin-top: 0.35rem;
-  border-radius: 50%;
-  background: var(--st-superseded);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ---- tabs -------------------------------------------------------------- */
-.tabs {
-  display: flex;
-  gap: 0.25rem;
-  margin-bottom: 1.75rem;
-}
-.tab {
-  padding: 0.55rem 0.85rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-dim);
-  border-bottom: 2px solid transparent;
-}
-.tab:hover {
-  color: var(--text);
-}
-.tabOn {
-  color: var(--text);
-  border-bottom-color: var(--accent);
-}
-.tabCount {
-  font-size: 0.75rem;
-  color: var(--text-faint);
-  margin-left: 0.3rem;
-}
-
-/* ---- document body ----------------------------------------------------- */
 .doc {
   display: flex;
   flex-direction: column;
-  gap: 1.9rem;
-  max-width: 44rem;
+  gap: 2rem;
 }
-.docBlock h3 {
-  font-size: 0.78rem;
+.docBlock {
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--border);
+}
+/* Decision is the sentence the whole record exists to hold; everything else is
+   the justification around it. It gets the accent rule. */
+.docBlockLead {
+  border-left-color: var(--accent);
+}
+.docLabel {
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.45rem;
 }
-.docBlock p {
-  line-height: 1.7;
-  white-space: pre-wrap;
-  color: var(--text);
-  font-size: 1rem;
+.docBlockLead .docLabel {
+  color: var(--accent);
 }
 .docEmpty {
   color: var(--text-faint);
   font-style: italic;
 }
 
+/* References belong to the document, so they sit on the same paper — below a
+   rule rather than in a card of their own. One less surface on the page. */
+.docFooter {
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.docFooterHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.docFooterTitle {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+/* Last-checked and the re-check control read as one unit: a status with a way
+   to refresh it, not a button that happens to sit near a date. */
+.syncRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.syncWhen {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.docFooterAction {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+.docFooterAction:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---- activity ----------------------------------------------------------
+   Rendered inside the meta card, below its rule — the history of the record
+   the card summarises. */
+.activity {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+.activityGroup > h2 {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.9rem;
+}
+
 /* ---- activity: timeline ------------------------------------------------ */
 .timeline {
   display: flex;
   flex-direction: column;
-  max-width: 44rem;
 }
 .tlItem {
   position: relative;
@@ -392,19 +434,6 @@
 .refLink:hover {
   text-decoration: underline;
 }
-.refRemove {
-  font: inherit;
-  font-size: 1.1rem;
-  line-height: 1;
-  color: var(--text-faint);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0 0.2rem;
-}
-.refRemove:hover {
-  color: var(--danger);
-}
 .refForm {
   display: flex;
   gap: 0.5rem;
@@ -416,40 +445,6 @@
   min-width: 8rem;
 }
 
-.filePicker {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-top: 0.85rem;
-}
-.fileList {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  max-height: 15rem;
-  overflow-y: auto;
-  background: var(--surface-2);
-  border-radius: var(--r-sm);
-  padding: 0.3rem;
-}
-.fileItem {
-  width: 100%;
-  text-align: left;
-  font: inherit;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  padding: 0.35rem 0.5rem;
-  background: none;
-  border: none;
-  border-radius: var(--r-sm);
-  color: var(--text-dim);
-  cursor: pointer;
-}
-.fileItem:hover {
-  background: var(--surface-3);
-  color: var(--text);
-}
 
 /* ---- members ----------------------------------------------------------- */
 .memberRow {
@@ -480,4 +475,20 @@
 .hint {
   font-size: 0.82rem;
   color: var(--text-faint);
+}
+
+/* Scope note on a reference row: whole-file vs a cited span. */
+.refScope {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .sheet {
+    padding: 1.5rem 1.25rem;
+  }
+  .props {
+    gap: 1.1rem;
+  }
 }

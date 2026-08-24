@@ -28,11 +28,11 @@
   --ring: oklch(0.5 0.16 260 / 0.32);
 
   /* status — retro poster inks (independent of the brand accent) */
-  --st-proposed: oklch(0.5 0.16 260);
+  --st-proposed: oklch(0.5 0.16 55); /* flame */
   --st-accepted: oklch(0.5 0.12 165);
   --st-rejected: oklch(0.53 0.2 28);
-  --st-deprecated: oklch(0.55 0.02 70);
-  --st-superseded: oklch(0.6 0.13 74);
+  --st-deprecated: oklch(0.55 0.14 88); /* gold */
+  --st-superseded: oklch(0.6 0.13 350); /* rose */
 
   --danger: oklch(0.5 0.2 26);
 
@@ -104,10 +104,25 @@ h1, h2, h3, h4 {
   color: var(--text-faint);
 }
 
-/* buttons */
+/* ---- buttons ------------------------------------------------------------
+   Two families, and the difference between them is what the control is
+   attached to.
+
+   `.btn` is a **labelled action on the page**. Every one of them carries a
+   background — a transparent button with a word in it reads as a link, and a
+   row mixing filled and unfilled controls has no rhythm. There is no "ghost"
+   variant: the default *is* the quiet one, and it is quiet by being the
+   lightest fill rather than by being absent.
+
+   `.iconbtn` is an **icon-only affordance inside a container** — the × on a
+   chip, a formatting tool, a refresh beside a timestamp. Those fill on hover
+   only, because eight filled squares in a toolbar is noise, and because they
+   belong to the thing they sit in rather than to the page.
+   -------------------------------------------------------------------------- */
 .btn {
   --btn-bg: var(--surface-2);
   --btn-border: transparent;
+  --btn-fg: var(--text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -123,7 +138,7 @@ h1, h2, h3, h4 {
   border-radius: var(--r-sm);
   border: 1px solid var(--btn-border);
   background: var(--btn-bg);
-  color: var(--text);
+  color: var(--btn-fg);
   cursor: pointer;
   transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
   white-space: nowrap;
@@ -141,56 +156,98 @@ h1, h2, h3, h4 {
   cursor: default;
   box-shadow: none;
 }
+
+/* One per view: the action being recommended. */
 .btn--primary {
   --btn-bg: var(--accent);
   --btn-border: var(--accent);
-  color: var(--accent-fg);
+  --btn-fg: var(--accent-fg);
   font-weight: 550;
 }
 .btn--primary:hover {
   --btn-bg: var(--accent-hover);
   --btn-border: var(--accent-hover);
 }
+
+/* Approve keeps its own colour: green says "yes, and permanently" in a way the
+   brand accent — which also means "primary" and "link" — cannot. */
 .btn--accept {
   --btn-bg: var(--st-accepted);
   --btn-border: var(--st-accepted);
-  color: var(--accent-fg);
+  --btn-fg: var(--accent-fg);
   font-weight: 550;
 }
 .btn--accept:hover {
   --btn-bg: color-mix(in oklch, var(--st-accepted) 86%, black);
   --btn-border: color-mix(in oklch, var(--st-accepted) 86%, black);
 }
-.btn--icon {
-  width: 36px;
-  padding: 0;
-}
-.btn--ghost {
-  --btn-bg: transparent;
-  --btn-border: transparent;
-  color: var(--text-dim);
-  padding: 0 0.7rem;
-  box-shadow: none;
-}
-.btn--ghost:hover {
-  --btn-bg: var(--surface-2);
-  color: var(--text);
-}
+
+/* Reversible destructive — Reject, Discard. Tinted, not solid: the weight
+   should match the consequence. */
 .btn--danger {
-  color: var(--danger);
+  --btn-bg: color-mix(in oklch, var(--danger) 8%, var(--surface-2));
+  --btn-fg: var(--danger);
 }
 .btn--danger:hover {
-  --btn-bg: color-mix(in oklch, var(--danger) 12%, var(--surface-2));
+  --btn-bg: color-mix(in oklch, var(--danger) 15%, var(--surface-2));
 }
+
+/* Irreversible — deleting a workspace. Solid, and rare. */
 .btn--destructive {
   --btn-bg: var(--danger);
   --btn-border: var(--danger);
-  color: var(--accent-fg);
+  --btn-fg: var(--accent-fg);
   font-weight: 550;
 }
 .btn--destructive:hover {
   --btn-bg: color-mix(in oklch, var(--danger) 88%, black);
   --btn-border: color-mix(in oklch, var(--danger) 88%, black);
+}
+
+/* A labelled button reduced to its icon — same height, square. */
+.btn--icon {
+  width: 36px;
+  padding: 0;
+}
+
+/* ---- icon affordances --------------------------------------------------- */
+.iconbtn {
+  --ib-size: 28px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--ib-size);
+  height: var(--ib-size);
+  padding: 0;
+  border: none;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+.iconbtn:hover {
+  color: var(--text);
+  background: var(--surface-3);
+}
+.iconbtn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+.iconbtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.iconbtn--sm {
+  --ib-size: 22px;
+}
+.iconbtn--accent:hover {
+  color: var(--accent);
+  background: var(--accent-tint);
+}
+.iconbtn--danger:hover {
+  color: var(--danger);
+  background: color-mix(in oklch, var(--danger) 10%, transparent);
 }
 
 /* inputs */
@@ -245,7 +302,6 @@ h1, h2, h3, h4 {
   --pc: var(--text-dim);
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -257,12 +313,33 @@ h1, h2, h3, h4 {
   border: 1px solid color-mix(in oklch, var(--pc) 32%, transparent);
   white-space: nowrap;
 }
-.pill::before {
-  content: "";
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--pc);
+/* decision key (VAU-001) — outlined, neutral: an identifier, never a status */
+.key-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 0.22rem 0.5rem;
+  border-radius: var(--r-full);
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid color-mix(in oklch, var(--text-faint) 45%, transparent);
+  white-space: nowrap;
+}
+
+/* A draft is not a lifecycle state, so it takes no status ink — neutral grey
+   marks it as "not yet in the log" rather than as another kind of decision. */
+.pill--draft { --pc: var(--text-faint); }
+
+/* The key slot for a row that has no number yet. Filled rather than dashed: a
+   draft is a real thing waiting for a number, not a broken row. Same footprint
+   as .key-chip so draft and decision rows stay aligned. */
+.key-chip--pending {
+  border-color: transparent;
+  background: var(--surface-3);
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
 }
 .pill--proposed { --pc: var(--st-proposed); }
 .pill--accepted { --pc: var(--st-accepted); }

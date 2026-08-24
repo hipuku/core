@@ -1,14 +1,10 @@
+import { FileText, Users } from "lucide-react";
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import { GithubMark } from "@/components/icons/GithubMark";
 import { NewWorkspaceModal } from "@/components/NewWorkspaceModal";
-import { brandColor } from "@/lib/brand";
 import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "./app.module.css";
-
-function plural(n: number, one: string) {
-  return `${n} ${one}${n === 1 ? "" : "s"}`;
-}
 
 export default async function WorkspacesPage() {
   const user = await requireUser();
@@ -38,27 +34,27 @@ export default async function WorkspacesPage() {
                 <Link href={`/app/${workspace.id}`} className={styles.wsCard}>
                   <span className={styles.wsName}>{workspace.name}</span>
                   <div className={styles.wsMeta}>
-                    <span className={styles.wsMetaItem}>
-                      {plural(decisionCount, "decision")}
-                    </span>
                     {proposedCount > 0 && (
                       <span className={styles.wsPending}>
                         {proposedCount} awaiting review
                       </span>
                     )}
-                    <span className={styles.wsMetaItem}>
-                      {plural(memberCount, "member")}
+                    <span className={styles.wsMetaItem} title={`${decisionCount} decisions`}>
+                      <FileText size={14} aria-hidden />
+                      {decisionCount}
+                    </span>
+                    <span className={styles.wsMetaItem} title={`${memberCount} members`}>
+                      <Users size={14} aria-hidden />
+                      {memberCount}
                     </span>
                     {repos.length > 0 ? (
-                      repos.map((repo, i) => (
-                        <span
-                          key={repo}
-                          className={styles.wsRepo}
-                          style={{ "--chip": brandColor(i) } as CSSProperties}
-                        >
-                          {repo}
-                        </span>
-                      ))
+                      <span
+                        className={styles.wsMetaItem}
+                        title={repos.join(", ")}
+                      >
+                        <GithubMark size={14} />
+                        {repos.length}
+                      </span>
                     ) : (
                       <span className={styles.wsMetaItem}>no repo connected</span>
                     )}

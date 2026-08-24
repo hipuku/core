@@ -1,38 +1,25 @@
-import {
-  Archive,
-  ArrowLeftRight,
-  Check,
-  Pencil,
-  Plus,
-  RefreshCw,
-  X,
-} from "lucide-react";
+import { Archive, Check, Pencil, RefreshCw, X } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FileReferencePicker } from "@/components/FileReferencePicker";
+import { DecisionMeta } from "@/components/DecisionMeta";
+import { DecisionReferences } from "@/components/DecisionReferences";
 import { Markdown } from "@/components/Markdown";
 import { StatusBadge } from "@/components/StatusBadge";
+import { SupersedeModal } from "@/components/SupersedeModal";
 import { ToastForm } from "@/components/ToastForm";
 import {
   canEditContent,
   capabilitiesFor,
   decisionLabel,
   decisionService,
+  formatRange,
   isStale,
-  referenceDrift,
-  type DriftStatus,
 } from "@/lib/decisions";
 import type { Change, Json } from "@/lib/versioning";
 import { requireUser } from "@/lib/session";
+import { timeAgo } from "@/lib/time-ago";
 import { usersById } from "@/lib/users";
-import {
-  addReference,
-  changeStatus,
-  checkReferenceDrift,
-  removeReference,
-  revise,
-  supersede,
-} from "../../actions";
+import { changeStatus, checkReferenceDrift, supersede } from "../../actions";
 import styles from "../../app.module.css";
 
 function field(body: Json, key: string): string {
@@ -56,22 +43,17 @@ function when(date: Date): string {
   });
 }
 
-const DRIFT_PILL: Record<DriftStatus, { cls: string; label: string } | null> = {
-  synced: { cls: "pill pill--accepted", label: "in sync" },
-  drifted: { cls: "pill pill--superseded", label: "changed" },
-  missing: { cls: "pill pill--rejected", label: "missing" },
-  unknown: null,
-};
+/** A decision is a date-level fact; the minute it was filed is noise. */
+function onlyDate(date: Date): string {
+  return new Date(date).toLocaleDateString(undefined, { dateStyle: "medium" });
+}
 
 export default async function DecisionPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ workspaceId: string; decisionId: string }>;
-  searchParams: Promise<{ view?: string; edit?: string }>;
 }) {
   const { workspaceId, decisionId } = await params;
-  const { view, edit } = await searchParams;
   const user = await requireUser();
 
   const role = await decisionService.roleOf(workspaceId, user.id);
@@ -92,6 +74,11 @@ export default async function DecisionPage({
       decisionService.getWorkspace(workspaceId),
     ]);
   const key = workspace?.key ?? "ADR";
+  // What inline `{{repo:path}}` citations in the body can resolve against.
+  const citable = repos.map((r) => ({
+    repo: `${r.owner}/${r.name}`,
+    branch: r.defaultBranch,
+  }));
 
   const people = await usersById([
     decision.authorId,
@@ -100,12 +87,14 @@ export default async function DecisionPage({
   const nameOf = (id: string) => people.get(id)?.name ?? "someone";
 
   const body = content.at(-1)?.state ?? {};
+  // The first version is the proposal itself, so "last edited" only exists once
+  // there has been a revision — otherwise created and edited would always match.
+  const lastEdited = content.length > 1 ? content.at(-1)!.createdAt : null;
   const editable = canEditContent(
     decision.status,
     actor,
     decision.authorId === user.id,
   );
-  const isEditing = editable.ok && edit === "1";
 
   const canAccept = actor.capabilities.includes("accept") && decision.status === "proposed";
   const canReject = actor.capabilities.includes("reject") && decision.status === "proposed";
@@ -119,9 +108,27 @@ export default async function DecisionPage({
 
   const stale = isStale(references);
   const hasFileRefs = references.some((r) => r.kind === "file");
+  /** The most recent drift check across every file reference. */
+  /**
+   * The most recent thing that happened to this decision, of either kind — a
+   * status change or a revision. Both timelines are already loaded.
+   */
+  const lastActivity = [
+    ...transitions.map((t) => t.createdAt),
+    ...content.map((v) => v.createdAt),
+  ].reduce<number | null>((latest, date) => {
+    const at = new Date(date).getTime();
+    return latest === null || at > latest ? at : latest;
+  }, null);
+
+  /** The transition that put this decision in its current state. */
+  const settled = decision.status === "proposed" ? null : lastOf(decision.status);
+  const lastChecked = references.reduce<Date | null>((latest, r) => {
+    if (!r.checkedAt) return latest;
+    return !latest || r.checkedAt > latest ? r.checkedAt : latest;
+  }, null);
 
   const base = `/app/${workspaceId}/${decisionId}`;
-  const tab = view === "activity" ? "activity" : "document";
   const adrNumber = decisionLabel(key, decision.number);
 
   const accept = changeStatus.bind(null, workspaceId, decisionId, "accepted");
@@ -129,18 +136,121 @@ export default async function DecisionPage({
   const deprecate = changeStatus.bind(null, workspaceId, decisionId, "deprecated");
 
   return (
-    <div>
+    <div className={styles.decisionPage}>
       <div className={styles.pageHead}>
-        <div style={{ flex: 1 }}>
-          <p className="eyebrow" style={{ marginBottom: "0.5rem" }}>
-            {adrNumber}
+        <div className={styles.headMain}>
+          <p className={styles.headKey}>
+            <span className="key-chip">{adrNumber}</span>
           </p>
           <h1 className={styles.title}>{decision.title}</h1>
+        </div>
+        {/* The page-level action belongs in the page header, once — not floating
+            above the prose and repeated inside the review banner. */}
+        {/* Every action this decision affords, in one place, weighted so the
+            consequential one is unmistakable: Edit is quiet, Reject is text,
+            and Approve — an irreversible, audited transition — is the only
+            filled control on the page. */}
+        <div className={styles.headActions}>
+          {editable.ok && (
+            <Link href={`${base}/edit`} className="btn">
+              <Pencil size={15} />
+              Edit
+            </Link>
+          )}
+          {canReject && (
+            <ToastForm action={reject}>
+              <button type="submit" className="btn btn--danger">
+                <X size={16} />
+                Reject
+              </button>
+            </ToastForm>
+          )}
+          {canAccept && (
+            <ToastForm action={accept}>
+              <button type="submit" className="btn btn--accept">
+                <Check size={16} />
+                Approve
+              </button>
+            </ToastForm>
+          )}
+          {canSupersede && (
+            <SupersedeModal
+              action={supersede.bind(null, workspaceId, decisionId)}
+              candidates={supersedable.map((d) => ({
+                id: d.id,
+                label: decisionLabel(key, d.number),
+                title: d.title,
+              }))}
+            />
+          )}
+          {canDeprecate && (
+            <ToastForm action={deprecate}>
+              <button type="submit" className="btn">
+                <Archive size={16} />
+                Deprecate
+              </button>
+            </ToastForm>
+          )}
         </div>
       </div>
 
       {/* properties */}
-      <div className={styles.props}>
+      <DecisionMeta
+        count={transitions.length + content.length}
+        lastActivity={lastActivity}
+        activity={
+            <div className={styles.activity}>
+              <section className={styles.activityGroup}>
+                <h2>Status history</h2>
+                <div className={styles.timeline}>
+                  {transitions.map((t) => (
+                    <div key={t.id} className={styles.tlItem}>
+                      <div className={styles.tlHead}>
+                        <StatusBadge status={t.toStatus} />
+                        <span className={styles.tlMsg}>
+                          {t.fromStatus ? `from ${t.fromStatus}` : "proposed"} by {nameOf(t.actorId)}
+                        </span>
+                      </div>
+                      <div className={styles.tlMeta}>{when(t.createdAt)}</div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className={styles.activityGroup}>
+                <h2>Content history</h2>
+                <div className={styles.timeline}>
+                  {content.map((version) => (
+                    <div key={version.id} className={styles.tlItem}>
+                      <div className={styles.tlHead}>
+                        <span className={styles.tlMsg}>{version.message}</span>
+                      </div>
+                      <div className={styles.tlMeta}>{when(version.createdAt)}</div>
+                      {version.changes.length > 0 && (
+                        <ul className={styles.changes}>
+                          {version.changes.map((change, i) => (
+                            <li
+                              key={i}
+                              className={
+                                change.op === "add"
+                                  ? styles.opAdd
+                                  : change.op === "remove"
+                                    ? styles.opRemove
+                                    : styles.opReplace
+                              }
+                            >
+                              {describe(change)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+        }
+      >
         <div className={styles.prop}>
           <span className={styles.propLabel}>Status</span>
           <span className={styles.propValue}><StatusBadge status={decision.status} /></span>
@@ -151,332 +261,132 @@ export default async function DecisionPage({
         </div>
         <div className={styles.prop}>
           <span className={styles.propLabel}>Created</span>
-          <span className={styles.propValue}>{when(decision.createdAt)}</span>
+          <span className={styles.propValue}>{onlyDate(decision.createdAt)}</span>
         </div>
+        <div className={styles.prop}>
+          <span className={styles.propLabel}>Last edited</span>
+          <span className={styles.propValue}>
+            {lastEdited ? (
+              <>
+                {onlyDate(lastEdited)}
+                <span className={styles.propAside}>{timeAgo(lastEdited.getTime())}</span>
+              </>
+            ) : (
+              <span className={styles.propAside}>never revised</span>
+            )}
+          </span>
+        </div>
+
+        {/* What the pill cannot carry: who moved this decision to where it is,
+            and what replaced it. A property, not a banner — it is a fact about
+            the record, and it belongs with the record's other facts. */}
+        {settled && (
+          <div className={styles.prop}>
+            <span className={styles.propLabel}>
+              {decision.status === "accepted" ? "Accepted" : decision.status}
+            </span>
+            <span className={styles.propValue}>
+              {nameOf(settled.actorId)}
+              <span className={styles.propAside}>{onlyDate(settled.createdAt)}</span>
+            </span>
+          </div>
+        )}
+
         {supersededBy && (
           <div className={styles.prop}>
-            <span className={styles.propLabel}>Superseded by</span>
+            <span className={styles.propLabel}>Replaced by</span>
             <span className={styles.propValue}>
-              <Link href={`/app/${workspaceId}/${supersededBy.id}`}>
+              <Link
+                href={`/app/${workspaceId}/${supersededBy.id}`}
+                className={styles.propLink}
+              >
                 {decisionLabel(key, supersededBy.number)}
               </Link>
             </span>
           </div>
         )}
-      </div>
-
-      {/* review banner */}
-      <ReviewBanner />
+      </DecisionMeta>
 
       {stale && (
-        <div className={styles.staleBanner}>
-          <span className={styles.staleDot} />
-          <div>
-            <strong>Referenced code has changed.</strong> One or more files this
-            decision cites have drifted since it was recorded — it may be out of
-            date. See References for detail.
+        <div className={`${styles.notice} ${styles.noticeWarn}`}>
+          <div className={styles.noticeText}>
+            <span className={styles.noticeTitle}>Referenced code has changed</span>
+            <span className={styles.noticeSub}>
+              Code this decision cites has drifted since it was recorded — it may
+              be out of date. See References below.
+            </span>
           </div>
         </div>
       )}
 
-      {/* tabs */}
-      <div className={styles.tabs}>
-        <Link href={base} className={`${styles.tab} ${tab === "document" ? styles.tabOn : ""}`}>
-          Document
-        </Link>
-        <Link href={`${base}?view=activity`} className={`${styles.tab} ${tab === "activity" ? styles.tabOn : ""}`}>
-          Activity<span className={styles.tabCount}>{transitions.length + content.length}</span>
-        </Link>
-      </div>
-
-      {tab === "document" ? (
-        isEditing ? (
-          <ToastForm action={revise.bind(null, workspaceId, decisionId)} className={styles.form}>
-            <p className={styles.hint}>
-              Markdown supported, including <code>```mermaid</code> diagrams.
-            </p>
-            <label className="field">
-              <span>Context</span>
-              <textarea className="textarea" name="context" rows={3} defaultValue={field(body, "context")} />
-            </label>
-            <label className="field">
-              <span>Decision</span>
-              <textarea className="textarea" name="decision" rows={3} defaultValue={field(body, "decision")} />
-            </label>
-            <label className="field">
-              <span>Consequences</span>
-              <textarea className="textarea" name="consequences" rows={3} defaultValue={field(body, "consequences")} />
-            </label>
-            <div className={styles.actions}>
-              <button type="submit" className="btn btn--primary">
-                <Check size={16} />
-                Save revision
-              </button>
-              <Link href={base} className="btn btn--ghost">Cancel</Link>
-            </div>
-          </ToastForm>
-        ) : (
-          <div className={styles.doc}>
-            {editable.ok && (
-              <div className={styles.actions}>
-                <Link href={`${base}?edit=1`} className="btn"><Pencil size={15} />Edit</Link>
-              </div>
-            )}
-            {(["context", "decision", "consequences"] as const).map((key) => {
-              const text = field(body, key);
+      <div className={styles.sheet}>
+          <article className={styles.doc}>
+            {(["context", "decision", "consequences"] as const).map((block) => {
+              const text = field(body, block);
               return (
-                <div key={key} className={styles.docBlock}>
-                  <h3>{key}</h3>
+                <section
+                  key={block}
+                  className={`${styles.docBlock} ${
+                    block === "decision" ? styles.docBlockLead : ""
+                  }`}
+                >
+                  <h2 className={styles.docLabel}>{block}</h2>
                   {text ? (
-                    <Markdown>{text}</Markdown>
+                    <Markdown citable={citable}>{text}</Markdown>
                   ) : (
                     <p className={styles.docEmpty}>Not yet written.</p>
                   )}
-                </div>
+                </section>
               );
             })}
+          </article>
 
-            <div className={styles.docBlock}>
-              <h3>References</h3>
-              {references.length === 0 ? (
-                <p className={styles.docEmpty}>No references attached.</p>
-              ) : (
-                <ul className={styles.refList}>
-                  {references.map((ref) => {
-                    const pill = DRIFT_PILL[referenceDrift(ref)];
-                    return (
-                      <li key={ref.id} className={styles.refItem}>
-                        <a
-                          href={ref.url ?? "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.refLink}
-                        >
-                          {ref.label || ref.url}
-                        </a>
-                        {pill && <span className={pill.cls}>{pill.label}</span>}
-                        <ToastForm action={removeReference.bind(null, workspaceId, decisionId, ref.id)}>
-                          <button type="submit" className={styles.refRemove} aria-label="Remove reference">
-                            ×
-                          </button>
-                        </ToastForm>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-
+          {/* On the same paper, below a rule: references belong to this
+              document, so giving them a card of their own added a surface
+              without adding a distinction. */}
+          <section className={styles.docFooter}>
+            <div className={styles.docFooterHead}>
+              <h2 className={styles.docFooterTitle}>References</h2>
               {hasFileRefs && (
-                <ToastForm
-                  action={checkReferenceDrift.bind(null, workspaceId, decisionId)}
-                  style={{ marginBottom: "0.85rem" }}
-                >
-                  <button type="submit" className="btn">
-                    <RefreshCw size={15} />
-                    Check for drift
-                  </button>
+                <ToastForm action={checkReferenceDrift.bind(null, workspaceId, decisionId)}>
+                  <span className={styles.syncRow}>
+                    <span className={styles.syncWhen}>
+                      {lastChecked
+                        ? `checked ${timeAgo(lastChecked.getTime())}`
+                        : "never checked"}
+                    </span>
+                    <button
+                      type="submit"
+                      className="iconbtn iconbtn--accent"
+                      title="Check whether the cited code has changed"
+                      aria-label="Check for drift"
+                    >
+                      <RefreshCw size={14} />
+                    </button>
+                  </span>
                 </ToastForm>
               )}
-              <ToastForm
-                action={addReference.bind(null, workspaceId, decisionId)}
-                className={styles.refForm}
-              >
-                <input className="input" type="url" name="url" placeholder="https://…" required />
-                <input className="input" name="label" placeholder="Label (optional)" />
-                <button type="submit" className="btn">
-                  <Plus size={16} />
-                  Add link
-                </button>
-              </ToastForm>
-
-              <FileReferencePicker
-                workspaceId={workspaceId}
-                decisionId={decisionId}
-                repos={repos}
-              />
             </div>
-          </div>
-        )
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-          <section>
-            <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}>Decision history</h2>
-            </div>
-            <div className={styles.timeline}>
-              {transitions.map((t) => (
-                <div key={t.id} className={styles.tlItem}>
-                  <div className={styles.tlHead}>
-                    <StatusBadge status={t.toStatus} />
-                    <span className={styles.tlMsg}>
-                      {t.fromStatus ? `from ${t.fromStatus}` : "proposed"} by {nameOf(t.actorId)}
-                    </span>
-                  </div>
-                  <div className={styles.tlMeta}>{when(t.createdAt)}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}>Content history</h2>
-            </div>
-            <div className={styles.timeline}>
-              {content.map((version) => (
-                <div key={version.id} className={styles.tlItem}>
-                  <div className={styles.tlHead}>
-                    <span className={styles.tlMsg}>{version.message}</span>
-                  </div>
-                  <div className={styles.tlMeta}>{when(version.createdAt)}</div>
-                  {version.changes.length > 0 && (
-                    <ul className={styles.changes}>
-                      {version.changes.map((change, i) => (
-                        <li
-                          key={i}
-                          className={
-                            change.op === "add"
-                              ? styles.opAdd
-                              : change.op === "remove"
-                                ? styles.opRemove
-                                : styles.opReplace
-                          }
-                        >
-                          {describe(change)}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
+            <DecisionReferences
+              references={references.map((r) => ({
+                id: r.id,
+                kind: r.kind,
+                label: r.label,
+                url: r.url,
+                repo: r.repo,
+                path: r.path,
+                lines:
+                  r.startLine && r.endLine
+                    ? formatRange({ start: r.startLine, end: r.endLine })
+                    : null,
+                startLine: r.startLine,
+                baselineSha: r.baselineSha,
+                currentSha: r.currentSha,
+              }))}
+            />
           </section>
         </div>
-      )}
     </div>
   );
 
-  function ReviewBanner() {
-    if (decision.status === "proposed") {
-      if (canAccept || canReject) {
-        return (
-          <div className={`${styles.review} ${styles.reviewAction}`}>
-            <div className={styles.reviewText}>
-              <span className={styles.reviewTitle}>Ready for your review</span>
-              <span className={styles.reviewSub}>
-                Approve to accept this decision, or reject it.
-              </span>
-            </div>
-            <div className={styles.reviewActions}>
-              {editable.ok && !isEditing && (
-                <Link href={`${base}?edit=1`} className="btn btn--ghost"><Pencil size={15} />Edit</Link>
-              )}
-              {canReject && (
-                <ToastForm action={reject}>
-                  <button type="submit" className="btn btn--danger">
-                    <X size={16} />
-                    Reject
-                  </button>
-                </ToastForm>
-              )}
-              {canAccept && (
-                <ToastForm action={accept}>
-                  <button type="submit" className="btn btn--accept">
-                    <Check size={16} />
-                    Approve
-                  </button>
-                </ToastForm>
-              )}
-            </div>
-          </div>
-        );
-      }
-      return (
-        <div className={styles.review}>
-          <div className={styles.reviewText}>
-            <span className={styles.reviewTitle}>Awaiting review</span>
-            <span className={styles.reviewSub}>
-              A maintainer needs to accept this decision.
-              {editable.ok && " You can keep revising it until then."}
-            </span>
-          </div>
-          {editable.ok && !isEditing && (
-            <div className={styles.reviewActions}>
-              <Link href={`${base}?edit=1`} className="btn"><Pencil size={15} />Edit</Link>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (decision.status === "accepted") {
-      const accepted = lastOf("accepted");
-      return (
-        <div className={`${styles.review} ${styles.reviewOk}`}>
-          <div className={styles.reviewText}>
-            <span className={styles.reviewTitle}>Accepted</span>
-            <span className={styles.reviewSub}>
-              {accepted
-                ? `by ${nameOf(accepted.actorId)} · ${when(accepted.createdAt)}`
-                : "This decision is in effect."}
-            </span>
-          </div>
-          {(canDeprecate || (canSupersede && supersedable.length > 0)) && (
-            <div className={styles.reviewActions}>
-              {canDeprecate && (
-                <ToastForm action={deprecate}>
-                  <button type="submit" className="btn btn--ghost">
-                    <Archive size={16} />
-                    Deprecate
-                  </button>
-                </ToastForm>
-              )}
-              {canSupersede && supersedable.length > 0 && (
-                <form action={supersede.bind(null, workspaceId, decisionId)} style={{ display: "flex", gap: "0.4rem" }}>
-                  <select className="select" name="supersededId" required defaultValue="" style={{ width: "auto" }}>
-                    <option value="" disabled>Supersede…</option>
-                    {supersedable.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {decisionLabel(key, d.number)} — {d.title}
-                      </option>
-                    ))}
-                  </select>
-                  <button type="submit" className="btn">
-                    <ArrowLeftRight size={15} />
-                    Supersede
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // rejected / deprecated / superseded — terminal
-    const term = lastOf(decision.status);
-    return (
-      <div className={`${styles.review} ${styles.reviewTerminal}`}>
-        <div className={styles.reviewText}>
-          <span className={styles.reviewTitle} style={{ textTransform: "capitalize" }}>
-            {decision.status}
-          </span>
-          <span className={styles.reviewSub}>
-            {supersededBy ? (
-              <>
-                Replaced by{" "}
-                <Link href={`/app/${workspaceId}/${supersededBy.id}`} className={styles.reviewLink}>
-                  {decisionLabel(key, supersededBy.number)} — {supersededBy.title}
-                </Link>
-              </>
-            ) : term ? (
-              `by ${nameOf(term.actorId)} · ${when(term.createdAt)}`
-            ) : (
-              "This decision is no longer active."
-            )}
-          </span>
-        </div>
-      </div>
-    );
-  }
 }

@@ -100,7 +100,7 @@ export default async function SettingsPage({
                 </span>
                 {!isOwner && (
                   <ToastForm action={removeMember.bind(null, workspaceId, member.userId)}>
-                    <button type="submit" className={styles.refRemove} aria-label="Remove member">
+                    <button type="submit" className="iconbtn iconbtn--danger" aria-label="Remove member">
                       ×
                     </button>
                   </ToastForm>
@@ -134,7 +134,7 @@ export default async function SettingsPage({
                   <span className={styles.memberEmail}>{repo.defaultBranch}</span>
                 </span>
                 <ToastForm action={disconnectRepo.bind(null, workspaceId, repo.id)}>
-                  <button type="submit" className={styles.refRemove} aria-label="Disconnect repository">
+                  <button type="submit" className="iconbtn iconbtn--danger" aria-label="Disconnect repository">
                     ×
                   </button>
                 </ToastForm>

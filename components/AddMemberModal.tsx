@@ -3,12 +3,23 @@
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { inviteMember } from "@/app/app/actions";
+import { Dropdown } from "./Dropdown";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
 import styles from "./Modal.module.css";
 
+const ROLE_OPTIONS = [
+  { value: "author", label: "Author", hint: "Can propose and revise" },
+  {
+    value: "maintainer",
+    label: "Maintainer",
+    hint: "Can also accept, reject, supersede",
+  },
+];
+
 export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
   const [open, setOpen] = useState(false);
+  const [role, setRole] = useState("author");
 
   return (
     <>
@@ -37,15 +48,10 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
             </label>
             <label className="field">
               <span>Role</span>
-              <select className="select" name="role" defaultValue="author">
-                <option value="author">author — can propose and revise</option>
-                <option value="maintainer">
-                  maintainer — can also accept, reject, supersede
-                </option>
-              </select>
+              <Dropdown name="role" value={role} onChange={setRole} options={ROLE_OPTIONS} />
             </label>
             <div className={styles.actions}>
-              <button type="button" className="btn btn--ghost" onClick={() => setOpen(false)}>
+              <button type="button" className="btn" onClick={() => setOpen(false)}>
                 Cancel
               </button>
               <button type="submit" className="btn btn--primary">

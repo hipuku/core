@@ -71,7 +71,7 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
                 </select>
               </label>
               <div className={styles.actions}>
-                <button type="button" className="btn btn--ghost" onClick={() => setOpen(false)}>
+                <button type="button" className="btn" onClick={() => setOpen(false)}>
                   Cancel
                 </button>
                 <button type="submit" className="btn btn--primary">

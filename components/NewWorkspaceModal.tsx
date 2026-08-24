@@ -36,7 +36,7 @@ export function NewWorkspaceModal() {
             <div className={styles.actions}>
               <button
                 type="button"
-                className="btn btn--ghost"
+                className="btn"
                 onClick={() => setOpen(false)}
               >
                 Cancel
