@@ -290,12 +290,15 @@ export class DecisionService {
       url?: string | null;
       repo?: string | null;
       path?: string | null;
+      baselineSha?: string | null;
     },
   ): Promise<ReferenceRecord> {
     const decision = await this.requireDecision(decisionId);
     const role = await this.roleOf(decision.workspaceId, userId);
     if (!role) throw new DecisionError("you are not a member of this workspace");
 
+    const now = this.clock.now();
+    const baselineSha = input.baselineSha ?? null;
     const reference: ReferenceRecord = {
       id: this.ids.next(),
       decisionId,
@@ -304,11 +307,36 @@ export class DecisionService {
       url: input.url ?? null,
       repo: input.repo ?? null,
       path: input.path ?? null,
+      baselineSha,
+      // A freshly cited file starts in sync with its baseline.
+      currentSha: baselineSha,
+      checkedAt: baselineSha ? now : null,
       addedBy: userId,
-      createdAt: this.clock.now(),
+      createdAt: now,
     };
     await this.store.addReference(reference);
     return reference;
+  }
+
+  /**
+   * Record the latest observed SHA for a file reference (from a drift check).
+   * The GitHub call happens in the action layer; the service just persists it,
+   * gated on workspace membership.
+   */
+  async recordReferenceState(
+    referenceId: string,
+    userId: string,
+    currentSha: string | null,
+  ): Promise<void> {
+    const reference = await this.store.getReference(referenceId);
+    if (!reference) throw new DecisionError("reference not found");
+    const decision = await this.requireDecision(reference.decisionId);
+    const role = await this.roleOf(decision.workspaceId, userId);
+    if (!role) throw new DecisionError("you are not a member of this workspace");
+    await this.store.updateReferenceState(referenceId, {
+      currentSha,
+      checkedAt: this.clock.now(),
+    });
   }
 
   listReferences(decisionId: string): Promise<ReferenceRecord[]> {

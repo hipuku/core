@@ -188,6 +188,16 @@ export class DrizzleDecisionStore implements DecisionStore {
     await db.delete(decisionReferences).where(eq(decisionReferences.id, id));
   }
 
+  async updateReferenceState(
+    id: string,
+    state: { currentSha: string | null; checkedAt: Date },
+  ): Promise<void> {
+    await db
+      .update(decisionReferences)
+      .set({ currentSha: state.currentSha, checkedAt: state.checkedAt })
+      .where(eq(decisionReferences.id, id));
+  }
+
   async addWorkspaceRepo(repo: RepoRecord): Promise<void> {
     await db.insert(workspaceRepos).values(repo);
   }

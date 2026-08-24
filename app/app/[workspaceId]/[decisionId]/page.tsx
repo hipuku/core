@@ -7,6 +7,9 @@ import {
   canEditContent,
   capabilitiesFor,
   decisionService,
+  isStale,
+  referenceDrift,
+  type DriftStatus,
 } from "@/lib/decisions";
 import type { Change, Json } from "@/lib/versioning";
 import { requireUser } from "@/lib/session";
@@ -14,6 +17,7 @@ import { usersById } from "@/lib/users";
 import {
   addReference,
   changeStatus,
+  checkReferenceDrift,
   removeReference,
   revise,
   supersede,
@@ -40,6 +44,13 @@ function when(date: Date): string {
     timeStyle: "short",
   });
 }
+
+const DRIFT_PILL: Record<DriftStatus, { cls: string; label: string } | null> = {
+  synced: { cls: "pill pill--accepted", label: "in sync" },
+  drifted: { cls: "pill pill--superseded", label: "changed" },
+  missing: { cls: "pill pill--rejected", label: "missing" },
+  unknown: null,
+};
 
 export default async function DecisionPage({
   params,
@@ -92,6 +103,9 @@ export default async function DecisionPage({
     : null;
   const lastOf = (status: string) => [...transitions].reverse().find((t) => t.toStatus === status);
 
+  const stale = isStale(references);
+  const hasFileRefs = references.some((r) => r.kind === "file");
+
   const base = `/app/${workspaceId}/${decisionId}`;
   const tab = view === "activity" ? "activity" : "document";
   const adrNumber = `ADR-${String(decision.number).padStart(3, "0")}`;
@@ -143,6 +157,17 @@ export default async function DecisionPage({
 
       {/* review banner */}
       <ReviewBanner />
+
+      {stale && (
+        <div className={styles.staleBanner}>
+          <span className={styles.staleDot} />
+          <div>
+            <strong>Referenced code has changed.</strong> One or more files this
+            decision cites have drifted since it was recorded — it may be out of
+            date. See References for detail.
+          </div>
+        </div>
+      )}
 
       {/* tabs */}
       <div className={styles.tabs}>
@@ -201,24 +226,37 @@ export default async function DecisionPage({
                 <p className={styles.docEmpty}>No references attached.</p>
               ) : (
                 <ul className={styles.refList}>
-                  {references.map((ref) => (
-                    <li key={ref.id} className={styles.refItem}>
-                      <a
-                        href={ref.url ?? "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.refLink}
-                      >
-                        {ref.label || ref.url}
-                      </a>
-                      <form action={removeReference.bind(null, workspaceId, decisionId, ref.id)}>
-                        <button type="submit" className={styles.refRemove} aria-label="Remove reference">
-                          ×
-                        </button>
-                      </form>
-                    </li>
-                  ))}
+                  {references.map((ref) => {
+                    const pill = DRIFT_PILL[referenceDrift(ref)];
+                    return (
+                      <li key={ref.id} className={styles.refItem}>
+                        <a
+                          href={ref.url ?? "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.refLink}
+                        >
+                          {ref.label || ref.url}
+                        </a>
+                        {pill && <span className={pill.cls}>{pill.label}</span>}
+                        <form action={removeReference.bind(null, workspaceId, decisionId, ref.id)}>
+                          <button type="submit" className={styles.refRemove} aria-label="Remove reference">
+                            ×
+                          </button>
+                        </form>
+                      </li>
+                    );
+                  })}
                 </ul>
+              )}
+
+              {hasFileRefs && (
+                <form
+                  action={checkReferenceDrift.bind(null, workspaceId, decisionId)}
+                  style={{ marginBottom: "0.85rem" }}
+                >
+                  <button type="submit" className="btn">Check for drift</button>
+                </form>
               )}
               <form
                 action={addReference.bind(null, workspaceId, decisionId)}

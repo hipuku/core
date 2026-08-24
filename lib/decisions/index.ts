@@ -4,6 +4,7 @@ import { DrizzleDecisionStore } from "./drizzle-store";
 
 export * from "./types";
 export * from "./lifecycle";
+export { referenceDrift, isStale, type DriftStatus } from "./drift";
 export type {
   DecisionRecord,
   DecisionStore,

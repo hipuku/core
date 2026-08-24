@@ -87,3 +87,22 @@ export function fileUrl(
 ): string {
   return `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
 }
+
+/** The current git blob SHA of a file, or null if it no longer exists. */
+export async function getFileSha(
+  token: string,
+  owner: string,
+  repo: string,
+  path: string,
+  branch: string,
+): Promise<string | null> {
+  const encoded = path.split("/").map(encodeURIComponent).join("/");
+  const res = await fetch(
+    `${API}/repos/${owner}/${repo}/contents/${encoded}?ref=${branch}`,
+    { headers: headers(token) },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub file lookup failed (${res.status})`);
+  const data = (await res.json()) as { sha: string };
+  return data.sha;
+}

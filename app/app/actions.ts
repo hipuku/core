@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { decisionService, DecisionError } from "@/lib/decisions";
 import type { DecisionStatus, Role } from "@/lib/decisions";
-import { fileUrl, getGithubToken, listRepoFiles, listRepos } from "@/lib/github";
+import {
+  fileUrl,
+  getFileSha,
+  getGithubToken,
+  listRepoFiles,
+  listRepos,
+} from "@/lib/github";
 import { requireUser } from "@/lib/session";
 import { findUserByEmail } from "@/lib/users";
 
@@ -123,13 +129,44 @@ export async function addFileReference(
   if (!repo || repo.workspaceId !== workspaceId) {
     throw new DecisionError("repository not found");
   }
+  const token = await getGithubToken(user.id);
+  // Snapshot the file's current SHA as the baseline this decision cites.
+  const baselineSha = token
+    ? await getFileSha(token, repo.owner, repo.name, path, repo.defaultBranch)
+    : null;
   await decisionService.addReference(decisionId, user.id, {
     kind: "file",
     label: `${repo.owner}/${repo.name} · ${path}`,
     url: fileUrl(repo.owner, repo.name, repo.defaultBranch, path),
     repo: `${repo.owner}/${repo.name}`,
     path,
+    baselineSha,
   });
+  revalidatePath(`/app/${workspaceId}/${decisionId}`);
+}
+
+/** Re-check every file reference on a decision against the repo's current state. */
+export async function checkReferenceDrift(
+  workspaceId: string,
+  decisionId: string,
+) {
+  const user = await requireUser();
+  const token = await getGithubToken(user.id);
+  if (!token) {
+    throw new DecisionError("connect your GitHub account to check for drift");
+  }
+  const [references, repos] = await Promise.all([
+    decisionService.listReferences(decisionId),
+    decisionService.listWorkspaceRepos(workspaceId),
+  ]);
+  for (const ref of references) {
+    if (ref.kind !== "file" || !ref.repo || !ref.path) continue;
+    const [owner, name] = ref.repo.split("/");
+    const repo = repos.find((r) => r.owner === owner && r.name === name);
+    if (!repo) continue;
+    const sha = await getFileSha(token, owner, name, ref.path, repo.defaultBranch);
+    await decisionService.recordReferenceState(ref.id, user.id, sha);
+  }
   revalidatePath(`/app/${workspaceId}/${decisionId}`);
 }
 

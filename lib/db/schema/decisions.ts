@@ -129,6 +129,11 @@ export const decisionReferences = pgTable("decision_references", {
   url: text("url"),
   repo: text("repo"),
   path: text("path"),
+  // Staleness: the file's git blob SHA when it was cited (baseline), the latest
+  // SHA observed on a drift check (null = the file is gone), and when that was.
+  baselineSha: text("baseline_sha"),
+  currentSha: text("current_sha"),
+  checkedAt: timestamp("checked_at"),
   addedBy: text("added_by")
     .notNull()
     .references(() => user.id),

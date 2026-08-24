@@ -194,6 +194,28 @@
   text-underline-offset: 2px;
 }
 
+/* ---- staleness banner -------------------------------------------------- */
+.staleBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 2rem;
+  border-radius: var(--r-lg);
+  border: 1px solid color-mix(in oklch, var(--st-superseded) 40%, var(--border));
+  background: color-mix(in oklch, var(--st-superseded) 10%, var(--surface));
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.staleDot {
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.35rem;
+  border-radius: 50%;
+  background: var(--st-superseded);
+}
+
 /* ---- tabs -------------------------------------------------------------- */
 .tabs {
   display: flex;

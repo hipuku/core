@@ -143,6 +143,16 @@ export class MemoryDecisionStore implements DecisionStore {
     this.references.delete(id);
   }
 
+  async updateReferenceState(
+    id: string,
+    state: { currentSha: string | null; checkedAt: Date },
+  ): Promise<void> {
+    const record = this.references.get(id);
+    if (!record) return;
+    record.currentSha = state.currentSha;
+    record.checkedAt = state.checkedAt;
+  }
+
   async addWorkspaceRepo(repo: RepoRecord): Promise<void> {
     this.repos.set(repo.id, { ...repo });
   }

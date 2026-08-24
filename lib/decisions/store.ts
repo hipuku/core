@@ -65,6 +65,9 @@ export interface ReferenceRecord {
   url: string | null;
   repo: string | null;
   path: string | null;
+  baselineSha: string | null;
+  currentSha: string | null;
+  checkedAt: Date | null;
   addedBy: string;
   createdAt: Date;
 }
@@ -113,6 +116,10 @@ export interface DecisionStore {
   getReference(id: string): Promise<ReferenceRecord | null>;
   listReferences(decisionId: string): Promise<ReferenceRecord[]>;
   deleteReference(id: string): Promise<void>;
+  updateReferenceState(
+    id: string,
+    state: { currentSha: string | null; checkedAt: Date },
+  ): Promise<void>;
 
   addWorkspaceRepo(repo: RepoRecord): Promise<void>;
   listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]>;
