@@ -13,6 +13,7 @@ import type {
   DecisionStore,
   ReferenceKind,
   ReferenceRecord,
+  RepoRecord,
   TransitionRecord,
 } from "./store";
 import type { Actor, DecisionStatus, Role } from "./types";
@@ -97,6 +98,47 @@ export class DecisionService {
 
   listMembers(workspaceId: string) {
     return this.store.listMembers(workspaceId);
+  }
+
+  /** Connect a GitHub repo to a workspace. Maintainer-only, like membership. */
+  async connectRepo(
+    workspaceId: string,
+    userId: string,
+    input: { owner: string; name: string; defaultBranch: string },
+  ): Promise<RepoRecord> {
+    const role = await this.roleOf(workspaceId, userId);
+    if (role !== "maintainer") {
+      throw new DecisionError("only a maintainer can connect a repository");
+    }
+    const repo: RepoRecord = {
+      id: this.ids.next(),
+      workspaceId,
+      owner: input.owner,
+      name: input.name,
+      defaultBranch: input.defaultBranch,
+      connectedBy: userId,
+      createdAt: this.clock.now(),
+    };
+    await this.store.addWorkspaceRepo(repo);
+    return repo;
+  }
+
+  listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]> {
+    return this.store.listWorkspaceRepos(workspaceId);
+  }
+
+  getWorkspaceRepo(id: string): Promise<RepoRecord | null> {
+    return this.store.getWorkspaceRepo(id);
+  }
+
+  async disconnectRepo(repoId: string, userId: string): Promise<void> {
+    const repo = await this.store.getWorkspaceRepo(repoId);
+    if (!repo) throw new DecisionError("repository not found");
+    const role = await this.roleOf(repo.workspaceId, userId);
+    if (role !== "maintainer") {
+      throw new DecisionError("only a maintainer can disconnect a repository");
+    }
+    await this.store.deleteWorkspaceRepo(repoId);
   }
 
   /** Open a new ADR as a proposal, seeding its body into a versioned document. */

@@ -5,6 +5,7 @@ import {
   decisions,
   decisionTransitions,
   memberships,
+  workspaceRepos,
   workspaces,
 } from "@/lib/db/schema";
 import type {
@@ -12,6 +13,7 @@ import type {
   DecisionStore,
   MembershipRecord,
   ReferenceRecord,
+  RepoRecord,
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";
@@ -184,6 +186,31 @@ export class DrizzleDecisionStore implements DecisionStore {
 
   async deleteReference(id: string): Promise<void> {
     await db.delete(decisionReferences).where(eq(decisionReferences.id, id));
+  }
+
+  async addWorkspaceRepo(repo: RepoRecord): Promise<void> {
+    await db.insert(workspaceRepos).values(repo);
+  }
+
+  async listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]> {
+    return db
+      .select()
+      .from(workspaceRepos)
+      .where(eq(workspaceRepos.workspaceId, workspaceId))
+      .orderBy(asc(workspaceRepos.createdAt));
+  }
+
+  async getWorkspaceRepo(id: string): Promise<RepoRecord | null> {
+    const [row] = await db
+      .select()
+      .from(workspaceRepos)
+      .where(eq(workspaceRepos.id, id))
+      .limit(1);
+    return row ?? null;
+  }
+
+  async deleteWorkspaceRepo(id: string): Promise<void> {
+    await db.delete(workspaceRepos).where(eq(workspaceRepos.id, id));
   }
 }
 

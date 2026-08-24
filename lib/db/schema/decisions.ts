@@ -89,6 +89,31 @@ export const decisions = pgTable(
  * decision's creation.
  */
 /**
+ * A GitHub repo connected to a workspace, so its files can be referenced by
+ * decisions. Only the connection is stored; file browsing uses the *current*
+ * user's GitHub token, so no one borrows another user's access.
+ */
+export const workspaceRepos = pgTable(
+  "workspace_repos",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    owner: text("owner").notNull(),
+    name: text("name").notNull(),
+    defaultBranch: text("default_branch").notNull(),
+    connectedBy: text("connected_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    unique("workspace_repos_key").on(table.workspaceId, table.owner, table.name),
+  ],
+);
+
+/**
  * Evidence attached to a decision. `link` references are a labelled URL. `file`
  * references point at a specific file in a connected repo (repo + path) and are
  * created from the GitHub picker — the columns exist now so both kinds share one

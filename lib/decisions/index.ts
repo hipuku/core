@@ -10,6 +10,7 @@ export type {
   MembershipRecord,
   ReferenceKind,
   ReferenceRecord,
+  RepoRecord,
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";

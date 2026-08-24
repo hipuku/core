@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { decisionService, DecisionError } from "@/lib/decisions";
 import type { DecisionStatus, Role } from "@/lib/decisions";
+import { fileUrl, getGithubToken, listRepoFiles, listRepos } from "@/lib/github";
 import { requireUser } from "@/lib/session";
 import { findUserByEmail } from "@/lib/users";
 
@@ -62,6 +63,73 @@ export async function removeReference(
 ) {
   const user = await requireUser();
   await decisionService.removeReference(referenceId, user.id);
+  revalidatePath(`/app/${workspaceId}/${decisionId}`);
+}
+
+/** The current user's GitHub repos, for the connect picker. */
+export async function listMyGithubRepos() {
+  const user = await requireUser();
+  const token = await getGithubToken(user.id);
+  if (!token) throw new DecisionError("connect your GitHub account first");
+  return listRepos(token);
+}
+
+export async function connectRepo(workspaceId: string, formData: FormData) {
+  const user = await requireUser();
+  const raw = String(formData.get("repo") ?? "");
+  let parsed: { owner?: string; name?: string; defaultBranch?: string };
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return;
+  }
+  if (!parsed.owner || !parsed.name || !parsed.defaultBranch) return;
+  await decisionService.connectRepo(workspaceId, user.id, {
+    owner: parsed.owner,
+    name: parsed.name,
+    defaultBranch: parsed.defaultBranch,
+  });
+  revalidatePath(`/app/${workspaceId}`);
+}
+
+export async function disconnectRepo(workspaceId: string, repoId: string) {
+  const user = await requireUser();
+  await decisionService.disconnectRepo(repoId, user.id);
+  revalidatePath(`/app/${workspaceId}`);
+}
+
+/** Every file path in a connected repo, for the file picker. */
+export async function listConnectedRepoFiles(repoId: string) {
+  const user = await requireUser();
+  const repo = await decisionService.getWorkspaceRepo(repoId);
+  if (!repo) throw new DecisionError("repository not found");
+  const role = await decisionService.roleOf(repo.workspaceId, user.id);
+  if (!role) throw new DecisionError("you are not a member of this workspace");
+  const token = await getGithubToken(user.id);
+  if (!token) throw new DecisionError("connect your GitHub account first");
+  return listRepoFiles(token, repo.owner, repo.name, repo.defaultBranch);
+}
+
+export async function addFileReference(
+  workspaceId: string,
+  decisionId: string,
+  formData: FormData,
+) {
+  const user = await requireUser();
+  const repoId = String(formData.get("repoId") ?? "");
+  const path = String(formData.get("path") ?? "").trim();
+  if (!repoId || !path) return;
+  const repo = await decisionService.getWorkspaceRepo(repoId);
+  if (!repo || repo.workspaceId !== workspaceId) {
+    throw new DecisionError("repository not found");
+  }
+  await decisionService.addReference(decisionId, user.id, {
+    kind: "file",
+    label: `${repo.owner}/${repo.name} · ${path}`,
+    url: fileUrl(repo.owner, repo.name, repo.defaultBranch, path),
+    repo: `${repo.owner}/${repo.name}`,
+    path,
+  });
   revalidatePath(`/app/${workspaceId}/${decisionId}`);
 }
 

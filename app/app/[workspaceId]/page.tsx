@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { RepoManager } from "@/components/RepoManager";
 import { StatusBadge } from "@/components/StatusBadge";
 import { decisionService } from "@/lib/decisions";
+import { getGithubToken } from "@/lib/github";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
 import { inviteMember } from "../actions";
@@ -24,6 +26,8 @@ export default async function WorkspacePage({
   const decisions = await decisionService.listDecisions(workspaceId);
   const members = await decisionService.listMembers(workspaceId);
   const memberUsers = await usersById(members.map((m) => m.userId));
+  const repos = await decisionService.listWorkspaceRepos(workspaceId);
+  const githubLinked = (await getGithubToken(user.id)) !== null;
 
   const inviteHere = inviteMember.bind(null, workspaceId);
   const article = role === "author" ? "an" : "a";
@@ -106,6 +110,18 @@ export default async function WorkspacePage({
             </div>
           </form>
         )}
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>Repositories</h2>
+        </div>
+        <RepoManager
+          workspaceId={workspaceId}
+          githubLinked={githubLinked}
+          canManage={role === "maintainer"}
+          repos={repos}
+        />
       </section>
     </div>
   );

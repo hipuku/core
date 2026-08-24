@@ -181,6 +181,33 @@ describe("DecisionService", () => {
     ).rejects.toThrow("only the person who added it or a maintainer");
   });
 
+  it("lets a maintainer connect a repo but not an author", async () => {
+    const ws = await workspaceWithAuthor(service);
+    await expect(
+      service.connectRepo(ws.id, AUTHOR, { owner: "acme", name: "api", defaultBranch: "main" }),
+    ).rejects.toThrow("only a maintainer");
+    const repo = await service.connectRepo(ws.id, MAINTAINER, {
+      owner: "acme",
+      name: "api",
+      defaultBranch: "main",
+    });
+    expect(repo).toMatchObject({ owner: "acme", name: "api" });
+    const repos = await service.listWorkspaceRepos(ws.id);
+    expect(repos).toHaveLength(1);
+  });
+
+  it("lets a maintainer disconnect a repo", async () => {
+    const ws = await workspaceWithAuthor(service);
+    const repo = await service.connectRepo(ws.id, MAINTAINER, {
+      owner: "acme",
+      name: "api",
+      defaultBranch: "main",
+    });
+    await expect(service.disconnectRepo(repo.id, AUTHOR)).rejects.toThrow("only a maintainer");
+    await service.disconnectRepo(repo.id, MAINTAINER);
+    expect(await service.listWorkspaceRepos(ws.id)).toHaveLength(0);
+  });
+
   it("refuses to supersede with a decision that is not accepted", async () => {
     const ws = await workspaceWithAuthor(service);
     const old = await service.propose(ws.id, AUTHOR, { title: "old", body: {} });

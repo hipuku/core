@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FileReferencePicker } from "@/components/FileReferencePicker";
 import { Markdown } from "@/components/Markdown";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
@@ -59,11 +60,12 @@ export default async function DecisionPage({
   const decision = found;
 
   const actor = { id: user.id, capabilities: capabilitiesFor(role) };
-  const [content, transitions, all, references] = await Promise.all([
+  const [content, transitions, all, references, repos] = await Promise.all([
     decisionService.contentHistory(decisionId),
     decisionService.statusHistory(decisionId),
     decisionService.listDecisions(workspaceId),
     decisionService.listReferences(decisionId),
+    decisionService.listWorkspaceRepos(workspaceId),
   ]);
 
   const people = await usersById([
@@ -226,6 +228,12 @@ export default async function DecisionPage({
                 <input className="input" name="label" placeholder="Label (optional)" />
                 <button type="submit" className="btn">Add link</button>
               </form>
+
+              <FileReferencePicker
+                workspaceId={workspaceId}
+                decisionId={decisionId}
+                repos={repos}
+              />
             </div>
           </div>
         )

@@ -3,6 +3,7 @@ import type {
   DecisionStore,
   MembershipRecord,
   ReferenceRecord,
+  RepoRecord,
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";
@@ -19,6 +20,7 @@ export class MemoryDecisionStore implements DecisionStore {
   private decisions = new Map<string, DecisionRecord>();
   private transitions: TransitionRecord[] = [];
   private references = new Map<string, ReferenceRecord>();
+  private repos = new Map<string, RepoRecord>();
   private counters = new Map<string, number>();
 
   private memberKey(workspaceId: string, userId: string): string {
@@ -139,5 +141,25 @@ export class MemoryDecisionStore implements DecisionStore {
 
   async deleteReference(id: string): Promise<void> {
     this.references.delete(id);
+  }
+
+  async addWorkspaceRepo(repo: RepoRecord): Promise<void> {
+    this.repos.set(repo.id, { ...repo });
+  }
+
+  async listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]> {
+    return [...this.repos.values()]
+      .filter((r) => r.workspaceId === workspaceId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .map((r) => ({ ...r }));
+  }
+
+  async getWorkspaceRepo(id: string): Promise<RepoRecord | null> {
+    const record = this.repos.get(id);
+    return record ? { ...record } : null;
+  }
+
+  async deleteWorkspaceRepo(id: string): Promise<void> {
+    this.repos.delete(id);
   }
 }

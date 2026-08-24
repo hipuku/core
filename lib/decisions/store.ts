@@ -45,6 +45,16 @@ export interface TransitionRecord {
   createdAt: Date;
 }
 
+export interface RepoRecord {
+  id: string;
+  workspaceId: string;
+  owner: string;
+  name: string;
+  defaultBranch: string;
+  connectedBy: string;
+  createdAt: Date;
+}
+
 export type ReferenceKind = "link" | "file";
 
 export interface ReferenceRecord {
@@ -103,4 +113,9 @@ export interface DecisionStore {
   getReference(id: string): Promise<ReferenceRecord | null>;
   listReferences(decisionId: string): Promise<ReferenceRecord[]>;
   deleteReference(id: string): Promise<void>;
+
+  addWorkspaceRepo(repo: RepoRecord): Promise<void>;
+  listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]>;
+  getWorkspaceRepo(id: string): Promise<RepoRecord | null>;
+  deleteWorkspaceRepo(id: string): Promise<void>;
 }
