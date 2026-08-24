@@ -48,19 +48,25 @@ export function PasswordField({
         </div>
       </label>
 
-      {showMeter && value.length > 0 && strength && (
-        <div className={styles.meter} data-score={strength.score}>
+      {showMeter && strength && (
+        <div className={styles.meter} data-score={value ? strength.score : -1}>
           <div className={styles.bars}>
             {[0, 1, 2, 3, 4].map((i) => (
               <span
                 key={i}
-                className={`${styles.bar} ${i <= strength.score ? styles.barOn : ""}`}
+                className={`${styles.bar} ${value && i <= strength.score ? styles.barOn : ""}`}
               />
             ))}
           </div>
           <p className={styles.readout}>
-            <span className={styles.label}>{strength.label}</span>
-            {strength.hint && <span className={styles.hint}> · {strength.hint}</span>}
+            {value && (
+              <>
+                <span className={styles.label}>{strength.label}</span>
+                {strength.hint && (
+                  <span className={styles.hint}> · {strength.hint}</span>
+                )}
+              </>
+            )}
           </p>
         </div>
       )}
