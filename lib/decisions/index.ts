@@ -8,6 +8,8 @@ export type {
   DecisionRecord,
   DecisionStore,
   MembershipRecord,
+  ReferenceKind,
+  ReferenceRecord,
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";

@@ -305,6 +305,59 @@
 .opRemove { color: color-mix(in oklch, var(--st-rejected) 85%, black); }
 .opReplace { color: color-mix(in oklch, var(--st-superseded) 80%, black); }
 
+/* ---- references -------------------------------------------------------- */
+.refList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+}
+.refItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+.refLink {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.refLink:hover {
+  text-decoration: underline;
+}
+.refRemove {
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.2rem;
+}
+.refRemove:hover {
+  color: var(--danger);
+}
+.refForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.refForm .input {
+  flex: 1;
+  min-width: 8rem;
+}
+
 /* ---- members ----------------------------------------------------------- */
 .memberRow {
   display: flex;

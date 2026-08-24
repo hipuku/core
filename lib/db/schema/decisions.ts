@@ -21,6 +21,8 @@ export const decisionStatus = pgEnum("decision_status", [
 
 export const memberRole = pgEnum("member_role", ["author", "maintainer"]);
 
+export const referenceKind = pgEnum("reference_kind", ["link", "file"]);
+
 /** A team. Decisions, membership and ADR numbering are all scoped to a workspace. */
 export const workspaces = pgTable("workspaces", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -86,6 +88,28 @@ export const decisions = pgTable(
  * and supersession lands one immutable row here. `fromStatus` is null for the
  * decision's creation.
  */
+/**
+ * Evidence attached to a decision. `link` references are a labelled URL. `file`
+ * references point at a specific file in a connected repo (repo + path) and are
+ * created from the GitHub picker — the columns exist now so both kinds share one
+ * table. Not versioned: references augment a decision, they are not its prose.
+ */
+export const decisionReferences = pgTable("decision_references", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  decisionId: uuid("decision_id")
+    .notNull()
+    .references(() => decisions.id, { onDelete: "cascade" }),
+  kind: referenceKind("kind").notNull(),
+  label: text("label"),
+  url: text("url"),
+  repo: text("repo"),
+  path: text("path"),
+  addedBy: text("added_by")
+    .notNull()
+    .references(() => user.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const decisionTransitions = pgTable("decision_transitions", {
   id: uuid("id").primaryKey().defaultRandom(),
   decisionId: uuid("decision_id")

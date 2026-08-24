@@ -45,6 +45,20 @@ export interface TransitionRecord {
   createdAt: Date;
 }
 
+export type ReferenceKind = "link" | "file";
+
+export interface ReferenceRecord {
+  id: string;
+  decisionId: string;
+  kind: ReferenceKind;
+  label: string | null;
+  url: string | null;
+  repo: string | null;
+  path: string | null;
+  addedBy: string;
+  createdAt: Date;
+}
+
 export interface DecisionStore {
   createWorkspace(input: {
     id: string;
@@ -84,4 +98,9 @@ export interface DecisionStore {
   }): Promise<void>;
 
   listTransitions(decisionId: string): Promise<TransitionRecord[]>;
+
+  addReference(reference: ReferenceRecord): Promise<void>;
+  getReference(id: string): Promise<ReferenceRecord | null>;
+  listReferences(decisionId: string): Promise<ReferenceRecord[]>;
+  deleteReference(id: string): Promise<void>;
 }

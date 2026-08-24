@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Markdown } from "@/components/Markdown";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
   canEditContent,
@@ -9,7 +10,13 @@ import {
 import type { Change, Json } from "@/lib/versioning";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
-import { changeStatus, revise, supersede } from "../../actions";
+import {
+  addReference,
+  changeStatus,
+  removeReference,
+  revise,
+  supersede,
+} from "../../actions";
 import styles from "../../app.module.css";
 
 function field(body: Json, key: string): string {
@@ -52,10 +59,11 @@ export default async function DecisionPage({
   const decision = found;
 
   const actor = { id: user.id, capabilities: capabilitiesFor(role) };
-  const [content, transitions, all] = await Promise.all([
+  const [content, transitions, all, references] = await Promise.all([
     decisionService.contentHistory(decisionId),
     decisionService.statusHistory(decisionId),
     decisionService.listDecisions(workspaceId),
+    decisionService.listReferences(decisionId),
   ]);
 
   const people = await usersById([
@@ -176,10 +184,49 @@ export default async function DecisionPage({
               return (
                 <div key={key} className={styles.docBlock}>
                   <h3>{key}</h3>
-                  {text ? <p>{text}</p> : <p className={styles.docEmpty}>Not yet written.</p>}
+                  {text ? (
+                    <Markdown>{text}</Markdown>
+                  ) : (
+                    <p className={styles.docEmpty}>Not yet written.</p>
+                  )}
                 </div>
               );
             })}
+
+            <div className={styles.docBlock}>
+              <h3>References</h3>
+              {references.length === 0 ? (
+                <p className={styles.docEmpty}>No references attached.</p>
+              ) : (
+                <ul className={styles.refList}>
+                  {references.map((ref) => (
+                    <li key={ref.id} className={styles.refItem}>
+                      <a
+                        href={ref.url ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.refLink}
+                      >
+                        {ref.label || ref.url}
+                      </a>
+                      <form action={removeReference.bind(null, workspaceId, decisionId, ref.id)}>
+                        <button type="submit" className={styles.refRemove} aria-label="Remove reference">
+                          ×
+                        </button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <form
+                action={addReference.bind(null, workspaceId, decisionId)}
+                className={styles.refForm}
+              >
+                <input className="input" type="url" name="url" placeholder="https://…" required />
+                <input className="input" name="label" placeholder="Label (optional)" />
+                <button type="submit" className="btn">Add link</button>
+              </form>
+            </div>
           </div>
         )
       ) : (

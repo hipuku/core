@@ -19,10 +19,13 @@
     "@zxcvbn-ts/language-en": "^4.1.1",
     "better-auth": "^1.7.1",
     "drizzle-orm": "^0.45.2",
+    "mermaid": "^11.17.0",
     "next": "16.3.2",
     "postgres": "^3.4.9",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",

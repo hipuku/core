@@ -139,6 +139,48 @@ describe("DecisionService", () => {
     ).rejects.toThrow("only a maintainer");
   });
 
+  it("lets any member add a reference and lists it", async () => {
+    const ws = await workspaceWithAuthor(service);
+    const d = await service.propose(ws.id, AUTHOR, { title: "x", body: {} });
+    await service.addReference(d.id, AUTHOR, {
+      kind: "link",
+      label: "RFC",
+      url: "https://example.com/rfc",
+    });
+    const refs = await service.listReferences(d.id);
+    expect(refs).toHaveLength(1);
+    expect(refs[0]).toMatchObject({ kind: "link", url: "https://example.com/rfc", addedBy: AUTHOR });
+  });
+
+  it("refuses a reference from a non-member", async () => {
+    const ws = await workspaceWithAuthor(service);
+    const d = await service.propose(ws.id, AUTHOR, { title: "x", body: {} });
+    await expect(
+      service.addReference(d.id, STRANGER, { kind: "link", url: "https://x" }),
+    ).rejects.toThrow("not a member");
+  });
+
+  it("lets a maintainer remove another member's reference but not a stranger", async () => {
+    const ws = await workspaceWithAuthor(service);
+    const d = await service.propose(ws.id, AUTHOR, { title: "x", body: {} });
+    const ref = await service.addReference(d.id, AUTHOR, { kind: "link", url: "https://x" });
+    await expect(
+      service.removeReference(ref.id, STRANGER),
+    ).rejects.toThrow("not a member");
+    await service.removeReference(ref.id, MAINTAINER);
+    expect(await service.listReferences(d.id)).toHaveLength(0);
+  });
+
+  it("refuses to let one author remove another member's reference", async () => {
+    const ws = await workspaceWithAuthor(service);
+    await service.addMember(ws.id, "user_second", "author");
+    const d = await service.propose(ws.id, AUTHOR, { title: "x", body: {} });
+    const ref = await service.addReference(d.id, AUTHOR, { kind: "link", url: "https://x" });
+    await expect(
+      service.removeReference(ref.id, "user_second"),
+    ).rejects.toThrow("only the person who added it or a maintainer");
+  });
+
   it("refuses to supersede with a decision that is not accepted", async () => {
     const ws = await workspaceWithAuthor(service);
     const old = await service.propose(ws.id, AUTHOR, { title: "old", body: {} });

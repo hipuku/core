@@ -2,6 +2,7 @@ import type {
   DecisionRecord,
   DecisionStore,
   MembershipRecord,
+  ReferenceRecord,
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";
@@ -17,6 +18,7 @@ export class MemoryDecisionStore implements DecisionStore {
   private members = new Map<string, MembershipRecord>();
   private decisions = new Map<string, DecisionRecord>();
   private transitions: TransitionRecord[] = [];
+  private references = new Map<string, ReferenceRecord>();
   private counters = new Map<string, number>();
 
   private memberKey(workspaceId: string, userId: string): string {
@@ -117,5 +119,25 @@ export class MemoryDecisionStore implements DecisionStore {
       .filter((t) => t.decisionId === decisionId)
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
       .map((t) => ({ ...t }));
+  }
+
+  async addReference(reference: ReferenceRecord): Promise<void> {
+    this.references.set(reference.id, { ...reference });
+  }
+
+  async getReference(id: string): Promise<ReferenceRecord | null> {
+    const record = this.references.get(id);
+    return record ? { ...record } : null;
+  }
+
+  async listReferences(decisionId: string): Promise<ReferenceRecord[]> {
+    return [...this.references.values()]
+      .filter((r) => r.decisionId === decisionId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .map((r) => ({ ...r }));
+  }
+
+  async deleteReference(id: string): Promise<void> {
+    this.references.delete(id);
   }
 }

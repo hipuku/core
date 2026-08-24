@@ -38,6 +38,33 @@ export async function inviteMember(workspaceId: string, formData: FormData) {
   revalidatePath(`/app/${workspaceId}`);
 }
 
+export async function addReference(
+  workspaceId: string,
+  decisionId: string,
+  formData: FormData,
+) {
+  const user = await requireUser();
+  const url = String(formData.get("url") ?? "").trim();
+  if (!url) return;
+  const label = String(formData.get("label") ?? "").trim() || null;
+  await decisionService.addReference(decisionId, user.id, {
+    kind: "link",
+    label,
+    url,
+  });
+  revalidatePath(`/app/${workspaceId}/${decisionId}`);
+}
+
+export async function removeReference(
+  workspaceId: string,
+  decisionId: string,
+  referenceId: string,
+) {
+  const user = await requireUser();
+  await decisionService.removeReference(referenceId, user.id);
+  revalidatePath(`/app/${workspaceId}/${decisionId}`);
+}
+
 export async function propose(workspaceId: string, formData: FormData) {
   const user = await requireUser();
   const title = String(formData.get("title") ?? "").trim();

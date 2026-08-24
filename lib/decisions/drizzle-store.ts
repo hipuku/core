@@ -1,6 +1,7 @@
 import { and, asc, eq, max } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
+  decisionReferences,
   decisions,
   decisionTransitions,
   memberships,
@@ -10,6 +11,7 @@ import type {
   DecisionRecord,
   DecisionStore,
   MembershipRecord,
+  ReferenceRecord,
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";
@@ -157,6 +159,31 @@ export class DrizzleDecisionStore implements DecisionStore {
       .from(decisionTransitions)
       .where(eq(decisionTransitions.decisionId, decisionId))
       .orderBy(asc(decisionTransitions.createdAt));
+  }
+
+  async addReference(reference: ReferenceRecord): Promise<void> {
+    await db.insert(decisionReferences).values(reference);
+  }
+
+  async getReference(id: string): Promise<ReferenceRecord | null> {
+    const [row] = await db
+      .select()
+      .from(decisionReferences)
+      .where(eq(decisionReferences.id, id))
+      .limit(1);
+    return row ?? null;
+  }
+
+  async listReferences(decisionId: string): Promise<ReferenceRecord[]> {
+    return db
+      .select()
+      .from(decisionReferences)
+      .where(eq(decisionReferences.decisionId, decisionId))
+      .orderBy(asc(decisionReferences.createdAt));
+  }
+
+  async deleteReference(id: string): Promise<void> {
+    await db.delete(decisionReferences).where(eq(decisionReferences.id, id));
   }
 }
 

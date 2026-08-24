@@ -11,6 +11,8 @@ import {
 import type {
   DecisionRecord,
   DecisionStore,
+  ReferenceKind,
+  ReferenceRecord,
   TransitionRecord,
 } from "./store";
 import type { Actor, DecisionStatus, Role } from "./types";
@@ -230,6 +232,60 @@ export class DecisionService {
 
   listDecisions(workspaceId: string): Promise<DecisionRecord[]> {
     return this.store.listDecisions(workspaceId);
+  }
+
+  /**
+   * Attach a reference (evidence) to a decision. Any workspace member may add one —
+   * references augment a decision rather than change its prose, and adding a PR link
+   * to an already-accepted decision is a legitimate thing to want to do.
+   */
+  async addReference(
+    decisionId: string,
+    userId: string,
+    input: {
+      kind: ReferenceKind;
+      label?: string | null;
+      url?: string | null;
+      repo?: string | null;
+      path?: string | null;
+    },
+  ): Promise<ReferenceRecord> {
+    const decision = await this.requireDecision(decisionId);
+    const role = await this.roleOf(decision.workspaceId, userId);
+    if (!role) throw new DecisionError("you are not a member of this workspace");
+
+    const reference: ReferenceRecord = {
+      id: this.ids.next(),
+      decisionId,
+      kind: input.kind,
+      label: input.label ?? null,
+      url: input.url ?? null,
+      repo: input.repo ?? null,
+      path: input.path ?? null,
+      addedBy: userId,
+      createdAt: this.clock.now(),
+    };
+    await this.store.addReference(reference);
+    return reference;
+  }
+
+  listReferences(decisionId: string): Promise<ReferenceRecord[]> {
+    return this.store.listReferences(decisionId);
+  }
+
+  /** Remove a reference — the person who added it, or any maintainer. */
+  async removeReference(referenceId: string, userId: string): Promise<void> {
+    const reference = await this.store.getReference(referenceId);
+    if (!reference) throw new DecisionError("reference not found");
+    const decision = await this.requireDecision(reference.decisionId);
+    const role = await this.roleOf(decision.workspaceId, userId);
+    if (!role) throw new DecisionError("you are not a member of this workspace");
+    if (role !== "maintainer" && reference.addedBy !== userId) {
+      throw new DecisionError(
+        "only the person who added it or a maintainer can remove a reference",
+      );
+    }
+    await this.store.deleteReference(referenceId);
   }
 
   /** The content trail: how the ADR's text changed, version by version. */
