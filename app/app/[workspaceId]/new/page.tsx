@@ -38,6 +38,10 @@ export default async function NewDecisionPage({
       </div>
 
       <form action={propose.bind(null, workspaceId)} className={styles.form}>
+        <p className={styles.hint}>
+          Context, Decision, and Consequences support Markdown — including code
+          blocks and <code>```mermaid</code> diagrams.
+        </p>
         <label className="field">
           <span>Title</span>
           <input className="input" name="title" required placeholder="Use Postgres for primary storage" />

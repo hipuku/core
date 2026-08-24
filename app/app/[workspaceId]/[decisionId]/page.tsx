@@ -182,6 +182,9 @@ export default async function DecisionPage({
       {tab === "document" ? (
         isEditing ? (
           <form action={revise.bind(null, workspaceId, decisionId)} className={styles.form}>
+            <p className={styles.hint}>
+              Markdown supported, including <code>```mermaid</code> diagrams.
+            </p>
             <label className="field">
               <span>Context</span>
               <textarea className="textarea" name="context" rows={3} defaultValue={field(body, "context")} />
