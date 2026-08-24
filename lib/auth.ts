@@ -17,9 +17,9 @@ const githubProvider =
         github: {
           clientId: process.env.GITHUB_CLIENT_ID,
           clientSecret: process.env.GITHUB_CLIENT_SECRET,
-          // `repo` is what lets us read files from private repos the user
-          // collaborates on; the rest identify them.
-          scope: ["repo", "read:user", "user:email"],
+          // `repo` lets us read files from private repos the user collaborates
+          // on. better-auth already requests read:user + user:email by default.
+          scope: ["repo"],
         },
       }
     : undefined;
@@ -34,9 +34,12 @@ export const auth = betterAuth({
   socialProviders: githubProvider,
   account: {
     accountLinking: {
-      // Let a signed-in email/password user connect their GitHub account.
+      // Let a signed-in email/password user connect their GitHub account, even
+      // when the GitHub email differs from their core email — they are already
+      // authenticated and GitHub verifies its emails, so self-linking is safe.
       enabled: true,
       trustedProviders: ["github"],
+      allowDifferentEmails: true,
     },
   },
   plugins: [
