@@ -116,7 +116,10 @@ h1, h2, h3, h4 {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1;
-  padding: 0.55rem 0.9rem;
+  /* Uniform height across every variant; vertical size comes from min-height,
+     not padding, so icon and text buttons line up exactly. */
+  min-height: 36px;
+  padding: 0 0.9rem;
   border-radius: var(--r-sm);
   border: 1px solid var(--btn-border);
   background: var(--btn-bg);
@@ -159,13 +162,14 @@ h1, h2, h3, h4 {
   --btn-border: color-mix(in oklch, var(--st-accepted) 86%, black);
 }
 .btn--icon {
-  padding: 0.55rem;
+  width: 36px;
+  padding: 0;
 }
 .btn--ghost {
   --btn-bg: transparent;
   --btn-border: transparent;
   color: var(--text-dim);
-  padding: 0.4rem 0.55rem;
+  padding: 0 0.7rem;
   box-shadow: none;
 }
 .btn--ghost:hover {
@@ -177,6 +181,16 @@ h1, h2, h3, h4 {
 }
 .btn--danger:hover {
   --btn-bg: color-mix(in oklch, var(--danger) 12%, var(--surface-2));
+}
+.btn--destructive {
+  --btn-bg: var(--danger);
+  --btn-border: var(--danger);
+  color: var(--accent-fg);
+  font-weight: 550;
+}
+.btn--destructive:hover {
+  --btn-bg: color-mix(in oklch, var(--danger) 88%, black);
+  --btn-border: color-mix(in oklch, var(--danger) 88%, black);
 }
 
 /* inputs */

@@ -1,20 +1,15 @@
-import { Check, Trash2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { redirect } from "next/navigation";
 import { AddMemberModal } from "@/components/AddMemberModal";
 import { AddRepoModal } from "@/components/AddRepoModal";
-import { ConfirmButton } from "@/components/ConfirmButton";
 import { ConnectGithubButton } from "@/components/ConnectGithubButton";
+import { DeleteWorkspaceModal } from "@/components/DeleteWorkspaceModal";
 import { ToastForm } from "@/components/ToastForm";
 import { decisionService } from "@/lib/decisions";
 import { getGithubToken } from "@/lib/github";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
-import {
-  deleteWorkspace,
-  disconnectRepo,
-  removeMember,
-  renameWorkspace,
-} from "../../actions";
+import { disconnectRepo, removeMember, renameWorkspace } from "../../actions";
 import styles from "../../app.module.css";
 
 export default async function SettingsPage({
@@ -133,15 +128,7 @@ export default async function SettingsPage({
         <div className={styles.sectionHead}>
           <h2 className={styles.sectionTitle}>Danger zone</h2>
         </div>
-        <form action={deleteWorkspace.bind(null, workspaceId)}>
-          <ConfirmButton
-            className="btn btn--danger"
-            message="Delete this workspace and all its decisions? This cannot be undone."
-          >
-            <Trash2 size={15} />
-            Delete workspace
-          </ConfirmButton>
-        </form>
+        <DeleteWorkspaceModal workspaceId={workspaceId} name={workspace.name} />
       </section>
     </div>
   );

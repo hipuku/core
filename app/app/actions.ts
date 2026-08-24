@@ -61,10 +61,13 @@ export async function renameWorkspace(
   }, "Workspace renamed.");
 }
 
-export async function deleteWorkspace(workspaceId: string) {
+export async function deleteWorkspace(
+  workspaceId: string,
+): Promise<ActionResult> {
   const user = await requireUser();
-  await decisionService.deleteWorkspace(workspaceId, user.id);
-  redirect("/app");
+  return attempt(async () => {
+    await decisionService.deleteWorkspace(workspaceId, user.id);
+  }, "Workspace deleted.");
 }
 
 export async function inviteMember(
