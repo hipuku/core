@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { connectRepo, disconnectRepo, listMyGithubRepos } from "@/app/app/actions";
 import type { RepoRecord } from "@/lib/decisions";
@@ -65,6 +66,7 @@ export function RepoManager({
           </div>
         ) : available === null ? (
           <button type="button" className="btn" onClick={loadRepos} disabled={loading}>
+            <Plus size={16} />
             {loading ? "Loading…" : "Connect a repository"}
           </button>
         ) : (

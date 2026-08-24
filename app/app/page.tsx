@@ -16,26 +16,24 @@ export default async function WorkspacesPage() {
     <div>
       <div className={styles.pageHead}>
         <div>
-          <div className={styles.titleRow}>
-            <h1 className={styles.title}>Workspaces</h1>
-            <NewWorkspaceModal />
-          </div>
+          <h1 className={styles.title}>Workspaces</h1>
           <p className={styles.sub}>
             Each workspace is a team with its own decision log.
           </p>
         </div>
+        <NewWorkspaceModal />
       </div>
 
       {summaries.length === 0 ? (
         <p className={styles.empty}>
-          No workspaces yet. Use + to create one and start recording decisions.
+          No workspaces yet. Create one to start recording decisions.
         </p>
       ) : (
         <ul className={styles.list}>
           {summaries.map(({ workspace, decisionCount, memberCount, repos }) => (
             <li key={workspace.id}>
               <Link href={`/app/${workspace.id}`} className={styles.wsCard}>
-                <div className={styles.wsName}>{workspace.name}</div>
+                <span className={styles.wsName}>{workspace.name}</span>
                 <div className={styles.wsMeta}>
                   <span className={styles.wsMetaItem}>
                     {plural(decisionCount, "decision")}

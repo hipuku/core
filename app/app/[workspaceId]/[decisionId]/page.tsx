@@ -1,3 +1,12 @@
+import {
+  Archive,
+  ArrowLeftRight,
+  Check,
+  Pencil,
+  Plus,
+  RefreshCw,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FileReferencePicker } from "@/components/FileReferencePicker";
@@ -119,11 +128,7 @@ export default async function DecisionPage({
     <div>
       <div className={styles.pageHead}>
         <div style={{ flex: 1 }}>
-          <p className={styles.crumbs}>
-            <Link href="/app">workspaces</Link>
-            <span className={styles.sep}>/</span>
-            <Link href={`/app/${workspaceId}`}>decisions</Link>
-            <span className={styles.sep}>/</span>
+          <p className="eyebrow" style={{ marginBottom: "0.5rem" }}>
             {adrNumber}
           </p>
           <h1 className={styles.title}>{decision.title}</h1>
@@ -199,7 +204,10 @@ export default async function DecisionPage({
               <textarea className="textarea" name="consequences" rows={3} defaultValue={field(body, "consequences")} />
             </label>
             <div className={styles.actions}>
-              <button type="submit" className="btn btn--primary">Save revision</button>
+              <button type="submit" className="btn btn--primary">
+                <Check size={16} />
+                Save revision
+              </button>
               <Link href={base} className="btn btn--ghost">Cancel</Link>
             </div>
           </ToastForm>
@@ -207,7 +215,7 @@ export default async function DecisionPage({
           <div className={styles.doc}>
             {editable.ok && (
               <div className={styles.actions}>
-                <Link href={`${base}?edit=1`} className="btn">Edit</Link>
+                <Link href={`${base}?edit=1`} className="btn"><Pencil size={15} />Edit</Link>
               </div>
             )}
             {(["context", "decision", "consequences"] as const).map((key) => {
@@ -259,7 +267,10 @@ export default async function DecisionPage({
                   action={checkReferenceDrift.bind(null, workspaceId, decisionId)}
                   style={{ marginBottom: "0.85rem" }}
                 >
-                  <button type="submit" className="btn">Check for drift</button>
+                  <button type="submit" className="btn">
+                    <RefreshCw size={15} />
+                    Check for drift
+                  </button>
                 </ToastForm>
               )}
               <ToastForm
@@ -268,7 +279,10 @@ export default async function DecisionPage({
               >
                 <input className="input" type="url" name="url" placeholder="https://…" required />
                 <input className="input" name="label" placeholder="Label (optional)" />
-                <button type="submit" className="btn">Add link</button>
+                <button type="submit" className="btn">
+                  <Plus size={16} />
+                  Add link
+                </button>
               </ToastForm>
 
               <FileReferencePicker
@@ -351,16 +365,22 @@ export default async function DecisionPage({
             </div>
             <div className={styles.reviewActions}>
               {editable.ok && !isEditing && (
-                <Link href={`${base}?edit=1`} className="btn btn--ghost">Edit</Link>
+                <Link href={`${base}?edit=1`} className="btn btn--ghost"><Pencil size={15} />Edit</Link>
               )}
               {canReject && (
                 <ToastForm action={reject}>
-                  <button type="submit" className="btn btn--danger">Reject</button>
+                  <button type="submit" className="btn btn--danger">
+                    <X size={16} />
+                    Reject
+                  </button>
                 </ToastForm>
               )}
               {canAccept && (
                 <ToastForm action={accept}>
-                  <button type="submit" className="btn btn--accept">Approve</button>
+                  <button type="submit" className="btn btn--accept">
+                    <Check size={16} />
+                    Approve
+                  </button>
                 </ToastForm>
               )}
             </div>
@@ -378,7 +398,7 @@ export default async function DecisionPage({
           </div>
           {editable.ok && !isEditing && (
             <div className={styles.reviewActions}>
-              <Link href={`${base}?edit=1`} className="btn">Edit</Link>
+              <Link href={`${base}?edit=1`} className="btn"><Pencil size={15} />Edit</Link>
             </div>
           )}
         </div>
@@ -401,7 +421,10 @@ export default async function DecisionPage({
             <div className={styles.reviewActions}>
               {canDeprecate && (
                 <ToastForm action={deprecate}>
-                  <button type="submit" className="btn btn--ghost">Deprecate</button>
+                  <button type="submit" className="btn btn--ghost">
+                    <Archive size={16} />
+                    Deprecate
+                  </button>
                 </ToastForm>
               )}
               {canSupersede && supersedable.length > 0 && (
@@ -414,7 +437,10 @@ export default async function DecisionPage({
                       </option>
                     ))}
                   </select>
-                  <button type="submit" className="btn">Supersede</button>
+                  <button type="submit" className="btn">
+                    <ArrowLeftRight size={15} />
+                    Supersede
+                  </button>
                 </form>
               )}
             </div>

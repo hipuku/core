@@ -6,25 +6,6 @@
   gap: 1rem;
   margin-bottom: 2rem;
 }
-.crumbs {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
-  color: var(--text-faint);
-  margin-bottom: 0.55rem;
-}
-.crumbs a:hover {
-  color: var(--text-dim);
-}
-.sep {
-  opacity: 0.5;
-}
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-}
 .title {
   font-size: 1.7rem;
   font-weight: 700;
@@ -33,14 +14,9 @@
 }
 .sub {
   color: var(--text-dim);
-  font-size: 0.92rem;
-  margin-top: 0.4rem;
+  font-size: 1.02rem;
+  margin-top: 0.5rem;
 }
-.roleTag {
-  font-size: 0.8rem;
-  color: var(--text-faint);
-}
-
 /* ---- lists ------------------------------------------------------------- */
 .list {
   list-style: none;
@@ -83,8 +59,11 @@
 
 /* ---- workspace card ---------------------------------------------------- */
 .wsCard {
-  display: block;
-  padding: 1.1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.1rem 1.35rem;
   background: var(--surface);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
@@ -95,16 +74,17 @@
   transform: translateY(-1px);
 }
 .wsName {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 650;
   letter-spacing: -0.01em;
 }
 .wsMeta {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.4rem 1rem;
-  margin-top: 0.55rem;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--text-dim);
 }
 .wsMetaItem {

@@ -1,24 +1,3 @@
-.trigger {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--r-sm);
-  border: none;
-  background: var(--accent);
-  color: var(--accent-fg);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: background 0.12s ease;
-}
-.trigger:hover {
-  background: var(--accent-hover);
-}
-.trigger:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
 .backdrop {
   position: fixed;
   inset: 0;

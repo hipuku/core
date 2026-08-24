@@ -1,3 +1,4 @@
+import { Pencil, Plus, Trash2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ConfirmButton } from "@/components/ConfirmButton";
@@ -38,17 +39,13 @@ export default async function WorkspacePage({
     <div>
       <div className={styles.pageHead}>
         <div>
-          <p className={styles.crumbs}>
-            <Link href="/app">workspaces</Link>
-            <span className={styles.sep}>/</span>
-            {workspace.name}
-          </p>
           <h1 className={styles.title}>Decisions</h1>
           <p className={styles.sub}>
             You are {article} {role} in this workspace.
           </p>
         </div>
         <Link href={`/app/${workspaceId}/new`} className="btn btn--primary">
+          <Plus size={16} />
           New decision
         </Link>
       </div>
@@ -108,7 +105,10 @@ export default async function WorkspacePage({
               </select>
             </label>
             <div className={styles.actions}>
-              <button type="submit" className="btn">Add member</button>
+              <button type="submit" className="btn">
+                <UserPlus size={16} />
+                Add member
+              </button>
             </div>
           </ToastForm>
         )}
@@ -137,7 +137,10 @@ export default async function WorkspacePage({
               <input className="input" name="name" defaultValue={workspace.name} required />
             </label>
             <div className={styles.actions}>
-              <button type="submit" className="btn">Rename</button>
+              <button type="submit" className="btn">
+                <Pencil size={15} />
+                Rename
+              </button>
             </div>
           </ToastForm>
           <form action={deleteWorkspace.bind(null, workspaceId)} style={{ marginTop: "1.25rem" }}>
@@ -145,6 +148,7 @@ export default async function WorkspacePage({
               className="btn btn--danger"
               message="Delete this workspace and all its decisions? This cannot be undone."
             >
+              <Trash2 size={15} />
               Delete workspace
             </ConfirmButton>
           </form>

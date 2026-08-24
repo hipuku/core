@@ -6,12 +6,12 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  height: 56px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.25rem;
-  background: color-mix(in oklch, var(--surface) 80%, transparent);
+  padding: 0 1.5rem;
+  background: color-mix(in oklch, var(--bg) 82%, transparent);
   backdrop-filter: blur(12px);
 }
 
@@ -19,8 +19,34 @@
   display: inline-flex;
   align-items: center;
   font-weight: 700;
-  font-size: 1.35rem;
-  letter-spacing: -0.02em;
+  font-size: 1.7rem;
+  letter-spacing: -0.03em;
+}
+
+/* workspace context: back button + name */
+.leftCtx {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.backBtn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  color: var(--text-dim);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.backBtn:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.ctxName {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .main {

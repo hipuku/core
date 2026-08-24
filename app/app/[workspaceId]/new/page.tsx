@@ -1,3 +1,4 @@
+import { Send } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { decisionService } from "@/lib/decisions";
@@ -23,13 +24,6 @@ export default async function NewDecisionPage({
     <div className={styles.compose}>
       <div className={styles.pageHead}>
         <div>
-          <p className={styles.crumbs}>
-            <Link href="/app">workspaces</Link>
-            <span className={styles.sep}>/</span>
-            <Link href={`/app/${workspaceId}`}>{workspace.name}</Link>
-            <span className={styles.sep}>/</span>
-            new
-          </p>
           <h1 className={styles.title}>Propose a decision</h1>
           <p className={styles.sub}>
             It starts as a proposal. A maintainer reviews and accepts it.
@@ -59,7 +53,10 @@ export default async function NewDecisionPage({
           <textarea className="textarea" name="consequences" rows={4} placeholder="What becomes easier or harder? What do we accept as a trade-off?" />
         </label>
         <div className={styles.actions}>
-          <button type="submit" className="btn btn--primary">Propose decision</button>
+          <button type="submit" className="btn btn--primary">
+            <Send size={16} />
+            Propose decision
+          </button>
           <Link href={`/app/${workspaceId}`} className="btn btn--ghost">Cancel</Link>
         </div>
       </form>

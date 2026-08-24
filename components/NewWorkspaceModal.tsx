@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createWorkspace } from "@/app/app/actions";
 import styles from "./NewWorkspaceModal.module.css";
@@ -20,13 +21,11 @@ export function NewWorkspaceModal() {
     <>
       <button
         type="button"
-        className={styles.trigger}
-        aria-label="New workspace"
+        className="btn btn--primary"
         onClick={() => setOpen(true)}
       >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-          <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-        </svg>
+        <Plus size={16} />
+        New workspace
       </button>
 
       {open && (
@@ -59,6 +58,7 @@ export function NewWorkspaceModal() {
                   Cancel
                 </button>
                 <button type="submit" className="btn btn--primary">
+                  <Plus size={16} />
                   Create workspace
                 </button>
               </div>
