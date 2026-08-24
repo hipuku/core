@@ -97,21 +97,26 @@ whatever port you are actually running on.
 | Script              | What it does                             |
 | ------------------- | ---------------------------------------- |
 | `npm run dev`       | Next dev server                          |
-| `npm run build`     | Production build (typechecks)            |
-| `npm test`          | Vitest — the domain and text-core suites |
+| `npm run build`     | Production build                         |
 | `npm run lint`      | eslint                                   |
+| `npm run typecheck` | `tsc --noEmit`                           |
+| `npm test`          | Vitest — the domain and text-core suites |
 | `npm run db:push`   | Push the Drizzle schema to the database  |
 | `npm run db:studio` | Drizzle Studio                           |
 
-## Tests
+## Tests and CI
 
 Every pure module has its own suite, exercised directly rather than through a
 component. The two storage ports are covered by running the in-memory store
 against the same tests the domain relies on.
 
 ```
-npm test
+npm run lint && npm run typecheck && npm test
 ```
+
+CI runs exactly those three on every push and pull request, then a production
+build once they agree. Each check reports independently, so one run tells you
+everything that is wrong rather than only the first thing.
 
 ## Stack
 

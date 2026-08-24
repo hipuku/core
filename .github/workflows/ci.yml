@@ -1,0 +1,70 @@
+# The gate. Every push and every pull request runs the same three checks that
+# are expected to pass locally before committing, plus a production build.
+#
+# Split into two jobs rather than one: lint, typecheck and test are fast and
+# independent, and reporting them together means one run tells you everything
+# that is wrong instead of only the first thing. The build is slower and only
+# worth waiting for once the cheap checks agree.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch makes the first run irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, typecheck, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # `if: always()` on each step so one failure does not hide the others —
+      # a run that reports "lint failed" and nothing else wastes a round trip.
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        if: always()
+        run: npm run typecheck
+
+      - name: Test
+        if: always()
+        run: npm test
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        # `lib/db` connects lazily, so a build needs no reachable database —
+        # but better-auth reads its secret at module load, and these values must
+        # be present and syntactically valid for the module graph to evaluate.
+        # They are deliberately fake: nothing here talks to a real service.
+        env:
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          BETTER_AUTH_SECRET: ci-build-secret-not-used-for-anything-real
+          BETTER_AUTH_URL: http://localhost:3000
+        run: npm run build
