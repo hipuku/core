@@ -23,8 +23,7 @@
   color: var(--danger);
   padding: 0.55rem 0.7rem;
   border-radius: var(--r-sm);
-  border: 1px solid color-mix(in oklch, var(--danger) 35%, transparent);
-  background: color-mix(in oklch, var(--danger) 10%, transparent);
+  background: color-mix(in oklch, var(--danger) 12%, var(--surface));
 }
 
 .alt {

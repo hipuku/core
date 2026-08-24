@@ -1,4 +1,4 @@
-import { and, asc, eq, max } from "drizzle-orm";
+import { and, asc, count, eq, max } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   decisionReferences,
@@ -131,6 +131,22 @@ export class DrizzleDecisionStore implements DecisionStore {
       .where(eq(decisions.workspaceId, workspaceId))
       .orderBy(asc(decisions.number));
     return rows.map(toDecision);
+  }
+
+  async countDecisions(workspaceId: string): Promise<number> {
+    const [row] = await db
+      .select({ c: count() })
+      .from(decisions)
+      .where(eq(decisions.workspaceId, workspaceId));
+    return row?.c ?? 0;
+  }
+
+  async renameWorkspace(id: string, name: string): Promise<void> {
+    await db.update(workspaces).set({ name }).where(eq(workspaces.id, id));
+  }
+
+  async deleteWorkspace(id: string): Promise<void> {
+    await db.delete(workspaces).where(eq(workspaces.id, id));
   }
 
   async applyStatusChange(input: {

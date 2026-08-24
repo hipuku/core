@@ -30,6 +30,20 @@ export async function createWorkspace(formData: FormData) {
   redirect(`/app/${workspace.id}`);
 }
 
+export async function renameWorkspace(workspaceId: string, formData: FormData) {
+  const user = await requireUser();
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return;
+  await decisionService.renameWorkspace(workspaceId, user.id, name);
+  revalidatePath(`/app/${workspaceId}`);
+}
+
+export async function deleteWorkspace(workspaceId: string) {
+  const user = await requireUser();
+  await decisionService.deleteWorkspace(workspaceId, user.id);
+  redirect("/app");
+}
+
 export async function inviteMember(workspaceId: string, formData: FormData) {
   const user = await requireUser();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();

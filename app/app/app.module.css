@@ -43,9 +43,10 @@
 
 /* ---- lists ------------------------------------------------------------- */
 .list {
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 .card {
   display: flex;
@@ -53,14 +54,13 @@
   gap: 0.85rem;
   padding: 0.85rem 1rem;
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--r);
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+  transition: box-shadow 0.14s ease, transform 0.14s ease;
 }
 .card:hover {
-  border-color: var(--border-strong);
   box-shadow: var(--shadow);
+  transform: translateY(-1px);
 }
 .cardNum {
   font-size: 0.78rem;
@@ -76,9 +76,48 @@
   padding: 2.5rem;
   text-align: center;
   color: var(--text-faint);
-  border: 1px dashed var(--border-strong);
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- workspace card ---------------------------------------------------- */
+.wsCard {
+  display: block;
+  padding: 1.1rem 1.25rem;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.14s ease, transform 0.14s ease;
+}
+.wsCard:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.wsName {
+  font-size: 1.1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.wsMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: 0.55rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.wsMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.wsRepo {
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--r-full);
+  background: var(--surface-3);
+  font-size: 0.78rem;
+  color: var(--text-dim);
 }
 
 /* ---- sections ---------------------------------------------------------- */
@@ -113,10 +152,11 @@
 .props {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  padding: 0.9rem 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  gap: 1.75rem;
+  padding: 1rem 1.15rem;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 1.75rem;
 }
 .prop {
@@ -148,8 +188,8 @@
   flex-wrap: wrap;
   padding: 1rem 1.15rem;
   border-radius: var(--r-lg);
-  border: 1px solid var(--border);
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 2rem;
 }
 .reviewText {
@@ -171,18 +211,17 @@
   align-items: center;
   flex-wrap: wrap;
 }
-/* prominent: awaiting the viewer's approval — neutral card, coloured buttons */
+/* prominent: awaiting the viewer's approval — raised card, coloured buttons */
 .reviewAction {
-  border-color: var(--border-strong);
   box-shadow: var(--shadow);
 }
 .reviewOk {
-  border-color: color-mix(in oklch, var(--st-accepted) 30%, var(--border));
-  background: color-mix(in oklch, var(--st-accepted) 6%, var(--surface));
+  background: color-mix(in oklch, var(--st-accepted) 9%, var(--surface));
 }
 .reviewTerminal {
-  background: var(--surface-2);
+  background: var(--surface-3);
   color: var(--text-dim);
+  box-shadow: none;
 }
 .reviewTerminal .reviewTitle {
   color: var(--text-dim);
@@ -202,8 +241,7 @@
   padding: 0.9rem 1.1rem;
   margin-bottom: 2rem;
   border-radius: var(--r-lg);
-  border: 1px solid color-mix(in oklch, var(--st-superseded) 40%, var(--border));
-  background: color-mix(in oklch, var(--st-superseded) 10%, var(--surface));
+  background: color-mix(in oklch, var(--st-superseded) 15%, var(--surface));
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -220,7 +258,6 @@
 .tabs {
   display: flex;
   gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
   margin-bottom: 1.75rem;
 }
 .tab {
@@ -229,7 +266,6 @@
   font-weight: 500;
   color: var(--text-dim);
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
 }
 .tab:hover {
   color: var(--text);
@@ -279,7 +315,7 @@
 .tlItem {
   position: relative;
   padding: 0 0 1.35rem 1.5rem;
-  border-left: 1px solid var(--border);
+  border-left: 2px solid var(--surface-3);
 }
 .tlItem:last-child {
   border-left-color: transparent;
@@ -288,13 +324,12 @@
 .tlItem::before {
   content: "";
   position: absolute;
-  left: -0.33rem;
+  left: -0.36rem;
   top: 0.2rem;
   width: 0.62rem;
   height: 0.62rem;
   border-radius: 50%;
-  background: var(--surface);
-  border: 2px solid var(--border-strong);
+  background: var(--text-faint);
 }
 .tlHead {
   display: flex;
@@ -318,8 +353,7 @@
   margin-top: 0.5rem;
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--surface-3);
   border-radius: var(--r-sm);
   padding: 0.55rem 0.7rem;
 }
@@ -340,9 +374,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.7rem;
-  border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  background: var(--surface);
+  background: var(--surface-2);
 }
 .refLink {
   flex: 1;
@@ -393,7 +426,7 @@
   gap: 0.15rem;
   max-height: 15rem;
   overflow-y: auto;
-  border: 1px solid var(--border);
+  background: var(--surface-2);
   border-radius: var(--r-sm);
   padding: 0.3rem;
 }
@@ -411,7 +444,7 @@
   cursor: pointer;
 }
 .fileItem:hover {
-  background: var(--surface-2);
+  background: var(--surface-3);
   color: var(--text);
 }
 
@@ -422,8 +455,8 @@
   gap: 0.75rem;
   padding: 0.7rem 0.95rem;
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
 }
 .memberName {
   flex: 1;

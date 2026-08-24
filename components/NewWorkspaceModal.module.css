@@ -1,20 +1,18 @@
 .trigger {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--r-sm);
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
-  color: var(--text-dim);
+  border: none;
+  background: var(--accent);
+  color: var(--accent-fg);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  transition: background 0.12s ease;
 }
 .trigger:hover {
-  background: var(--surface-2);
-  color: var(--text);
-  border-color: var(--text-faint);
+  background: var(--accent-hover);
 }
 .trigger:focus-visible {
   outline: 2px solid var(--ring);
@@ -36,7 +34,6 @@
   width: 100%;
   max-width: 25rem;
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);
   padding: 1.4rem;

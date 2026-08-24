@@ -99,6 +99,27 @@ export class MemoryDecisionStore implements DecisionStore {
       .map((d) => ({ ...d }));
   }
 
+  async countDecisions(workspaceId: string): Promise<number> {
+    return [...this.decisions.values()].filter(
+      (d) => d.workspaceId === workspaceId,
+    ).length;
+  }
+
+  async renameWorkspace(id: string, name: string): Promise<void> {
+    const ws = this.workspaces.get(id);
+    if (ws) ws.name = name;
+  }
+
+  async deleteWorkspace(id: string): Promise<void> {
+    this.workspaces.delete(id);
+    for (const [key, m] of this.members) {
+      if (m.workspaceId === id) this.members.delete(key);
+    }
+    for (const [key, d] of this.decisions) {
+      if (d.workspaceId === id) this.decisions.delete(key);
+    }
+  }
+
   async applyStatusChange(input: {
     decisionId: string;
     toStatus: DecisionRecord["status"];

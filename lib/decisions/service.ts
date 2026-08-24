@@ -258,6 +258,42 @@ export class DecisionService {
     return this.store.listWorkspacesForUser(userId);
   }
 
+  /** Workspaces the user belongs to, each with headline counts for the list. */
+  async workspaceSummaries(userId: string) {
+    const workspaces = await this.store.listWorkspacesForUser(userId);
+    return Promise.all(
+      workspaces.map(async (workspace) => {
+        const [decisionCount, members, repos] = await Promise.all([
+          this.store.countDecisions(workspace.id),
+          this.store.listMembers(workspace.id),
+          this.store.listWorkspaceRepos(workspace.id),
+        ]);
+        return {
+          workspace,
+          decisionCount,
+          memberCount: members.length,
+          repos: repos.map((r) => `${r.owner}/${r.name}`),
+        };
+      }),
+    );
+  }
+
+  async renameWorkspace(workspaceId: string, userId: string, name: string) {
+    const role = await this.roleOf(workspaceId, userId);
+    if (role !== "maintainer") {
+      throw new DecisionError("only a maintainer can rename a workspace");
+    }
+    await this.store.renameWorkspace(workspaceId, name);
+  }
+
+  async deleteWorkspace(workspaceId: string, userId: string) {
+    const role = await this.roleOf(workspaceId, userId);
+    if (role !== "maintainer") {
+      throw new DecisionError("only a maintainer can delete a workspace");
+    }
+    await this.store.deleteWorkspace(workspaceId);
+  }
+
   getWorkspace(id: string) {
     return this.store.getWorkspace(id);
   }

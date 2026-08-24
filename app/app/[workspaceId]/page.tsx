@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { RepoManager } from "@/components/RepoManager";
 import { StatusBadge } from "@/components/StatusBadge";
 import { decisionService } from "@/lib/decisions";
 import { getGithubToken } from "@/lib/github";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
-import { inviteMember } from "../actions";
+import { deleteWorkspace, inviteMember, renameWorkspace } from "../actions";
 import styles from "../app.module.css";
 
 export default async function WorkspacePage({
@@ -123,6 +124,31 @@ export default async function WorkspacePage({
           repos={repos}
         />
       </section>
+
+      {role === "maintainer" && (
+        <section className={styles.section}>
+          <div className={styles.sectionHead}>
+            <h2 className={styles.sectionTitle}>Workspace settings</h2>
+          </div>
+          <form action={renameWorkspace.bind(null, workspaceId)} className={styles.form}>
+            <label className="field">
+              <span>Rename workspace</span>
+              <input className="input" name="name" defaultValue={workspace.name} required />
+            </label>
+            <div className={styles.actions}>
+              <button type="submit" className="btn">Rename</button>
+            </div>
+          </form>
+          <form action={deleteWorkspace.bind(null, workspaceId)} style={{ marginTop: "1.25rem" }}>
+            <ConfirmButton
+              className="btn btn--danger"
+              message="Delete this workspace and all its decisions? This cannot be undone."
+            >
+              Delete workspace
+            </ConfirmButton>
+          </form>
+        </section>
+      )}
     </div>
   );
 }

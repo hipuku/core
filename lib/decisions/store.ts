@@ -100,6 +100,9 @@ export interface DecisionStore {
 
   getDecision(id: string): Promise<DecisionRecord | null>;
   listDecisions(workspaceId: string): Promise<DecisionRecord[]>;
+  countDecisions(workspaceId: string): Promise<number>;
+  renameWorkspace(id: string, name: string): Promise<void>;
+  deleteWorkspace(id: string): Promise<void>;
 
   /** Change a decision's status and append its transition atomically. */
   applyStatusChange(input: {

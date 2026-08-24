@@ -6,29 +6,21 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  height: 52px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 1.25rem;
-  background: color-mix(in oklch, var(--bg) 82%, transparent);
+  background: color-mix(in oklch, var(--surface) 80%, transparent);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.mark {
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 5px;
-  background: var(--accent);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
 }
 
 .main {
@@ -73,17 +65,19 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  min-width: 200px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-strong);
+  min-width: 208px;
+  background: var(--surface);
   border-radius: var(--r);
-  box-shadow: 0 12px 32px oklch(0 0 0 / 0.45);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
+  padding: 0.3rem;
 }
 
 .menuHead {
-  padding: 0.7rem 0.85rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0.6rem 0.6rem;
+  margin-bottom: 0.2rem;
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
 }
 .menuName {
   font-size: 0.875rem;
@@ -100,9 +94,10 @@
   text-align: left;
   font: inherit;
   font-size: 0.85rem;
-  padding: 0.6rem 0.85rem;
+  padding: 0.5rem 0.6rem;
   background: none;
   border: none;
+  border-radius: var(--r-sm);
   color: var(--text-dim);
   cursor: pointer;
 }
