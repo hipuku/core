@@ -5,6 +5,7 @@ import { connectRepo, disconnectRepo, listMyGithubRepos } from "@/app/app/action
 import type { RepoRecord } from "@/lib/decisions";
 import type { GithubRepo } from "@/lib/github";
 import { ConnectGithubButton } from "./ConnectGithubButton";
+import { ToastForm } from "./ToastForm";
 import styles from "@/app/app/app.module.css";
 
 export function RepoManager({
@@ -45,11 +46,11 @@ export function RepoManager({
                 <span className={styles.memberEmail}>{repo.defaultBranch}</span>
               </span>
               {canManage && (
-                <form action={disconnectRepo.bind(null, workspaceId, repo.id)}>
+                <ToastForm action={disconnectRepo.bind(null, workspaceId, repo.id)}>
                   <button type="submit" className={styles.refRemove} aria-label="Disconnect repository">
                     ×
                   </button>
-                </form>
+                </ToastForm>
               )}
             </li>
           ))}
@@ -67,7 +68,7 @@ export function RepoManager({
             {loading ? "Loading…" : "Connect a repository"}
           </button>
         ) : (
-          <form action={connectRepo.bind(null, workspaceId)} className={styles.refForm}>
+          <ToastForm action={connectRepo.bind(null, workspaceId)} className={styles.refForm}>
             <select className="select" name="repo" required defaultValue="">
               <option value="" disabled>
                 Choose a repository
@@ -89,7 +90,7 @@ export function RepoManager({
             <button type="submit" className="btn">
               Connect
             </button>
-          </form>
+          </ToastForm>
         ))}
 
       {error && (

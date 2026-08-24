@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { RepoManager } from "@/components/RepoManager";
 import { StatusBadge } from "@/components/StatusBadge";
+import { ToastForm } from "@/components/ToastForm";
 import { decisionService } from "@/lib/decisions";
 import { getGithubToken } from "@/lib/github";
 import { requireUser } from "@/lib/session";
@@ -94,7 +95,7 @@ export default async function WorkspacePage({
         </ul>
 
         {role === "maintainer" && (
-          <form action={inviteHere} className={styles.form} style={{ marginTop: "1rem" }}>
+          <ToastForm action={inviteHere} className={styles.form} style={{ marginTop: "1rem" }}>
             <label className="field">
               <span>Add a member by email</span>
               <input className="input" type="email" name="email" required placeholder="teammate@example.com" />
@@ -109,7 +110,7 @@ export default async function WorkspacePage({
             <div className={styles.actions}>
               <button type="submit" className="btn">Add member</button>
             </div>
-          </form>
+          </ToastForm>
         )}
       </section>
 
@@ -130,7 +131,7 @@ export default async function WorkspacePage({
           <div className={styles.sectionHead}>
             <h2 className={styles.sectionTitle}>Workspace settings</h2>
           </div>
-          <form action={renameWorkspace.bind(null, workspaceId)} className={styles.form}>
+          <ToastForm action={renameWorkspace.bind(null, workspaceId)} className={styles.form}>
             <label className="field">
               <span>Rename workspace</span>
               <input className="input" name="name" defaultValue={workspace.name} required />
@@ -138,7 +139,7 @@ export default async function WorkspacePage({
             <div className={styles.actions}>
               <button type="submit" className="btn">Rename</button>
             </div>
-          </form>
+          </ToastForm>
           <form action={deleteWorkspace.bind(null, workspaceId)} style={{ marginTop: "1.25rem" }}>
             <ConfirmButton
               className="btn btn--danger"

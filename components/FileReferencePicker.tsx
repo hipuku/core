@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { addFileReference, listConnectedRepoFiles } from "@/app/app/actions";
 import type { RepoRecord } from "@/lib/decisions";
+import { ToastForm } from "./ToastForm";
 import styles from "@/app/app/app.module.css";
 
 export function FileReferencePicker({
@@ -88,13 +89,13 @@ export function FileReferencePicker({
           <ul className={styles.fileList}>
             {shown.map((path) => (
               <li key={path}>
-                <form action={addFileReference.bind(null, workspaceId, decisionId)}>
+                <ToastForm action={addFileReference.bind(null, workspaceId, decisionId)}>
                   <input type="hidden" name="repoId" value={repoId} />
                   <input type="hidden" name="path" value={path} />
                   <button type="submit" className={styles.fileItem}>
                     {path}
                   </button>
-                </form>
+                </ToastForm>
               </li>
             ))}
           </ul>

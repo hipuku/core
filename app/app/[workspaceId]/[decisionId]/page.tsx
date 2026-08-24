@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { FileReferencePicker } from "@/components/FileReferencePicker";
 import { Markdown } from "@/components/Markdown";
 import { StatusBadge } from "@/components/StatusBadge";
+import { ToastForm } from "@/components/ToastForm";
 import {
   canEditContent,
   capabilitiesFor,
@@ -181,7 +182,7 @@ export default async function DecisionPage({
 
       {tab === "document" ? (
         isEditing ? (
-          <form action={revise.bind(null, workspaceId, decisionId)} className={styles.form}>
+          <ToastForm action={revise.bind(null, workspaceId, decisionId)} className={styles.form}>
             <p className={styles.hint}>
               Markdown supported, including <code>```mermaid</code> diagrams.
             </p>
@@ -201,7 +202,7 @@ export default async function DecisionPage({
               <button type="submit" className="btn btn--primary">Save revision</button>
               <Link href={base} className="btn btn--ghost">Cancel</Link>
             </div>
-          </form>
+          </ToastForm>
         ) : (
           <div className={styles.doc}>
             {editable.ok && (
@@ -242,11 +243,11 @@ export default async function DecisionPage({
                           {ref.label || ref.url}
                         </a>
                         {pill && <span className={pill.cls}>{pill.label}</span>}
-                        <form action={removeReference.bind(null, workspaceId, decisionId, ref.id)}>
+                        <ToastForm action={removeReference.bind(null, workspaceId, decisionId, ref.id)}>
                           <button type="submit" className={styles.refRemove} aria-label="Remove reference">
                             ×
                           </button>
-                        </form>
+                        </ToastForm>
                       </li>
                     );
                   })}
@@ -254,21 +255,21 @@ export default async function DecisionPage({
               )}
 
               {hasFileRefs && (
-                <form
+                <ToastForm
                   action={checkReferenceDrift.bind(null, workspaceId, decisionId)}
                   style={{ marginBottom: "0.85rem" }}
                 >
                   <button type="submit" className="btn">Check for drift</button>
-                </form>
+                </ToastForm>
               )}
-              <form
+              <ToastForm
                 action={addReference.bind(null, workspaceId, decisionId)}
                 className={styles.refForm}
               >
                 <input className="input" type="url" name="url" placeholder="https://…" required />
                 <input className="input" name="label" placeholder="Label (optional)" />
                 <button type="submit" className="btn">Add link</button>
-              </form>
+              </ToastForm>
 
               <FileReferencePicker
                 workspaceId={workspaceId}
@@ -353,14 +354,14 @@ export default async function DecisionPage({
                 <Link href={`${base}?edit=1`} className="btn btn--ghost">Edit</Link>
               )}
               {canReject && (
-                <form action={reject}>
+                <ToastForm action={reject}>
                   <button type="submit" className="btn btn--danger">Reject</button>
-                </form>
+                </ToastForm>
               )}
               {canAccept && (
-                <form action={accept}>
+                <ToastForm action={accept}>
                   <button type="submit" className="btn btn--accept">Approve</button>
-                </form>
+                </ToastForm>
               )}
             </div>
           </div>
@@ -399,9 +400,9 @@ export default async function DecisionPage({
           {(canDeprecate || (canSupersede && supersedable.length > 0)) && (
             <div className={styles.reviewActions}>
               {canDeprecate && (
-                <form action={deprecate}>
+                <ToastForm action={deprecate}>
                   <button type="submit" className="btn btn--ghost">Deprecate</button>
-                </form>
+                </ToastForm>
               )}
               {canSupersede && supersedable.length > 0 && (
                 <form action={supersede.bind(null, workspaceId, decisionId)} style={{ display: "flex", gap: "0.4rem" }}>
