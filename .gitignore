@@ -43,3 +43,9 @@ next-env.d.ts
 
 # dev-only palette explorer, never committed
 /app/brand/
+
+# retired files staged for deletion, never committed
+/_to_delete/
+
+# local agent config
+/.claude/
