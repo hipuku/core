@@ -1,0 +1,24 @@
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  color: var(--text-faint);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* A plain link reference — a ticket or an RFC, not a file. */
+.link {
+  display: inline-block;
+  font-size: 0.85rem;
+  padding: 0.35rem 0;
+  color: var(--text);
+}
+.link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

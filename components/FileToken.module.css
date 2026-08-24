@@ -1,0 +1,92 @@
+/* ---- chip: inside a line of prose ---------------------------------------
+   Bounded and tinted so it reads as an object embedded in the sentence rather
+   than as text that happens to be monospaced. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  vertical-align: baseline;
+  padding: 0.08em 0.4em;
+  border-radius: var(--r-sm);
+  background: var(--accent-tint);
+  border: 1px solid color-mix(in oklch, var(--accent) 28%, transparent);
+  color: color-mix(in oklch, var(--accent) 85%, black);
+  text-decoration: none;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+a.chip:hover {
+  background: color-mix(in oklch, var(--accent) 18%, var(--surface));
+  border-color: var(--accent);
+}
+
+/* ---- row: in a list -----------------------------------------------------
+   No inset of its own: rows sit inside their container's padding, so an extra
+   indent would put filenames out of line with every other left edge. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-align: left;
+  padding: 0.35rem 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  text-decoration: none;
+}
+button.name,
+a.name {
+  cursor: pointer;
+}
+/* Colour only. A row of filenames flashing a grey ground as the pointer
+   crosses it is motion without meaning. */
+button.name:hover .path,
+a.name:hover .path {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.name:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+.icon {
+  flex: none;
+  color: var(--text-faint);
+}
+.repo {
+  flex: none;
+  color: var(--text-faint);
+}
+.path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.12s ease;
+}
+.lines {
+  flex: none;
+  color: var(--text-faint);
+}
+
+.slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: none;
+}

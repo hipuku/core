@@ -1,0 +1,11 @@
+/* A list of rows, not a wrap of pills: these are full paths being managed, and
+   a path is too long to sit in a chip without eating the width. */
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+.item {
+  min-width: 0;
+}

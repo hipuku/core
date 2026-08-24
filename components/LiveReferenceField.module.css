@@ -1,0 +1,25 @@
+/* Subordinate to the picker above it: checking drift is maintenance, not the
+   reason anyone opened the edit view. */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: inherit;
+  font-size: 0.8rem;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+.check:hover:not(:disabled) {
+  color: var(--accent);
+  background: var(--accent-tint);
+}
+.check:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

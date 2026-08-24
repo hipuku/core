@@ -1,0 +1,140 @@
+/* No tray. The search sits directly on whatever surface hosts it — a filled
+   field inside a filled box was two grounds doing one job, and the nested
+   rounding read as a seam rather than as structure. */
+.browse {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.7rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.searchRow:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-tint);
+}
+.searchIcon {
+  flex: none;
+  color: var(--text-faint);
+}
+.search {
+  font: inherit;
+  font-size: 0.9rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0;
+  border: none;
+  background: none;
+  color: var(--text);
+}
+.search::placeholder {
+  color: var(--text-faint);
+}
+.search:focus-visible {
+  outline: none;
+}
+.spinner {
+  flex: none;
+  color: var(--text-faint);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+.status {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  padding: 0 0.15rem;
+}
+.status[data-tone="error"] {
+  color: var(--danger);
+}
+.status code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* Results are rows — the shared file row, so a path in the picker looks like a
+   path everywhere else. */
+.results {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  max-height: 15rem;
+  overflow-y: auto;
+}
+.result {
+  min-width: 0;
+}
+
+/* Revealed on hover: citing a range is the better move, but offering it on
+   every row at rest would clutter a list you are scanning. */
+.lines {
+  flex: none;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.55rem;
+  border: none;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.result:hover .lines,
+.lines:focus-visible {
+  opacity: 1;
+}
+.lines:hover {
+  color: var(--accent);
+  background: var(--accent-tint);
+}
+
+/* ---- narrowing to a range ------------------------------------------------ */
+.narrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.15rem;
+}
+.narrowPath {
+  flex: 1;
+  min-width: 12rem;
+}
+.rangeInput {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  width: 9rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  background: var(--surface);
+  color: var(--text);
+}
+.rangeInput:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-tint);
+}
+.rangeInput[aria-invalid="true"] {
+  border-color: var(--danger);
+}
