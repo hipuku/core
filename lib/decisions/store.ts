@@ -11,6 +11,7 @@ import type { DecisionStatus, Role } from "./types";
 export interface WorkspaceRecord {
   id: string;
   name: string;
+  key: string;
   ownerId: string;
   createdAt: Date;
 }
@@ -76,6 +77,7 @@ export interface DecisionStore {
   createWorkspace(input: {
     id: string;
     name: string;
+    key: string;
     ownerId: string;
     createdAt: Date;
   }): Promise<WorkspaceRecord>;
@@ -102,7 +104,8 @@ export interface DecisionStore {
   getDecision(id: string): Promise<DecisionRecord | null>;
   listDecisions(workspaceId: string): Promise<DecisionRecord[]>;
   countDecisions(workspaceId: string): Promise<number>;
-  renameWorkspace(id: string, name: string): Promise<void>;
+  countProposed(workspaceId: string): Promise<number>;
+  updateWorkspace(id: string, patch: { name: string; key: string }): Promise<void>;
   deleteWorkspace(id: string): Promise<void>;
 
   /** Change a decision's status and append its transition atomically. */

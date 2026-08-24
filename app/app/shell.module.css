@@ -11,8 +11,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  background: color-mix(in oklch, var(--bg) 82%, transparent);
-  backdrop-filter: blur(12px);
+  /* Seamless with the page — same ramp, no contrasting bar. */
+  background: var(--bg);
 }
 
 .brand {

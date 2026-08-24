@@ -28,6 +28,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   async createWorkspace(input: {
     id: string;
     name: string;
+    key: string;
     ownerId: string;
     createdAt: Date;
   }): Promise<WorkspaceRecord> {
@@ -117,6 +118,7 @@ export class DrizzleDecisionStore implements DecisionStore {
       .select({
         id: workspaces.id,
         name: workspaces.name,
+        key: workspaces.key,
         ownerId: workspaces.ownerId,
         createdAt: workspaces.createdAt,
       })
@@ -152,8 +154,24 @@ export class DrizzleDecisionStore implements DecisionStore {
     return row?.c ?? 0;
   }
 
-  async renameWorkspace(id: string, name: string): Promise<void> {
-    await db.update(workspaces).set({ name }).where(eq(workspaces.id, id));
+  async countProposed(workspaceId: string): Promise<number> {
+    const [row] = await db
+      .select({ c: count() })
+      .from(decisions)
+      .where(
+        and(
+          eq(decisions.workspaceId, workspaceId),
+          eq(decisions.status, "proposed"),
+        ),
+      );
+    return row?.c ?? 0;
+  }
+
+  async updateWorkspace(
+    id: string,
+    patch: { name: string; key: string },
+  ): Promise<void> {
+    await db.update(workspaces).set(patch).where(eq(workspaces.id, id));
   }
 
   async deleteWorkspace(id: string): Promise<void> {

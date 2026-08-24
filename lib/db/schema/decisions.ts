@@ -27,6 +27,8 @@ export const referenceKind = pgEnum("reference_kind", ["link", "file"]);
 export const workspaces = pgTable("workspaces", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
+  // Short project key: decisions display as KEY-001 (Jira-style).
+  key: text("key").notNull(),
   ownerId: text("owner_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),

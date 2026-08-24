@@ -48,17 +48,19 @@ export async function createWorkspace(formData: FormData) {
   redirect(`/app/${workspace.id}`);
 }
 
-export async function renameWorkspace(
+export async function updateWorkspaceGeneral(
   workspaceId: string,
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
   const name = String(formData.get("name") ?? "").trim();
+  const key = String(formData.get("key") ?? "").trim();
   if (!name) return { error: "A name is required." };
   return attempt(async () => {
-    await decisionService.renameWorkspace(workspaceId, user.id, name);
+    await decisionService.updateWorkspace(workspaceId, user.id, { name, key });
     revalidatePath(`/app/${workspaceId}`);
-  }, "Workspace renamed.");
+    revalidatePath(`/app/${workspaceId}/settings`);
+  }, "Settings saved.");
 }
 
 export async function deleteWorkspace(

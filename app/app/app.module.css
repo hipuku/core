@@ -12,6 +12,10 @@
   letter-spacing: -0.025em;
   line-height: 1.12;
 }
+.titleMuted {
+  color: var(--text-faint);
+  font-weight: 600;
+}
 .sub {
   color: var(--text-dim);
   font-size: 1.02rem;
@@ -102,12 +106,21 @@
   align-items: center;
   gap: 0.35rem;
 }
-.wsRepo {
-  padding: 0.1rem 0.5rem;
+.wsPending {
+  padding: 0.2rem 0.6rem;
   border-radius: var(--r-full);
-  background: var(--surface-3);
-  font-size: 0.78rem;
-  color: var(--text-dim);
+  background: color-mix(in oklch, var(--st-proposed) 15%, var(--surface));
+  color: color-mix(in oklch, var(--st-proposed) 72%, black);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.wsRepo {
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--r-full);
+  background: color-mix(in oklch, var(--chip, var(--text-faint)) 15%, var(--surface));
+  color: color-mix(in oklch, var(--chip, var(--text-dim)) 72%, black);
+  font-size: 0.8rem;
+  font-weight: 550;
 }
 
 /* ---- sections ---------------------------------------------------------- */

@@ -30,6 +30,7 @@ export class MemoryDecisionStore implements DecisionStore {
   async createWorkspace(input: {
     id: string;
     name: string;
+    key: string;
     ownerId: string;
     createdAt: Date;
   }): Promise<WorkspaceRecord> {
@@ -109,9 +110,21 @@ export class MemoryDecisionStore implements DecisionStore {
     ).length;
   }
 
-  async renameWorkspace(id: string, name: string): Promise<void> {
+  async countProposed(workspaceId: string): Promise<number> {
+    return [...this.decisions.values()].filter(
+      (d) => d.workspaceId === workspaceId && d.status === "proposed",
+    ).length;
+  }
+
+  async updateWorkspace(
+    id: string,
+    patch: { name: string; key: string },
+  ): Promise<void> {
     const ws = this.workspaces.get(id);
-    if (ws) ws.name = name;
+    if (ws) {
+      ws.name = patch.name;
+      ws.key = patch.key;
+    }
   }
 
   async deleteWorkspace(id: string): Promise<void> {

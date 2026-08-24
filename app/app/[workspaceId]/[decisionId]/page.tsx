@@ -16,6 +16,7 @@ import { ToastForm } from "@/components/ToastForm";
 import {
   canEditContent,
   capabilitiesFor,
+  decisionLabel,
   decisionService,
   isStale,
   referenceDrift,
@@ -81,13 +82,16 @@ export default async function DecisionPage({
   const decision = found;
 
   const actor = { id: user.id, capabilities: capabilitiesFor(role) };
-  const [content, transitions, all, references, repos] = await Promise.all([
-    decisionService.contentHistory(decisionId),
-    decisionService.statusHistory(decisionId),
-    decisionService.listDecisions(workspaceId),
-    decisionService.listReferences(decisionId),
-    decisionService.listWorkspaceRepos(workspaceId),
-  ]);
+  const [content, transitions, all, references, repos, workspace] =
+    await Promise.all([
+      decisionService.contentHistory(decisionId),
+      decisionService.statusHistory(decisionId),
+      decisionService.listDecisions(workspaceId),
+      decisionService.listReferences(decisionId),
+      decisionService.listWorkspaceRepos(workspaceId),
+      decisionService.getWorkspace(workspaceId),
+    ]);
+  const key = workspace?.key ?? "ADR";
 
   const people = await usersById([
     decision.authorId,
@@ -118,7 +122,7 @@ export default async function DecisionPage({
 
   const base = `/app/${workspaceId}/${decisionId}`;
   const tab = view === "activity" ? "activity" : "document";
-  const adrNumber = `ADR-${String(decision.number).padStart(3, "0")}`;
+  const adrNumber = decisionLabel(key, decision.number);
 
   const accept = changeStatus.bind(null, workspaceId, decisionId, "accepted");
   const reject = changeStatus.bind(null, workspaceId, decisionId, "rejected");
@@ -154,7 +158,7 @@ export default async function DecisionPage({
             <span className={styles.propLabel}>Superseded by</span>
             <span className={styles.propValue}>
               <Link href={`/app/${workspaceId}/${supersededBy.id}`}>
-                ADR-{String(supersededBy.number).padStart(3, "0")}
+                {decisionLabel(key, supersededBy.number)}
               </Link>
             </span>
           </div>
@@ -433,7 +437,7 @@ export default async function DecisionPage({
                     <option value="" disabled>Supersede…</option>
                     {supersedable.map((d) => (
                       <option key={d.id} value={d.id}>
-                        ADR-{String(d.number).padStart(3, "0")} — {d.title}
+                        {decisionLabel(key, d.number)} — {d.title}
                       </option>
                     ))}
                   </select>
@@ -462,7 +466,7 @@ export default async function DecisionPage({
               <>
                 Replaced by{" "}
                 <Link href={`/app/${workspaceId}/${supersededBy.id}`} className={styles.reviewLink}>
-                  ADR-{String(supersededBy.number).padStart(3, "0")} — {supersededBy.title}
+                  {decisionLabel(key, supersededBy.number)} — {supersededBy.title}
                 </Link>
               </>
             ) : term ? (

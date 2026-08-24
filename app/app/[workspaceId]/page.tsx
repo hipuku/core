@@ -1,8 +1,10 @@
 import { Plus, Settings } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { CSSProperties } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
-import { decisionService } from "@/lib/decisions";
+import { brandColor } from "@/lib/brand";
+import { decisionLabel, decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "../app.module.css";
 
@@ -28,7 +30,10 @@ export default async function WorkspacePage({
     <div>
       <div className={styles.pageHead}>
         <div>
-          <h1 className={styles.title}>Decisions</h1>
+          <h1 className={styles.title}>
+            {workspace.name}{" "}
+            <span className={styles.titleMuted}>Decisions</span>
+          </h1>
           <p className={styles.sub}>
             You are {article} {role} in this workspace.
           </p>
@@ -61,7 +66,7 @@ export default async function WorkspacePage({
             <li key={decision.id}>
               <Link href={`/app/${workspaceId}/${decision.id}`} className={styles.card}>
                 <span className={styles.cardNum}>
-                  ADR-{String(decision.number).padStart(3, "0")}
+                  {decisionLabel(workspace.key, decision.number)}
                 </span>
                 <span className={styles.cardTitle}>{decision.title}</span>
                 <StatusBadge status={decision.status} />
@@ -77,8 +82,12 @@ export default async function WorkspacePage({
             <h2 className={styles.sectionTitle}>Connected repositories</h2>
           </div>
           <div className={styles.repoChips}>
-            {repos.map((repo) => (
-              <span key={repo.id} className={styles.wsRepo}>
+            {repos.map((repo, i) => (
+              <span
+                key={repo.id}
+                className={styles.wsRepo}
+                style={{ "--chip": brandColor(i) } as CSSProperties}
+              >
                 {repo.owner}/{repo.name}
               </span>
             ))}

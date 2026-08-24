@@ -9,7 +9,11 @@ import { decisionService } from "@/lib/decisions";
 import { getGithubToken } from "@/lib/github";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
-import { disconnectRepo, removeMember, renameWorkspace } from "../../actions";
+import {
+  disconnectRepo,
+  removeMember,
+  updateWorkspaceGeneral,
+} from "../../actions";
 import styles from "../../app.module.css";
 
 export default async function SettingsPage({
@@ -46,10 +50,26 @@ export default async function SettingsPage({
         <div className={styles.sectionHead}>
           <h2 className={styles.sectionTitle}>General</h2>
         </div>
-        <ToastForm action={renameWorkspace.bind(null, workspaceId)} className={styles.form}>
+        <ToastForm
+          action={updateWorkspaceGeneral.bind(null, workspaceId)}
+          className={styles.form}
+        >
           <label className="field">
             <span>Workspace name</span>
             <input className="input" name="name" defaultValue={workspace.name} required />
+          </label>
+          <label className="field">
+            <span>Decision key</span>
+            <input
+              className="input"
+              name="key"
+              defaultValue={workspace.key}
+              maxLength={6}
+              style={{ maxWidth: "10rem", textTransform: "uppercase" }}
+            />
+            <span className={styles.hint}>
+              Decisions are labelled {workspace.key}-001, {workspace.key}-002, …
+            </span>
           </label>
           <div className={styles.actions}>
             <button type="submit" className="btn btn--primary">

@@ -1,5 +1,7 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { NewWorkspaceModal } from "@/components/NewWorkspaceModal";
+import { brandColor } from "@/lib/brand";
 import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "./app.module.css";
@@ -30,30 +32,41 @@ export default async function WorkspacesPage() {
         </p>
       ) : (
         <ul className={styles.list}>
-          {summaries.map(({ workspace, decisionCount, memberCount, repos }) => (
-            <li key={workspace.id}>
-              <Link href={`/app/${workspace.id}`} className={styles.wsCard}>
-                <span className={styles.wsName}>{workspace.name}</span>
-                <div className={styles.wsMeta}>
-                  <span className={styles.wsMetaItem}>
-                    {plural(decisionCount, "decision")}
-                  </span>
-                  <span className={styles.wsMetaItem}>
-                    {plural(memberCount, "member")}
-                  </span>
-                  {repos.length > 0 ? (
-                    repos.map((repo) => (
-                      <span key={repo} className={styles.wsRepo}>
-                        {repo}
+          {summaries.map(
+            ({ workspace, decisionCount, proposedCount, memberCount, repos }) => (
+              <li key={workspace.id}>
+                <Link href={`/app/${workspace.id}`} className={styles.wsCard}>
+                  <span className={styles.wsName}>{workspace.name}</span>
+                  <div className={styles.wsMeta}>
+                    <span className={styles.wsMetaItem}>
+                      {plural(decisionCount, "decision")}
+                    </span>
+                    {proposedCount > 0 && (
+                      <span className={styles.wsPending}>
+                        {proposedCount} awaiting review
                       </span>
-                    ))
-                  ) : (
-                    <span className={styles.wsMetaItem}>no repo connected</span>
-                  )}
-                </div>
-              </Link>
-            </li>
-          ))}
+                    )}
+                    <span className={styles.wsMetaItem}>
+                      {plural(memberCount, "member")}
+                    </span>
+                    {repos.length > 0 ? (
+                      repos.map((repo, i) => (
+                        <span
+                          key={repo}
+                          className={styles.wsRepo}
+                          style={{ "--chip": brandColor(i) } as CSSProperties}
+                        >
+                          {repo}
+                        </span>
+                      ))
+                    ) : (
+                      <span className={styles.wsMetaItem}>no repo connected</span>
+                    )}
+                  </div>
+                </Link>
+              </li>
+            ),
+          )}
         </ul>
       )}
     </div>

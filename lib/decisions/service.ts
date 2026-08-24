@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Versioning } from "@/lib/versioning/engine";
 import type { HistoryEntry } from "@/lib/versioning/engine";
 import type { Json } from "@/lib/versioning/types";
+import { deriveWorkspaceKey, normalizeWorkspaceKey } from "./key";
 import {
   canEditContent,
   capabilitiesFor,
@@ -56,6 +57,7 @@ export class DecisionService {
     const workspace = await this.store.createWorkspace({
       id: this.ids.next(),
       name,
+      key: deriveWorkspaceKey(name),
       ownerId,
       createdAt: now,
     });
@@ -280,14 +282,16 @@ export class DecisionService {
     const workspaces = await this.store.listWorkspacesForUser(userId);
     return Promise.all(
       workspaces.map(async (workspace) => {
-        const [decisionCount, members, repos] = await Promise.all([
+        const [decisionCount, proposedCount, members, repos] = await Promise.all([
           this.store.countDecisions(workspace.id),
+          this.store.countProposed(workspace.id),
           this.store.listMembers(workspace.id),
           this.store.listWorkspaceRepos(workspace.id),
         ]);
         return {
           workspace,
           decisionCount,
+          proposedCount,
           memberCount: members.length,
           repos: repos.map((r) => `${r.owner}/${r.name}`),
         };
@@ -295,12 +299,19 @@ export class DecisionService {
     );
   }
 
-  async renameWorkspace(workspaceId: string, userId: string, name: string) {
+  async updateWorkspace(
+    workspaceId: string,
+    userId: string,
+    patch: { name: string; key: string },
+  ) {
     const role = await this.roleOf(workspaceId, userId);
     if (role !== "maintainer") {
-      throw new DecisionError("only a maintainer can rename a workspace");
+      throw new DecisionError("only a maintainer can change workspace settings");
     }
-    await this.store.renameWorkspace(workspaceId, name);
+    await this.store.updateWorkspace(workspaceId, {
+      name: patch.name,
+      key: normalizeWorkspaceKey(patch.key),
+    });
   }
 
   async deleteWorkspace(workspaceId: string, userId: string) {
