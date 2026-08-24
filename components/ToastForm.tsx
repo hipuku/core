@@ -13,11 +13,13 @@ export function ToastForm({
   children,
   className,
   style,
+  onSuccess,
 }: {
   action: (formData: FormData) => Promise<ActionResult>;
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  onSuccess?: () => void;
 }) {
   return (
     <form
@@ -25,8 +27,12 @@ export function ToastForm({
       style={style}
       action={async (formData) => {
         const result = await action(formData);
-        if (result?.error) toast.error(result.error);
-        else if (result?.ok) toast.success(result.ok);
+        if (result?.error) {
+          toast.error(result.error);
+        } else if (result?.ok) {
+          toast.success(result.ok);
+          onSuccess?.();
+        }
       }}
     >
       {children}

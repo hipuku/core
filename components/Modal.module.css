@@ -11,7 +11,7 @@
 
 .panel {
   width: 100%;
-  max-width: 25rem;
+  max-width: 26rem;
   background: var(--surface);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);

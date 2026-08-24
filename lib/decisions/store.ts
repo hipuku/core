@@ -85,6 +85,7 @@ export interface DecisionStore {
     userId: string,
   ): Promise<MembershipRecord | null>;
   listMembers(workspaceId: string): Promise<MembershipRecord[]>;
+  removeMember(workspaceId: string, userId: string): Promise<void>;
 
   /**
    * Insert a decision and its opening transition atomically, assigning the next

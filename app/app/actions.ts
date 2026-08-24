@@ -87,6 +87,17 @@ export async function inviteMember(
   }, "Member added.");
 }
 
+export async function removeMember(
+  workspaceId: string,
+  targetUserId: string,
+): Promise<ActionResult> {
+  const user = await requireUser();
+  return attempt(async () => {
+    await decisionService.removeMember(workspaceId, user.id, targetUserId);
+    revalidatePath(`/app/${workspaceId}/settings`);
+  }, "Member removed.");
+}
+
 export async function addReference(
   workspaceId: string,
   decisionId: string,

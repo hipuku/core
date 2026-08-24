@@ -100,6 +100,23 @@ export class DecisionService {
     return this.store.listMembers(workspaceId);
   }
 
+  /** Remove a member. Maintainer-only, and never the workspace owner. */
+  async removeMember(
+    workspaceId: string,
+    actorId: string,
+    targetUserId: string,
+  ) {
+    const role = await this.roleOf(workspaceId, actorId);
+    if (role !== "maintainer") {
+      throw new DecisionError("only a maintainer can remove members");
+    }
+    const workspace = await this.store.getWorkspace(workspaceId);
+    if (workspace && workspace.ownerId === targetUserId) {
+      throw new DecisionError("the workspace owner cannot be removed");
+    }
+    await this.store.removeMember(workspaceId, targetUserId);
+  }
+
   /** Connect a GitHub repo to a workspace. Maintainer-only, like membership. */
   async connectRepo(
     workspaceId: string,

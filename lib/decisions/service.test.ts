@@ -132,6 +132,24 @@ describe("DecisionService", () => {
     expect(members.find((m) => m.userId === "user_new")?.role).toBe("maintainer");
   });
 
+  it("lets a maintainer remove a member but not the owner", async () => {
+    const ws = await workspaceWithAuthor(service);
+    await service.removeMember(ws.id, MAINTAINER, AUTHOR);
+    expect((await service.listMembers(ws.id)).map((m) => m.userId)).toEqual([MAINTAINER]);
+    // MAINTAINER is the owner (created the workspace).
+    await expect(
+      service.removeMember(ws.id, MAINTAINER, MAINTAINER),
+    ).rejects.toThrow("owner cannot be removed");
+  });
+
+  it("refuses to let an author remove a member", async () => {
+    const ws = await workspaceWithAuthor(service);
+    await service.addMember(ws.id, "user_x", "author");
+    await expect(
+      service.removeMember(ws.id, AUTHOR, "user_x"),
+    ).rejects.toThrow("only a maintainer");
+  });
+
   it("refuses to let an author invite a member", async () => {
     const ws = await workspaceWithAuthor(service);
     await expect(

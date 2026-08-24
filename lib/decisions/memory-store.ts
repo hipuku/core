@@ -59,6 +59,10 @@ export class MemoryDecisionStore implements DecisionStore {
       .map((m) => ({ ...m }));
   }
 
+  async removeMember(workspaceId: string, userId: string): Promise<void> {
+    this.members.delete(this.memberKey(workspaceId, userId));
+  }
+
   async insertDecision(input: {
     decision: Omit<DecisionRecord, "number">;
     transition: TransitionRecord;

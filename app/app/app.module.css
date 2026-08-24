@@ -17,6 +17,16 @@
   font-size: 1.02rem;
   margin-top: 0.5rem;
 }
+.headActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.repoChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 /* ---- lists ------------------------------------------------------------- */
 .list {
   list-style: none;

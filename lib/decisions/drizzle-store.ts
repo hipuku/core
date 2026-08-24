@@ -72,6 +72,17 @@ export class DrizzleDecisionStore implements DecisionStore {
       .orderBy(asc(memberships.createdAt));
   }
 
+  async removeMember(workspaceId: string, userId: string): Promise<void> {
+    await db
+      .delete(memberships)
+      .where(
+        and(
+          eq(memberships.workspaceId, workspaceId),
+          eq(memberships.userId, userId),
+        ),
+      );
+  }
+
   async insertDecision(input: {
     decision: Omit<DecisionRecord, "number">;
     transition: TransitionRecord;

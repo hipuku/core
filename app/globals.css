@@ -158,6 +158,9 @@ h1, h2, h3, h4 {
   --btn-bg: color-mix(in oklch, var(--st-accepted) 86%, black);
   --btn-border: color-mix(in oklch, var(--st-accepted) 86%, black);
 }
+.btn--icon {
+  padding: 0.55rem;
+}
 .btn--ghost {
   --btn-bg: transparent;
   --btn-border: transparent;

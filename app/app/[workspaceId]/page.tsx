@@ -1,15 +1,9 @@
-import { Pencil, Plus, Trash2, UserPlus } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ConfirmButton } from "@/components/ConfirmButton";
-import { RepoManager } from "@/components/RepoManager";
 import { StatusBadge } from "@/components/StatusBadge";
-import { ToastForm } from "@/components/ToastForm";
 import { decisionService } from "@/lib/decisions";
-import { getGithubToken } from "@/lib/github";
 import { requireUser } from "@/lib/session";
-import { usersById } from "@/lib/users";
-import { deleteWorkspace, inviteMember, renameWorkspace } from "../actions";
 import styles from "../app.module.css";
 
 export default async function WorkspacePage({
@@ -27,12 +21,7 @@ export default async function WorkspacePage({
   if (!workspace) notFound();
 
   const decisions = await decisionService.listDecisions(workspaceId);
-  const members = await decisionService.listMembers(workspaceId);
-  const memberUsers = await usersById(members.map((m) => m.userId));
   const repos = await decisionService.listWorkspaceRepos(workspaceId);
-  const githubLinked = (await getGithubToken(user.id)) !== null;
-
-  const inviteHere = inviteMember.bind(null, workspaceId);
   const article = role === "author" ? "an" : "a";
 
   return (
@@ -44,10 +33,22 @@ export default async function WorkspacePage({
             You are {article} {role} in this workspace.
           </p>
         </div>
-        <Link href={`/app/${workspaceId}/new`} className="btn btn--primary">
-          <Plus size={16} />
-          New decision
-        </Link>
+        <div className={styles.headActions}>
+          <Link href={`/app/${workspaceId}/new`} className="btn btn--primary">
+            <Plus size={16} />
+            New decision
+          </Link>
+          {role === "maintainer" && (
+            <Link
+              href={`/app/${workspaceId}/settings`}
+              className="btn btn--icon"
+              aria-label="Workspace settings"
+              title="Workspace settings"
+            >
+              <Settings size={17} />
+            </Link>
+          )}
+        </div>
       </div>
 
       {decisions.length === 0 ? (
@@ -70,88 +71,18 @@ export default async function WorkspacePage({
         </ul>
       )}
 
-      <section className={styles.section}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Members</h2>
-        </div>
-        <ul className={styles.list}>
-          {members.map((member) => {
-            const person = memberUsers.get(member.userId);
-            return (
-              <li key={member.userId} className={styles.memberRow}>
-                <span className={styles.memberName}>
-                  {person?.name ?? "Unknown"}
-                  <span className={styles.memberEmail}>{person?.email}</span>
-                </span>
-                <span className={`pill pill--${member.role === "maintainer" ? "accepted" : "proposed"}`}>
-                  {member.role}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-
-        {role === "maintainer" && (
-          <ToastForm action={inviteHere} className={styles.form} style={{ marginTop: "1rem" }}>
-            <label className="field">
-              <span>Add a member by email</span>
-              <input className="input" type="email" name="email" required placeholder="teammate@example.com" />
-            </label>
-            <label className="field">
-              <span>Role</span>
-              <select className="select" name="role" defaultValue="author">
-                <option value="author">author — can propose and revise</option>
-                <option value="maintainer">maintainer — can also accept, reject, supersede</option>
-              </select>
-            </label>
-            <div className={styles.actions}>
-              <button type="submit" className="btn">
-                <UserPlus size={16} />
-                Add member
-              </button>
-            </div>
-          </ToastForm>
-        )}
-      </section>
-
-      <section className={styles.section}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Repositories</h2>
-        </div>
-        <RepoManager
-          workspaceId={workspaceId}
-          githubLinked={githubLinked}
-          canManage={role === "maintainer"}
-          repos={repos}
-        />
-      </section>
-
-      {role === "maintainer" && (
+      {repos.length > 0 && (
         <section className={styles.section}>
           <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle}>Workspace settings</h2>
+            <h2 className={styles.sectionTitle}>Connected repositories</h2>
           </div>
-          <ToastForm action={renameWorkspace.bind(null, workspaceId)} className={styles.form}>
-            <label className="field">
-              <span>Rename workspace</span>
-              <input className="input" name="name" defaultValue={workspace.name} required />
-            </label>
-            <div className={styles.actions}>
-              <button type="submit" className="btn">
-                <Pencil size={15} />
-                Rename
-              </button>
-            </div>
-          </ToastForm>
-          <form action={deleteWorkspace.bind(null, workspaceId)} style={{ marginTop: "1.25rem" }}>
-            <ConfirmButton
-              className="btn btn--danger"
-              message="Delete this workspace and all its decisions? This cannot be undone."
-            >
-              <Trash2 size={15} />
-              Delete workspace
-            </ConfirmButton>
-          </form>
+          <div className={styles.repoChips}>
+            {repos.map((repo) => (
+              <span key={repo.id} className={styles.wsRepo}>
+                {repo.owner}/{repo.name}
+              </span>
+            ))}
+          </div>
         </section>
       )}
     </div>
