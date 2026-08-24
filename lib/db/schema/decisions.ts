@@ -1,5 +1,6 @@
 import {
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -131,6 +132,13 @@ export const decisionReferences = pgTable("decision_references", {
   url: text("url"),
   repo: text("repo"),
   path: text("path"),
+  // An optional cited span, 1-based inclusive. Without one the reference is the
+  // whole file and drift fires on any change to it; with one, only the cited
+  // lines matter. `baselineSnippet` is those lines as they read when cited —
+  // stored so a block that merely *moved* can be recognised as unchanged.
+  startLine: integer("start_line"),
+  endLine: integer("end_line"),
+  baselineSnippet: text("baseline_snippet"),
   // Staleness: the file's git blob SHA when it was cited (baseline), the latest
   // SHA observed on a drift check (null = the file is gone), and when that was.
   baselineSha: text("baseline_sha"),
@@ -154,4 +162,34 @@ export const decisionTransitions = pgTable("decision_transitions", {
     .references(() => user.id),
   reason: text("reason"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+/**
+ * An unsent decision, parked by its author.
+ *
+ * Deliberately **not** a `decision` row with a `draft` status. A draft has not
+ * entered the lifecycle: it holds no ADR number (reserving one would leave
+ * permanent gaps in the sequence when a draft is abandoned), it is private to
+ * its author rather than visible to the workspace, and it has no transitions,
+ * because nothing has happened to it yet. Keeping it out of `decisions` is what
+ * lets the status enum stay an honest description of a decision's life.
+ *
+ * Body and references are jsonb rather than columns: this is scratch content on
+ * its way to becoming a document, and it is never queried by shape.
+ */
+export const decisionDrafts = pgTable("decision_drafts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  authorId: text("author_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").notNull().default(""),
+  /** `{ context, decision, consequences }` — every field may be empty. */
+  body: jsonb("body").notNull(),
+  /** Files cited while composing: `[{ repoId, repo, path }]`. */
+  refs: jsonb("refs").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

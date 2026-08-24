@@ -1,6 +1,7 @@
 import type {
   DecisionRecord,
   DecisionStore,
+  DraftRecord,
   MembershipRecord,
   ReferenceRecord,
   RepoRecord,
@@ -74,6 +75,38 @@ export class MemoryDecisionStore implements DecisionStore {
     this.decisions.set(record.id, { ...record });
     this.transitions.push({ ...input.transition });
     return { ...record };
+  }
+
+  private drafts = new Map<string, DraftRecord>();
+
+  async upsertDraft(draft: DraftRecord): Promise<DraftRecord> {
+    const existing = this.drafts.get(draft.id);
+    const record: DraftRecord = {
+      ...draft,
+      createdAt: existing?.createdAt ?? draft.createdAt,
+    };
+    this.drafts.set(record.id, { ...record });
+    return { ...record };
+  }
+
+  async getDraft(id: string): Promise<DraftRecord | null> {
+    const record = this.drafts.get(id);
+    return record ? { ...record } : null;
+  }
+
+  async listDrafts(workspaceId: string, authorId: string): Promise<DraftRecord[]> {
+    return [...this.drafts.values()]
+      .filter((d) => d.workspaceId === workspaceId && d.authorId === authorId)
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+      .map((d) => ({ ...d }));
+  }
+
+  async deleteDraft(id: string): Promise<void> {
+    this.drafts.delete(id);
+  }
+
+  async peekNextNumber(workspaceId: string): Promise<number> {
+    return (this.counters.get(workspaceId) ?? 0) + 1;
   }
 
   async getWorkspace(id: string): Promise<WorkspaceRecord | null> {
@@ -181,14 +214,42 @@ export class MemoryDecisionStore implements DecisionStore {
     this.references.delete(id);
   }
 
+  async rebaselineReference(
+    id: string,
+    state: {
+      baselineSha: string | null;
+      baselineSnippet: string | null;
+      startLine: number | null;
+      endLine: number | null;
+      checkedAt: Date;
+    },
+  ): Promise<void> {
+    const record = this.references.get(id);
+    if (!record) return;
+    record.baselineSha = state.baselineSha;
+    record.baselineSnippet = state.baselineSnippet;
+    record.startLine = state.startLine;
+    record.endLine = state.endLine;
+    // A freshly baselined reference is in sync with itself by definition.
+    record.currentSha = state.baselineSha;
+    record.checkedAt = state.checkedAt;
+  }
+
   async updateReferenceState(
     id: string,
-    state: { currentSha: string | null; checkedAt: Date },
+    state: {
+      currentSha: string | null;
+      checkedAt: Date;
+      startLine?: number;
+      endLine?: number;
+    },
   ): Promise<void> {
     const record = this.references.get(id);
     if (!record) return;
     record.currentSha = state.currentSha;
     record.checkedAt = state.checkedAt;
+    if (state.startLine !== undefined) record.startLine = state.startLine;
+    if (state.endLine !== undefined) record.endLine = state.endLine;
   }
 
   async addWorkspaceRepo(repo: RepoRecord): Promise<void> {

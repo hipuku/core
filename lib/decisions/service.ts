@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Versioning } from "@/lib/versioning/engine";
 import type { HistoryEntry } from "@/lib/versioning/engine";
 import type { Json } from "@/lib/versioning/types";
-import { deriveWorkspaceKey, normalizeWorkspaceKey } from "./key";
+import { decisionLabel, deriveWorkspaceKey, normalizeWorkspaceKey } from "./key";
 import {
   canEditContent,
   capabilitiesFor,
@@ -12,6 +12,7 @@ import {
 import type {
   DecisionRecord,
   DecisionStore,
+  DraftRecord,
   ReferenceKind,
   ReferenceRecord,
   RepoRecord,
@@ -236,6 +237,43 @@ export class DecisionService {
     });
   }
 
+  /**
+   * Move every file reference's baseline to the code as it stands now.
+   *
+   * Called when a decision is accepted. A citation made while drafting records
+   * the code the *author* was looking at; the decision itself does not exist
+   * until the team accepts it, so that is the moment its reference point should
+   * be fixed. Without this, a proposal that sat in review for a fortnight is
+   * flagged as drifted the instant it is agreed — which is how a staleness
+   * signal teaches people to ignore it.
+   *
+   * The fetching happens in the caller: the service holds no GitHub token.
+   */
+  async rebaselineReferences(
+    decisionId: string,
+    snapshots: {
+      referenceId: string;
+      baselineSha: string | null;
+      baselineSnippet: string | null;
+      startLine: number | null;
+      endLine: number | null;
+    }[],
+  ): Promise<void> {
+    const now = this.clock.now();
+    for (const snapshot of snapshots) {
+      const reference = await this.store.getReference(snapshot.referenceId);
+      // Only ever this decision's own references.
+      if (!reference || reference.decisionId !== decisionId) continue;
+      await this.store.rebaselineReference(snapshot.referenceId, {
+        baselineSha: snapshot.baselineSha,
+        baselineSnippet: snapshot.baselineSnippet,
+        startLine: snapshot.startLine,
+        endLine: snapshot.endLine,
+        checkedAt: now,
+      });
+    }
+  }
+
   /** Replace one accepted decision with another, linking and superseding the old. */
   async supersede(
     supersedingId: string,
@@ -326,6 +364,87 @@ export class DecisionService {
     return this.store.getWorkspace(id);
   }
 
+  /* ---- drafts ------------------------------------------------------------
+     A draft is scratch work, not a decision. It carries no ADR number, has no
+     transitions, and is visible only to its author — including to maintainers,
+     who have no business reading unfinished reasoning. Every method here checks
+     authorship rather than role, which is why none of them touch `capabilitiesFor`. */
+
+  /**
+   * Create or update a draft. Nothing is validated: a draft may be untitled and
+   * entirely empty, because the whole point is to park work that is not ready.
+   */
+  async saveDraft(
+    workspaceId: string,
+    authorId: string,
+    input: {
+      /** Omitted for a new draft; supplied to update one in place. */
+      id?: string;
+      title: string;
+      body: DraftRecord["body"];
+      refs: DraftRecord["refs"];
+    },
+  ): Promise<DraftRecord> {
+    if (!(await this.store.getMembership(workspaceId, authorId))) {
+      throw new DecisionError("not a member of this workspace");
+    }
+
+    if (input.id) {
+      const existing = await this.store.getDraft(input.id);
+      // A missing draft is not an error worth surfacing — it was deleted, or
+      // proposed, in another tab. Fall through and create a fresh one.
+      if (existing && existing.authorId !== authorId) {
+        throw new DecisionError("not your draft");
+      }
+      if (existing && existing.workspaceId !== workspaceId) {
+        throw new DecisionError("draft belongs to another workspace");
+      }
+    }
+
+    const now = this.clock.now();
+    return this.store.upsertDraft({
+      id: input.id ?? this.ids.next(),
+      workspaceId,
+      authorId,
+      title: input.title,
+      body: input.body,
+      refs: input.refs,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  /** An author's own drafts in a workspace, newest first. */
+  async listDrafts(workspaceId: string, authorId: string): Promise<DraftRecord[]> {
+    if (!(await this.store.getMembership(workspaceId, authorId))) return [];
+    return this.store.listDrafts(workspaceId, authorId);
+  }
+
+  /** A single draft, only ever for the author who wrote it. */
+  async getDraft(id: string, authorId: string): Promise<DraftRecord | null> {
+    const draft = await this.store.getDraft(id);
+    if (!draft || draft.authorId !== authorId) return null;
+    return draft;
+  }
+
+  async deleteDraft(id: string, authorId: string): Promise<void> {
+    const draft = await this.store.getDraft(id);
+    if (!draft) return;
+    if (draft.authorId !== authorId) throw new DecisionError("not your draft");
+    await this.store.deleteDraft(id);
+  }
+
+  /**
+   * The label the next proposal in this workspace would carry (`VAU-014`) —
+   * shown while composing so the author knows what they are about to create.
+   * A preview, not a reservation: see `DecisionStore.peekNextNumber`.
+   */
+  async peekNextLabel(workspaceId: string): Promise<string | null> {
+    const workspace = await this.store.getWorkspace(workspaceId);
+    if (!workspace) return null;
+    return decisionLabel(workspace.key, await this.store.peekNextNumber(workspaceId));
+  }
+
   /** The acting user's role in a workspace, or null if they are not a member. */
   async roleOf(workspaceId: string, userId: string): Promise<Role | null> {
     const membership = await this.store.getMembership(workspaceId, userId);
@@ -354,6 +473,9 @@ export class DecisionService {
       url?: string | null;
       repo?: string | null;
       path?: string | null;
+      startLine?: number | null;
+      endLine?: number | null;
+      baselineSnippet?: string | null;
       baselineSha?: string | null;
     },
   ): Promise<ReferenceRecord> {
@@ -371,6 +493,9 @@ export class DecisionService {
       url: input.url ?? null,
       repo: input.repo ?? null,
       path: input.path ?? null,
+      startLine: input.startLine ?? null,
+      endLine: input.endLine ?? null,
+      baselineSnippet: input.baselineSnippet ?? null,
       baselineSha,
       // A freshly cited file starts in sync with its baseline.
       currentSha: baselineSha,
@@ -391,6 +516,8 @@ export class DecisionService {
     referenceId: string,
     userId: string,
     currentSha: string | null,
+    /** Supplied when a cited block was found to have moved intact. */
+    movedTo?: { start: number; end: number },
   ): Promise<void> {
     const reference = await this.store.getReference(referenceId);
     if (!reference) throw new DecisionError("reference not found");
@@ -400,6 +527,7 @@ export class DecisionService {
     await this.store.updateReferenceState(referenceId, {
       currentSha,
       checkedAt: this.clock.now(),
+      ...(movedTo ? { startLine: movedTo.start, endLine: movedTo.end } : {}),
     });
   }
 

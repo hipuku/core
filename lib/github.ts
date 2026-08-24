@@ -84,8 +84,50 @@ export function fileUrl(
   repo: string,
   branch: string,
   path: string,
+  /** `L47-L120` — GitHub highlights the span when the fragment is present. */
+  lines?: string | null,
 ): string {
-  return `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
+  const base = `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
+  return lines ? `${base}#${lines}` : base;
+}
+
+/**
+ * A file's contents and current blob SHA, or null if it no longer exists.
+ *
+ * One call for both, because every caller that wants the text also wants the
+ * SHA it belongs to — fetching them separately risks reading a file at one
+ * commit and stamping it with another's SHA.
+ */
+export async function getFileContent(
+  token: string,
+  owner: string,
+  repo: string,
+  path: string,
+  branch: string,
+): Promise<{ content: string; sha: string } | null> {
+  const encoded = path.split("/").map(encodeURIComponent).join("/");
+  const res = await fetch(
+    `${API}/repos/${owner}/${repo}/contents/${encoded}?ref=${branch}`,
+    { headers: headers(token) },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub file lookup failed (${res.status})`);
+
+  const data = (await res.json()) as {
+    sha: string;
+    content?: string;
+    encoding?: string;
+    size: number;
+  };
+
+  // Over ~1MB the contents endpoint stops inlining the body. The SHA is still
+  // good, so the caller can fall back to whole-file comparison.
+  if (data.encoding !== "base64" || data.content === undefined) return null;
+
+  return {
+    sha: data.sha,
+    content: Buffer.from(data.content, "base64").toString("utf8"),
+  };
 }
 
 /** The current git blob SHA of a file, or null if it no longer exists. */

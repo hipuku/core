@@ -1,6 +1,7 @@
-import { and, asc, count, eq, max } from "drizzle-orm";
+import { and, asc, count, desc, eq, max } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
+  decisionDrafts,
   decisionReferences,
   decisions,
   decisionTransitions,
@@ -11,12 +12,22 @@ import {
 import type {
   DecisionRecord,
   DecisionStore,
+  DraftRecord,
   MembershipRecord,
   ReferenceRecord,
   RepoRecord,
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";
+
+/** jsonb comes back as `unknown`; the draft's shape is asserted at this edge. */
+function toDraft(row: typeof decisionDrafts.$inferSelect): DraftRecord {
+  return {
+    ...row,
+    body: row.body as DraftRecord["body"],
+    refs: row.refs as DraftRecord["refs"],
+  };
+}
 
 /**
  * The production DecisionStore, backed by Postgres. Same interface the in-memory
@@ -102,6 +113,59 @@ export class DrizzleDecisionStore implements DecisionStore {
       await tx.insert(decisionTransitions).values(input.transition);
       return toDecision(row);
     });
+  }
+
+  async upsertDraft(draft: DraftRecord): Promise<DraftRecord> {
+    const [row] = await db
+      .insert(decisionDrafts)
+      .values(draft)
+      .onConflictDoUpdate({
+        target: decisionDrafts.id,
+        // `createdAt` stays put: re-saving a draft is an edit, not a new draft.
+        set: {
+          title: draft.title,
+          body: draft.body,
+          refs: draft.refs,
+          updatedAt: draft.updatedAt,
+        },
+      })
+      .returning();
+    return toDraft(row!);
+  }
+
+  async getDraft(id: string): Promise<DraftRecord | null> {
+    const [row] = await db
+      .select()
+      .from(decisionDrafts)
+      .where(eq(decisionDrafts.id, id))
+      .limit(1);
+    return row ? toDraft(row) : null;
+  }
+
+  async listDrafts(workspaceId: string, authorId: string): Promise<DraftRecord[]> {
+    const rows = await db
+      .select()
+      .from(decisionDrafts)
+      .where(
+        and(
+          eq(decisionDrafts.workspaceId, workspaceId),
+          eq(decisionDrafts.authorId, authorId),
+        ),
+      )
+      .orderBy(desc(decisionDrafts.updatedAt));
+    return rows.map(toDraft);
+  }
+
+  async deleteDraft(id: string): Promise<void> {
+    await db.delete(decisionDrafts).where(eq(decisionDrafts.id, id));
+  }
+
+  async peekNextNumber(workspaceId: string): Promise<number> {
+    const [row] = await db
+      .select({ current: max(decisions.number) })
+      .from(decisions)
+      .where(eq(decisions.workspaceId, workspaceId));
+    return (row?.current ?? 0) + 1;
   }
 
   async getWorkspace(id: string): Promise<WorkspaceRecord | null> {
@@ -233,13 +297,48 @@ export class DrizzleDecisionStore implements DecisionStore {
     await db.delete(decisionReferences).where(eq(decisionReferences.id, id));
   }
 
-  async updateReferenceState(
+  async rebaselineReference(
     id: string,
-    state: { currentSha: string | null; checkedAt: Date },
+    state: {
+      baselineSha: string | null;
+      baselineSnippet: string | null;
+      startLine: number | null;
+      endLine: number | null;
+      checkedAt: Date;
+    },
   ): Promise<void> {
     await db
       .update(decisionReferences)
-      .set({ currentSha: state.currentSha, checkedAt: state.checkedAt })
+      .set({
+        baselineSha: state.baselineSha,
+        baselineSnippet: state.baselineSnippet,
+        startLine: state.startLine,
+        endLine: state.endLine,
+        // A freshly baselined reference is in sync with itself by definition.
+        currentSha: state.baselineSha,
+        checkedAt: state.checkedAt,
+      })
+      .where(eq(decisionReferences.id, id));
+  }
+
+  async updateReferenceState(
+    id: string,
+    state: {
+      currentSha: string | null;
+      checkedAt: Date;
+      startLine?: number;
+      endLine?: number;
+    },
+  ): Promise<void> {
+    await db
+      .update(decisionReferences)
+      .set({
+        currentSha: state.currentSha,
+        checkedAt: state.checkedAt,
+        // Only written when the block moved; otherwise the range is untouched.
+        ...(state.startLine !== undefined ? { startLine: state.startLine } : {}),
+        ...(state.endLine !== undefined ? { endLine: state.endLine } : {}),
+      })
       .where(eq(decisionReferences.id, id));
   }
 

@@ -66,11 +66,32 @@ export interface ReferenceRecord {
   url: string | null;
   repo: string | null;
   path: string | null;
+  /** A cited line span, 1-based inclusive. Null means the whole file. */
+  startLine: number | null;
+  endLine: number | null;
+  /** The cited lines as they read when cited — lets a moved block be told from a changed one. */
+  baselineSnippet: string | null;
   baselineSha: string | null;
   currentSha: string | null;
   checkedAt: Date | null;
   addedBy: string;
   createdAt: Date;
+}
+
+/**
+ * An unsent decision, parked by its author. Not a lifecycle state — see the
+ * `decision_drafts` table comment for why this is kept out of `decisions`.
+ */
+export interface DraftRecord {
+  id: string;
+  workspaceId: string;
+  authorId: string;
+  title: string;
+  /** Every block may be empty — a draft is under no obligation to be complete. */
+  body: { context: string; decision: string; consequences: string };
+  refs: { repoId: string; repo: string; path: string; lines: string | null }[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface DecisionStore {
@@ -101,6 +122,16 @@ export interface DecisionStore {
   getWorkspace(id: string): Promise<WorkspaceRecord | null>;
   listWorkspacesForUser(userId: string): Promise<WorkspaceRecord[]>;
 
+  /**
+   * The number the next decision in this workspace would take. A *preview* for
+   * the compose screen, not a reservation — nothing is held, and two authors
+   * composing at once will both see the same number. The real number is assigned
+   * inside `insertDecision`'s transaction, where the unique constraint settles
+   * any race. Kept read-only on purpose: reserving a number for an unsent draft
+   * would leave permanent gaps in the ADR sequence.
+   */
+  peekNextNumber(workspaceId: string): Promise<number>;
+
   getDecision(id: string): Promise<DecisionRecord | null>;
   listDecisions(workspaceId: string): Promise<DecisionRecord[]>;
   countDecisions(workspaceId: string): Promise<number>;
@@ -123,10 +154,38 @@ export interface DecisionStore {
   getReference(id: string): Promise<ReferenceRecord | null>;
   listReferences(decisionId: string): Promise<ReferenceRecord[]>;
   deleteReference(id: string): Promise<void>;
+  /**
+   * Move a file reference's baseline to the state it is in now. Used when a
+   * decision is accepted — the reference point is the code the team agreed to,
+   * not the code the author happened to be looking at while drafting.
+   */
+  rebaselineReference(
+    id: string,
+    state: {
+      baselineSha: string | null;
+      baselineSnippet: string | null;
+      startLine: number | null;
+      endLine: number | null;
+      checkedAt: Date;
+    },
+  ): Promise<void>;
+
   updateReferenceState(
     id: string,
-    state: { currentSha: string | null; checkedAt: Date },
+    state: {
+      currentSha: string | null;
+      checkedAt: Date;
+      /** Set when a cited block was found to have moved, so the range follows it. */
+      startLine?: number;
+      endLine?: number;
+    },
   ): Promise<void>;
+
+  upsertDraft(draft: DraftRecord): Promise<DraftRecord>;
+  getDraft(id: string): Promise<DraftRecord | null>;
+  /** An author's own drafts in one workspace, newest first. */
+  listDrafts(workspaceId: string, authorId: string): Promise<DraftRecord[]>;
+  deleteDraft(id: string): Promise<void>;
 
   addWorkspaceRepo(repo: RepoRecord): Promise<void>;
   listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]>;
