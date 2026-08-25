@@ -78,6 +78,7 @@ export default async function EditDecisionPage({
       }}
       draftKey={`${workspaceId}:${decisionId}`}
       citable={citable}
+      repoIds={repos.map((r) => ({ id: r.id, repo: `${r.owner}/${r.name}` }))}
       headingKey={decisionLabel(workspace?.key ?? "ADR", decision.number)}
       headingTitle={decision.title}
       status={decision.status}

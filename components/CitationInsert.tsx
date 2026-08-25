@@ -3,13 +3,14 @@
 import { createContext, useContext } from "react";
 
 /**
- * Lets a reference list drop a citation into the document it belongs to.
+ * What the editor knows about citations, offered to whatever renders the
+ * reference list.
  *
- * The editor owns the textarea and the caret; the reference list is passed in
- * from a server component, which cannot hand a callback across that boundary.
- * Context solves it without either side knowing about the other: the element is
- * created on the server, but it *renders* inside the editor's tree, so the
- * provider reaches it.
+ * The editor owns the textarea, the caret and the prose; the reference list is
+ * passed in from a server component, which cannot hand callbacks across that
+ * boundary. Context solves it without either side knowing about the other: the
+ * element is created on the server, but it *renders* inside the editor's tree,
+ * so the provider reaches it.
  */
 export interface Citable {
   repo: string;
@@ -17,11 +18,18 @@ export interface Citable {
   lines: string | null;
 }
 
-const CitationInsertContext = createContext<((citable: Citable) => void) | null>(null);
+export interface EditorCitations {
+  /** Drop a citation into the document at the caret. */
+  insert: (citable: Citable) => void;
+  /** Files named in the prose that no reference covers yet. */
+  untracked: (Citable & { repoId: string })[];
+}
 
-export const CitationInsertProvider = CitationInsertContext.Provider;
+const Context = createContext<EditorCitations | null>(null);
 
-/** The insert function, or null where there is no editor above — read-only views. */
-export function useCitationInsert(): ((citable: Citable) => void) | null {
-  return useContext(CitationInsertContext);
+export const CitationInsertProvider = Context.Provider;
+
+/** Null where there is no editor above — a read-only view. */
+export function useEditorCitations(): EditorCitations | null {
+  return useContext(Context);
 }

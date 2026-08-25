@@ -5,6 +5,7 @@ import {
   formatCitation,
   insertCitation,
   renderCitations,
+  untrackedCitations,
 } from "./citation";
 
 const REF = { repo: "acme/api", path: "src/auth.ts", lines: "L12-L40" };
@@ -104,5 +105,46 @@ describe("insertCitation", () => {
   it("replaces a selection", () => {
     const result = insertCitation({ value: "see THIS end", start: 4, end: 8 }, REF);
     expect(result.value).toBe("see {{acme/api:src/auth.ts#L12-L40}} end");
+  });
+});
+
+describe("untrackedCitations", () => {
+  const body = "We chose this because {{acme/api:src/auth.ts#L12-L40}} assumes it, " +
+    "unlike {{acme/web:app/page.tsx}}.";
+
+  it("finds citations no reference covers", () => {
+    expect(untrackedCitations(body, []).map((c) => c.path)).toEqual([
+      "src/auth.ts",
+      "app/page.tsx",
+    ]);
+  });
+
+  it("ignores one that is already tracked", () => {
+    const tracked = [{ repo: "acme/api", path: "src/auth.ts" }];
+    expect(untrackedCitations(body, tracked).map((c) => c.path)).toEqual([
+      "app/page.tsx",
+    ]);
+  });
+
+  it("matches on repo and path, so a range does not count as a different file", () => {
+    // The reference watches the whole file; the citation names part of it.
+    const tracked = [{ repo: "acme/api", path: "src/auth.ts" }];
+    const ranged = "see {{acme/api:src/auth.ts#L99-L120}}";
+    expect(untrackedCitations(ranged, tracked)).toEqual([]);
+  });
+
+  it("does not confuse the same path in different repos", () => {
+    const tracked = [{ repo: "other/repo", path: "src/auth.ts" }];
+    expect(untrackedCitations("{{acme/api:src/auth.ts}}", tracked)).toHaveLength(1);
+  });
+
+  it("reports a file cited three times once", () => {
+    const repeated =
+      "{{acme/api:src/auth.ts}} and {{acme/api:src/auth.ts#L1}} and {{acme/api:src/auth.ts#L9}}";
+    expect(untrackedCitations(repeated, [])).toHaveLength(1);
+  });
+
+  it("finds nothing in prose with no citations", () => {
+    expect(untrackedCitations("Just a paragraph.", [])).toEqual([]);
   });
 });

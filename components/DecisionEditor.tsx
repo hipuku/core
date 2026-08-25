@@ -35,7 +35,7 @@ import { ReferenceField } from "@/components/ReferenceField";
 import { ModalShell } from "@/components/ModalShell";
 import type { ActionResult } from "@/lib/action-result";
 import type { DecisionStatus } from "@/lib/decisions/types";
-import { insertCitation } from "@/lib/decisions/citation";
+import { insertCitation, untrackedCitations } from "@/lib/decisions/citation";
 import {
   continueList,
   indent,
@@ -264,6 +264,7 @@ export function DecisionEditor({
   /** The key this decision will carry once proposed (`VAU-014`). */
   nextKey,
   citable = [],
+  repoIds = [],
   headingKey,
   headingTitle,
   status,
@@ -291,6 +292,8 @@ export function DecisionEditor({
   nextKey?: string;
   /** Repos inline citations in the body can resolve against. */
   citable?: CitationRepo[];
+  /** The same repos with their ids, so a citation can become a reference. */
+  repoIds?: { id: string; repo: string }[];
   /** Revising an existing decision: its key, title and status, for the header. */
   headingKey?: string;
   headingTitle?: string;
@@ -334,6 +337,31 @@ export function DecisionEditor({
       setConfirmingDiscard(true);
     }, []),
   });
+
+  /**
+   * Files named in the prose that no reference covers. Computed over all three
+   * blocks, because a citation in Context is as much a claim as one in the
+   * Decision.
+   */
+  const untracked = useMemo(() => {
+    const prose = BLOCKS.map((b) => body[b.name]).join("\n\n");
+    // Compose holds its citations in state; revising was handed the ones the
+    // decision already has.
+    const tracked = (workspaceId ? cited : previewCited).map((c) => ({
+      repo: c.repo,
+      path: c.path,
+    }));
+    return untrackedCitations(prose, tracked)
+      .map((citation) => {
+        const repo = repoIds.find((r) => r.repo === citation.repo);
+        // A citation naming a repo this workspace has not connected cannot be
+        // tracked, and offering to would be a button that does nothing.
+        return repo
+          ? { repoId: repo.id, repo: citation.repo, path: citation.path, lines: citation.lines }
+          : null;
+      })
+      .filter((f) => f !== null);
+  }, [body, cited, previewCited, workspaceId, repoIds]);
 
   const draftValue = useMemo<DraftShape>(() => ({ title, body, cited }), [title, body, cited]);
   const draft = useDraft<DraftShape>({
@@ -588,9 +616,11 @@ export function DecisionEditor({
               {/* The slot comes from a server component, so it cannot be
                   handed a callback — context reaches it where props cannot. */}
               <CitationInsertProvider
-                value={(citable) =>
-                  format((state) => insertCitation(state, citable))
-                }
+                value={{
+                  insert: (citable) =>
+                    format((state) => insertCitation(state, citable)),
+                  untracked,
+                }}
               >
                 {referencesSlot}
               </CitationInsertProvider>
@@ -630,6 +660,16 @@ export function DecisionEditor({
                       list.filter(
                         (x) => `${x.repoId}:${x.path}:${x.lines ?? ""}` !== chip.key,
                       ),
+                    )
+                  }
+                  untracked={untracked}
+                  onTrack={(file, lines) =>
+                    setCited((list) =>
+                      list.some(
+                        (x) => x.repoId === file.repoId && x.path === file.path && x.lines === lines,
+                      )
+                        ? list
+                        : [...list, { repoId: file.repoId, repo: file.repo, path: file.path, lines }],
                     )
                   }
                   onInsert={(chip) =>

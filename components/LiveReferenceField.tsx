@@ -6,7 +6,7 @@ import {
   removeReference,
   type WorkspaceFile,
 } from "@/app/app/actions";
-import { useCitationInsert } from "@/components/CitationInsert";
+import { useEditorCitations } from "@/components/CitationInsert";
 import { ReferenceField, type ReferenceChip } from "@/components/ReferenceField";
 
 /**
@@ -32,7 +32,7 @@ export function LiveReferenceField({
   chips: ReferenceChip[];
 }) {
   // Present whenever this sits inside the editor, absent in a read-only view.
-  const insert = useCitationInsert();
+  const editor = useEditorCitations();
   async function add(file: WorkspaceFile, lines: string | null) {
     const formData = new FormData();
     formData.set("repoId", file.repoId);
@@ -56,10 +56,14 @@ export function LiveReferenceField({
       onAdd={add}
       onRemove={remove}
       onInsert={
-        insert
-          ? (chip) => insert({ repo: chip.repo, path: chip.path, lines: chip.lines })
+        editor
+          ? (chip) =>
+              editor.insert({ repo: chip.repo, path: chip.path, lines: chip.lines })
           : undefined
       }
+      untracked={editor?.untracked ?? []}
+      // Tracking here writes straight through, exactly as picking a file does.
+      onTrack={add}
     />
   );
 }

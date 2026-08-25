@@ -43,6 +43,7 @@ export default async function NewDecisionPage({
         repo: `${r.owner}/${r.name}`,
         branch: r.defaultBranch,
       }))}
+      repoIds={repos.map((r) => ({ id: r.id, repo: `${r.owner}/${r.name}` }))}
       draftId={draft?.id}
       onDiscardDraft={async (id) => {
         "use server";

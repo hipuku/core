@@ -9,3 +9,44 @@
 .item {
   min-width: 0;
 }
+
+/* ---- cited but untracked ------------------------------------------------
+   A gap the author may or may not want closed, so it is stated and offered
+   rather than fixed. Tinted like a notice, not like an error: nothing is
+   wrong, there is just a distinction the interface can help act on. */
+.untracked {
+  margin: 0.6rem 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--r);
+  background: color-mix(in oklch, var(--st-deprecated) 10%, var(--surface));
+  border-left: 3px solid color-mix(in oklch, var(--st-deprecated) 45%, transparent);
+}
+.untrackedLead {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-bottom: 0.35rem;
+}
+.untrackedList {
+  list-style: none;
+}
+
+.track {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: none;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.track:hover {
+  background: var(--accent-tint);
+  color: var(--accent);
+}

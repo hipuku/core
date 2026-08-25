@@ -1,6 +1,6 @@
 "use client";
 
-import { AtSign, X } from "lucide-react";
+import { AtSign, Plus, X } from "lucide-react";
 import { FileBrowser } from "@/components/FileBrowser";
 import { FileRow } from "@/components/FileToken";
 import type { WorkspaceFile } from "@/app/app/actions";
@@ -37,6 +37,8 @@ export function ReferenceField({
   /** Compose buffers its citations in the form until the decision exists. */
   withHiddenInputs = false,
   repoIdOf,
+  untracked = [],
+  onTrack,
 }: {
   workspaceId: string;
   chips: ReferenceChip[];
@@ -47,6 +49,9 @@ export function ReferenceField({
   withHiddenInputs?: boolean;
   /** The repo id behind a row, needed only for the buffered hidden inputs. */
   repoIdOf?: (chip: ReferenceChip) => string;
+  /** Files cited in the prose that nothing is watching yet. */
+  untracked?: { repo: string; path: string; lines: string | null; repoId: string }[];
+  onTrack?: (file: WorkspaceFile, lines: string | null) => void | Promise<void>;
 }) {
   return (
     <>
@@ -88,6 +93,41 @@ export function ReferenceField({
             </li>
           ))}
         </ul>
+      )}
+
+      {/* Cited in the argument, but not being watched. Offered rather than
+          done silently: citing a file while reasoning is not the same as
+          declaring that this decision governs it, and only the author knows
+          which one they meant. */}
+      {untracked.length > 0 && onTrack && (
+        <div className={styles.untracked}>
+          <p className={styles.untrackedLead}>
+            {untracked.length === 1
+              ? "One file is cited in the text but not tracked for changes."
+              : `${untracked.length} files are cited in the text but not tracked for changes.`}
+          </p>
+          <ul className={styles.untrackedList}>
+            {untracked.map((file) => (
+              <li key={`${file.repo}:${file.path}`}>
+                <FileRow repo={file.repo} path={file.path} lines={file.lines}>
+                  <button
+                    type="button"
+                    className={styles.track}
+                    onClick={() =>
+                      void onTrack(
+                        { repoId: file.repoId, repo: file.repo, path: file.path },
+                        file.lines,
+                      )
+                    }
+                  >
+                    <Plus size={13} />
+                    Track
+                  </button>
+                </FileRow>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <FileBrowser workspaceId={workspaceId} onPick={onAdd} />
