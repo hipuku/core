@@ -16,6 +16,7 @@ import {
   updateWorkspaceGeneral,
 } from "../../actions";
 import styles from "../../app.module.css";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function SettingsPage({
   params,
@@ -74,10 +75,10 @@ export default async function SettingsPage({
             </span>
           </label>
           <div className={styles.actions}>
-            <button type="submit" className="btn btn--primary">
+            <SubmitButton className="btn btn--primary">
               <Check size={16} />
               Save
-            </button>
+            </SubmitButton>
           </div>
         </ToastForm>
       </section>
@@ -102,9 +103,9 @@ export default async function SettingsPage({
                 </span>
                 {!isOwner && (
                   <ToastForm action={removeMember.bind(null, workspaceId, member.userId)}>
-                    <button type="submit" className="iconbtn iconbtn--danger" aria-label="Remove member">
+                    <SubmitButton className="iconbtn iconbtn--danger" aria-label="Remove member">
                       ×
-                    </button>
+                    </SubmitButton>
                   </ToastForm>
                 )}
               </li>
@@ -140,9 +141,9 @@ export default async function SettingsPage({
                   <span className={styles.memberEmail}>{repo.defaultBranch}</span>
                 </span>
                 <ToastForm action={disconnectRepo.bind(null, workspaceId, repo.id)}>
-                  <button type="submit" className="iconbtn iconbtn--danger" aria-label="Disconnect repository">
+                  <SubmitButton className="iconbtn iconbtn--danger" aria-label="Disconnect repository">
                     ×
-                  </button>
+                  </SubmitButton>
                 </ToastForm>
               </li>
             ))}

@@ -7,6 +7,7 @@ import type { GithubRepo } from "@/lib/github";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
 import styles from "./Modal.module.css";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
   const [open, setOpen] = useState(false);
@@ -74,10 +75,10 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
                 <button type="button" className="btn" onClick={() => setOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn--primary">
+                <SubmitButton className="btn btn--primary">
                   <Plus size={16} />
                   Connect
-                </button>
+                </SubmitButton>
               </div>
             </ToastForm>
           )}

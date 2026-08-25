@@ -6,6 +6,7 @@ import { createWorkspace } from "@/app/app/actions";
 import { ModalShell } from "./ModalShell";
 import styles from "./Modal.module.css";
 import { ToastForm } from "@/components/ToastForm";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export function NewWorkspaceModal() {
   const [open, setOpen] = useState(false);
@@ -42,10 +43,10 @@ export function NewWorkspaceModal() {
               >
                 Cancel
               </button>
-              <button type="submit" className="btn btn--primary">
+              <SubmitButton className="btn btn--primary">
                 <Plus size={16} />
                 Create workspace
-              </button>
+              </SubmitButton>
             </div>
           </ToastForm>
         </ModalShell>

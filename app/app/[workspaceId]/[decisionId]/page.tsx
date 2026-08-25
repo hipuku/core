@@ -21,6 +21,7 @@ import { timeAgo } from "@/lib/time-ago";
 import { usersById } from "@/lib/users";
 import { changeStatus, checkReferenceDrift, supersede } from "../../actions";
 import styles from "../../app.module.css";
+import { SubmitButton } from "@/components/SubmitButton";
 
 function field(body: Json, key: string): string {
   if (body && typeof body === "object" && !Array.isArray(body)) {
@@ -159,18 +160,18 @@ export default async function DecisionPage({
           )}
           {canReject && (
             <ToastForm action={reject}>
-              <button type="submit" className="btn btn--danger">
+              <SubmitButton className="btn btn--danger">
                 <X size={16} />
                 Reject
-              </button>
+              </SubmitButton>
             </ToastForm>
           )}
           {canAccept && (
             <ToastForm action={accept}>
-              <button type="submit" className="btn btn--accept">
+              <SubmitButton className="btn btn--accept">
                 <Check size={16} />
                 Approve
-              </button>
+              </SubmitButton>
             </ToastForm>
           )}
           {canSupersede && (
@@ -185,10 +186,10 @@ export default async function DecisionPage({
           )}
           {canDeprecate && (
             <ToastForm action={deprecate}>
-              <button type="submit" className="btn">
+              <SubmitButton className="btn">
                 <Archive size={16} />
                 Deprecate
-              </button>
+              </SubmitButton>
             </ToastForm>
           )}
         </div>
@@ -355,14 +356,13 @@ export default async function DecisionPage({
                         ? `checked ${timeAgo(lastChecked.getTime())}`
                         : "never checked"}
                     </span>
-                    <button
-                      type="submit"
+                    <SubmitButton
                       className="iconbtn iconbtn--accent"
                       title="Check whether the cited code has changed"
                       aria-label="Check for drift"
                     >
                       <RefreshCw size={14} />
-                    </button>
+                    </SubmitButton>
                   </span>
                 </ToastForm>
               )}

@@ -7,6 +7,7 @@ import { Dropdown } from "./Dropdown";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
 import styles from "./Modal.module.css";
+import { SubmitButton } from "@/components/SubmitButton";
 
 const ROLE_OPTIONS = [
   { value: "author", label: "Author", hint: "Can propose and revise" },
@@ -54,10 +55,10 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
               <button type="button" className="btn" onClick={() => setOpen(false)}>
                 Cancel
               </button>
-              <button type="submit" className="btn btn--primary">
+              <SubmitButton className="btn btn--primary">
                 <UserPlus size={16} />
                 Add member
-              </button>
+              </SubmitButton>
             </div>
           </ToastForm>
         </ModalShell>
