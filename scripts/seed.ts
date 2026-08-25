@@ -240,9 +240,54 @@ async function main() {
   console.log(`  author    : ${AUTHOR_EMAIL} / ${AUTHOR_PASSWORD}`);
 }
 
+/**
+ * Postgres errors arrive wrapped in the failing query, which is the least
+ * useful part of them. The three ways this actually goes wrong all have a
+ * specific fix, so say the fix.
+ */
+function explain(error: unknown): string {
+  const raw = error instanceof Error ? error.message : String(error);
+  const cause = error instanceof Error ? (error.cause as { code?: string } | undefined) : undefined;
+  const code = cause?.code;
+
+  if (code === "42P01" || /relation .* does not exist/i.test(raw)) {
+    return [
+      "The tables do not exist in that database yet.",
+      "",
+      "Run the schema push against the same DATABASE_URL first:",
+      "  DATABASE_URL='…' npx drizzle-kit push",
+    ].join("\n");
+  }
+
+  if (code === "28P01" || /password authentication failed/i.test(raw)) {
+    return [
+      "Postgres rejected those credentials.",
+      "",
+      "Check the password in DATABASE_URL is the real one — a placeholder left",
+      "in by mistake fails exactly like this.",
+    ].join("\n");
+  }
+
+  if (code === "ENOTFOUND" || /getaddrinfo|ENOTFOUND|ECONNREFUSED/i.test(raw)) {
+    return "Could not reach that host. Check the connection string is complete and quoted.";
+  }
+
+  if (/breach|compromised/i.test(raw)) {
+    return [
+      "The demo password was rejected as breached.",
+      "",
+      "Sign-up runs a HaveIBeenPwned check, so DEMO_USER_PASSWORD must be at",
+      "least 10 characters and not appear in a known breach.",
+    ].join("\n");
+  }
+
+  return raw;
+}
+
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error("\nSeed failed:", error instanceof Error ? error.message : error);
+    console.error("\nSeed failed.\n");
+    console.error(explain(error));
     process.exit(1);
   });
