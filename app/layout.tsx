@@ -19,7 +19,15 @@ export const metadata: Metadata = {
     "A team decision log for architecture decision records, with a permission-gated lifecycle and full history.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// Typed explicitly rather than with Next's generated `LayoutProps`: that global
+// lives in `.next/types`, so `tsc --noEmit` on a clean checkout — which is what
+// CI does — cannot see it. The root layout takes no route params, so the
+// generated type was buying nothing.
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={`${gabarito.variable} ${geistMono.variable}`}>
       <body>
