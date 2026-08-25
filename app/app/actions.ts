@@ -17,6 +17,7 @@ import {
   getFileContent,
   getFileSha,
   getGithubToken,
+  getReadToken,
   listRepoFiles,
   listRepos,
 } from "@/lib/github";
@@ -170,7 +171,14 @@ export async function removeReference(
   }, "Reference removed.");
 }
 
-/** The current user's GitHub repos, for the connect picker. */
+/**
+ * The current user's GitHub repos, for the connect picker.
+ *
+ * Deliberately *not* `getReadToken`: the deployment's fallback token belongs to
+ * the owner, and using it here would list the owner's repositories to whoever
+ * happened to be signed in. Connecting a repository is an act of your own
+ * access, so it requires your own account.
+ */
 export async function listMyGithubRepos() {
   const user = await requireUser();
   const token = await getGithubToken(user.id);
@@ -225,7 +233,7 @@ export async function listConnectedRepoFiles(repoId: string) {
   if (!repo) throw new DecisionError("repository not found");
   const role = await decisionService.roleOf(repo.workspaceId, user.id);
   if (!role) throw new DecisionError("you are not a member of this workspace");
-  const token = await getGithubToken(user.id);
+  const token = await getReadToken(user.id);
   if (!token) throw new DecisionError("connect your GitHub account first");
   return listRepoFiles(token, repo.owner, repo.name, repo.defaultBranch);
 }
@@ -246,7 +254,10 @@ export interface WorkspaceFile {
  */
 export async function listWorkspaceFiles(workspaceId: string): Promise<{
   files: WorkspaceFile[];
+  /** Repos whose tree GitHub returned only part of. */
   truncated: string[];
+  /** Repos this token could not read at all — private, or gone. */
+  unreachable: string[];
   /** Set when browsing is not possible here — a state, not a failure. */
   unavailable?: string;
 }> {
@@ -254,24 +265,21 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
   const role = await decisionService.roleOf(workspaceId, user.id);
   if (!role) throw new DecisionError("you are not a member of this workspace");
 
-  // Not having GitHub is an ordinary condition — switched off for this
-  // deployment, or simply not linked yet — so it is reported rather than
-  // thrown. A rejected server action surfaces as an opaque React error in
-  // production, which is a poor way to say "connect your account".
-  if (githubDisabled()) {
-    return {
-      files: [],
-      truncated: [],
-      unavailable: "GitHub linking is switched off on this deployment, so files cannot be browsed here.",
-    };
-  }
-
-  const token = await getGithubToken(user.id);
+  // Browsing and linking are separate concerns. `DISABLE_GITHUB` stops the app
+  // storing *other people's* tokens; it does not stop it reading public code
+  // through the deployment's own read-only one. Not having either is an
+  // ordinary condition, so it is reported rather than thrown — a rejected
+  // server action surfaces as an opaque React error in production, which is a
+  // poor way to say "connect your account".
+  const token = await getReadToken(user.id);
   if (!token) {
     return {
       files: [],
       truncated: [],
-      unavailable: "Connect your GitHub account in workspace settings to cite files.",
+      unreachable: [],
+      unavailable: githubDisabled()
+        ? "GitHub is switched off on this deployment, so files cannot be browsed here."
+        : "Connect your GitHub account in workspace settings to cite files.",
     };
   }
 
@@ -303,7 +311,13 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
       })),
     ),
     truncated: results
-      .filter((r) => r.truncated || r.failed)
+      .filter((r) => r.truncated)
+      .map((r) => `${r.repo.owner}/${r.repo.name}`),
+    // Told apart from truncation on purpose: a repo the deployment's public
+    // token cannot see is a *private* one, and "showing part of it" would be
+    // the wrong story.
+    unreachable: results
+      .filter((r) => r.failed)
       .map((r) => `${r.repo.owner}/${r.repo.name}`),
   };
 }
@@ -385,7 +399,7 @@ export async function addFileReference(
     if (!repo || repo.workspaceId !== workspaceId) {
       throw new DecisionError("repository not found");
     }
-    const token = await getGithubToken(user.id);
+    const token = await getReadToken(user.id);
     const snapshot = token
       ? await snapshotFile(token, repo, path, range)
       : { baselineSha: null, baselineSnippet: null, range: null };
@@ -417,7 +431,7 @@ export async function checkReferenceDrift(
   decisionId: string,
 ): Promise<ActionResult> {
   const user = await requireUser();
-  const token = await getGithubToken(user.id);
+  const token = await getReadToken(user.id);
   if (!token) {
     return { error: "Connect your GitHub account to check for drift." };
   }
@@ -579,7 +593,7 @@ async function attachCitedFiles(
   const lines = formData.getAll("refLines").map(String);
   if (repoIds.length === 0) return;
 
-  const token = await getGithubToken(userId);
+  const token = await getReadToken(userId);
   for (let i = 0; i < repoIds.length; i++) {
     const path = paths[i];
     const repoId = repoIds[i];
@@ -669,7 +683,7 @@ async function rebaselineOnAccept(
   userId: string,
 ): Promise<void> {
   try {
-    const token = await getGithubToken(userId);
+    const token = await getReadToken(userId);
     if (!token) return;
 
     const [references, repos] = await Promise.all([

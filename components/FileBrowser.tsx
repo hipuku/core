@@ -31,6 +31,7 @@ export function FileBrowser({
 }) {
   const [files, setFiles] = useState<WorkspaceFile[] | null>(null);
   const [partial, setPartial] = useState<string[]>([]);
+  const [unreachable, setUnreachable] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   /** Browsing is not possible here — GitHub off, or not linked. */
   const [unavailable, setUnavailable] = useState<string | null>(null);
@@ -51,6 +52,7 @@ export function FileBrowser({
         }
         setFiles(result.files);
         setPartial(result.truncated);
+        setUnreachable(result.unreachable);
       })
       .catch((e: unknown) => {
         if (!live) return;
@@ -121,7 +123,15 @@ export function FileBrowser({
 
       {partial.length > 0 && (
         <p className={styles.status}>
-          Partial file list for {partial.join(", ")} — very large or unreachable.
+          Showing part of {partial.join(", ")} — the repository is large enough
+          that GitHub truncates its file list.
+        </p>
+      )}
+
+      {unreachable.length > 0 && (
+        <p className={styles.status}>
+          {unreachable.join(", ")} could not be read. Private repositories need
+          your own GitHub account linked.
         </p>
       )}
 

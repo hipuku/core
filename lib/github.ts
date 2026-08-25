@@ -22,6 +22,36 @@ export async function getGithubToken(userId: string): Promise<string | null> {
   return row?.token ?? null;
 }
 
+/**
+ * A token that can read repository contents, preferring the acting user's own.
+ *
+ * The deployment may hold a **public-repo, read-only** token of the owner's, so
+ * that someone without a linked account can still browse and cite the code the
+ * workspace points at. That token is the owner's own and can reach nothing
+ * private, which is the whole reason it is safe to hold where a user's `repo`
+ * token would not be.
+ *
+ * A linked account still wins: it can see private repositories the fallback
+ * cannot, and it is the person's own access rather than a borrowed one.
+ */
+export async function getReadToken(userId: string): Promise<string | null> {
+  const linked = await getGithubToken(userId);
+  if (linked) return linked;
+  return process.env.GITHUB_PUBLIC_TOKEN?.trim() || null;
+}
+
+/**
+ * Repository trees, cached briefly in the running instance.
+ *
+ * A tree is a few hundred KB and changes rarely, while the file picker asks for
+ * every connected repo on every mount. Without this, a handful of visitors
+ * opening the compose screen would spend the hourly API budget on identical
+ * answers. Per-instance and short-lived on purpose: correctness here is "recent
+ * enough to cite from", not "current to the second".
+ */
+const TREE_TTL_MS = 5 * 60 * 1000;
+const treeCache = new Map<string, { at: number; value: { paths: string[]; truncated: boolean } }>();
+
 export interface GithubRepo {
   owner: string;
   name: string;
@@ -67,16 +97,22 @@ export async function listRepoFiles(
   repo: string,
   branch: string,
 ): Promise<{ paths: string[]; truncated: boolean }> {
+  const key = `${owner}/${repo}@${branch}`;
+  const hit = treeCache.get(key);
+  if (hit && Date.now() - hit.at < TREE_TTL_MS) return hit.value;
+
   const res = await fetch(
     `${API}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
     { headers: headers(token) },
   );
   if (!res.ok) throw new Error(`GitHub tree failed (${res.status})`);
   const data = (await res.json()) as TreeResponse;
-  return {
+  const value = {
     paths: data.tree.filter((t) => t.type === "blob").map((t) => t.path),
     truncated: data.truncated,
   };
+  treeCache.set(key, { at: Date.now(), value });
+  return value;
 }
 
 export function fileUrl(
