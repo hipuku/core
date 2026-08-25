@@ -3,7 +3,13 @@ import { Versioning } from "@/lib/versioning/engine";
 import { MemoryVersionStore } from "@/lib/versioning/memory-store";
 import { referenceDrift } from "./drift";
 import { MemoryDecisionStore } from "./memory-store";
-import { DecisionError, DecisionService, type Clock, type IdGenerator } from "./service";
+import {
+  DecisionError,
+  DecisionService,
+  MAX_DRAFTS_PER_AUTHOR,
+  type Clock,
+  type IdGenerator,
+} from "./service";
 
 function makeService() {
   let tick = 0;
@@ -133,6 +139,84 @@ describe("drafts", () => {
 
     await service.deleteDraft(draft.id, AUTHOR);
     expect(await service.listDrafts(ws.id, AUTHOR)).toEqual([]);
+  });
+
+  it("refuses a draft larger than the cap", async () => {
+    const ws = await workspace();
+    await expect(
+      service.saveDraft(ws.id, AUTHOR, {
+        title: "",
+        body: { ...EMPTY, decision: "x".repeat(200_000) },
+        refs: [],
+      }),
+    ).rejects.toThrow(/too large/);
+  });
+
+  it("counts the whole draft against the cap, not one field", async () => {
+    const ws = await workspace();
+    const third = "y".repeat(50_000);
+    await expect(
+      service.saveDraft(ws.id, AUTHOR, {
+        title: "",
+        body: { context: third, decision: third, consequences: third },
+        refs: [],
+      }),
+    ).rejects.toThrow(/too large/);
+  });
+
+  it("allows a long but realistic draft", async () => {
+    const ws = await workspace();
+    const draft = await service.saveDraft(ws.id, AUTHOR, {
+      title: "A thorough decision",
+      body: { ...EMPTY, decision: "z".repeat(20_000) },
+      refs: [],
+    });
+    expect(draft.id).toBeTruthy();
+  });
+
+  it("caps how many drafts one author may park in a workspace", async () => {
+    const ws = await workspace();
+    for (let i = 0; i < MAX_DRAFTS_PER_AUTHOR; i++) {
+      await service.saveDraft(ws.id, AUTHOR, { title: `d${i}`, body: EMPTY, refs: [] });
+    }
+    await expect(
+      service.saveDraft(ws.id, AUTHOR, { title: "one too many", body: EMPTY, refs: [] }),
+    ).rejects.toThrow(/already have/);
+  });
+
+  it("still lets an existing draft be updated once at the cap", async () => {
+    const ws = await workspace();
+    const first = await service.saveDraft(ws.id, AUTHOR, {
+      title: "first",
+      body: EMPTY,
+      refs: [],
+    });
+    for (let i = 1; i < MAX_DRAFTS_PER_AUTHOR; i++) {
+      await service.saveDraft(ws.id, AUTHOR, { title: `d${i}`, body: EMPTY, refs: [] });
+    }
+
+    // Editing what you already parked is not creating another one.
+    const updated = await service.saveDraft(ws.id, AUTHOR, {
+      id: first.id,
+      title: "first, revised",
+      body: EMPTY,
+      refs: [],
+    });
+    expect(updated.title).toBe("first, revised");
+  });
+
+  it("counts the cap per author, not per workspace", async () => {
+    const ws = await workspace();
+    for (let i = 0; i < MAX_DRAFTS_PER_AUTHOR; i++) {
+      await service.saveDraft(ws.id, AUTHOR, { title: `d${i}`, body: EMPTY, refs: [] });
+    }
+    // The maintainer's own allowance is untouched by the author's.
+    const theirs = await service.saveDraft(ws.id, MAINTAINER, {
+      title: "mine",
+      body: EMPTY,
+      refs: [],
+    });
+    expect(theirs.title).toBe("mine");
   });
 
   it("burns no ADR number — a draft leaves the sequence untouched", async () => {

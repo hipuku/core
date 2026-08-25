@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
@@ -44,6 +45,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
     "jsdom": "^29.1.1",
+    "tsx": "^4.23.12",
     "typescript": "^5",
     "vitest": "^4.1.11"
   },

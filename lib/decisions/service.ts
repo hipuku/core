@@ -30,6 +30,30 @@ export interface IdGenerator {
 const systemClock: Clock = { now: () => new Date() };
 const uuidGenerator: IdGenerator = { next: () => randomUUID() };
 
+/**
+ * How much unsent text one author may park in one workspace. Generous for a
+ * person — nobody has twenty half-written decisions on the go — and small
+ * enough that a script cannot use the draft table as free storage.
+ */
+export const MAX_DRAFTS_PER_AUTHOR = 20;
+
+/** ~128KB. A long ADR with diagrams is a few KB; this is two orders above it. */
+export const MAX_DRAFT_BYTES = 128 * 1024;
+
+function draftSize(input: {
+  title: string;
+  body: { context: string; decision: string; consequences: string };
+  refs: unknown[];
+}): number {
+  return new TextEncoder().encode(
+    input.title +
+      input.body.context +
+      input.body.decision +
+      input.body.consequences +
+      JSON.stringify(input.refs),
+  ).length;
+}
+
 export class DecisionError extends Error {
   constructor(message: string) {
     super(message);
@@ -389,6 +413,20 @@ export class DecisionService {
       throw new DecisionError("not a member of this workspace");
     }
 
+    // Bounds, not validation. A draft may be empty, untitled and half-formed —
+    // that is the point of one. What it may not be is unbounded: `saveDraft` is
+    // reachable by anyone with a session, and on a public demo that is a
+    // scriptable way to fill a database. Both limits sit far above anything a
+    // person writing a decision would hit.
+    const size = draftSize(input);
+    if (size > MAX_DRAFT_BYTES) {
+      throw new DecisionError(
+        `That draft is too large to save (${Math.round(size / 1024)}KB of ${
+          MAX_DRAFT_BYTES / 1024
+        }KB).`,
+      );
+    }
+
     if (input.id) {
       const existing = await this.store.getDraft(input.id);
       // A missing draft is not an error worth surfacing — it was deleted, or
@@ -398,6 +436,15 @@ export class DecisionService {
       }
       if (existing && existing.workspaceId !== workspaceId) {
         throw new DecisionError("draft belongs to another workspace");
+      }
+    }
+
+    if (!input.id) {
+      const existing = await this.store.listDrafts(workspaceId, authorId);
+      if (existing.length >= MAX_DRAFTS_PER_AUTHOR) {
+        throw new DecisionError(
+          `You already have ${MAX_DRAFTS_PER_AUTHOR} drafts in this workspace. Propose or discard one before starting another.`,
+        );
       }
     }
 
