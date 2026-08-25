@@ -6,6 +6,7 @@ import {
   removeReference,
   type WorkspaceFile,
 } from "@/app/app/actions";
+import { useCitationInsert } from "@/components/CitationInsert";
 import { ReferenceField, type ReferenceChip } from "@/components/ReferenceField";
 
 /**
@@ -30,6 +31,8 @@ export function LiveReferenceField({
   decisionId: string;
   chips: ReferenceChip[];
 }) {
+  // Present whenever this sits inside the editor, absent in a read-only view.
+  const insert = useCitationInsert();
   async function add(file: WorkspaceFile, lines: string | null) {
     const formData = new FormData();
     formData.set("repoId", file.repoId);
@@ -52,6 +55,11 @@ export function LiveReferenceField({
       chips={chips}
       onAdd={add}
       onRemove={remove}
+      onInsert={
+        insert
+          ? (chip) => insert({ repo: chip.repo, path: chip.path, lines: chip.lines })
+          : undefined
+      }
     />
   );
 }

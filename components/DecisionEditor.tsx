@@ -29,6 +29,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { Markdown, type CitationRepo } from "@/components/Markdown";
+import { CitationInsertProvider } from "@/components/CitationInsert";
 import { FileRow } from "@/components/FileToken";
 import { ReferenceField } from "@/components/ReferenceField";
 import { ModalShell } from "@/components/ModalShell";
@@ -584,7 +585,15 @@ export function DecisionEditor({
                 you&rsquo;ll be told when the cited code changes. Cite specific
                 lines where you can — a whole file drifts on any edit to it.
               </p>
-              {referencesSlot}
+              {/* The slot comes from a server component, so it cannot be
+                  handed a callback — context reaches it where props cannot. */}
+              <CitationInsertProvider
+                value={(citable) =>
+                  format((state) => insertCitation(state, citable))
+                }
+              >
+                {referencesSlot}
+              </CitationInsertProvider>
               {workspaceId && (
                 <ReferenceField
                   workspaceId={workspaceId}

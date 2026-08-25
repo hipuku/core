@@ -21,7 +21,7 @@ import {
   listRepos,
 } from "@/lib/github";
 import type { ActionResult } from "@/lib/action-result";
-import { DEMO_REFUSAL, isDemoAccount } from "@/lib/demo";
+import { DEMO_REFUSAL, githubDisabled, isDemoAccount } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { findUserByEmail } from "@/lib/users";
 
@@ -247,12 +247,33 @@ export interface WorkspaceFile {
 export async function listWorkspaceFiles(workspaceId: string): Promise<{
   files: WorkspaceFile[];
   truncated: string[];
+  /** Set when browsing is not possible here — a state, not a failure. */
+  unavailable?: string;
 }> {
   const user = await requireUser();
   const role = await decisionService.roleOf(workspaceId, user.id);
   if (!role) throw new DecisionError("you are not a member of this workspace");
+
+  // Not having GitHub is an ordinary condition — switched off for this
+  // deployment, or simply not linked yet — so it is reported rather than
+  // thrown. A rejected server action surfaces as an opaque React error in
+  // production, which is a poor way to say "connect your account".
+  if (githubDisabled()) {
+    return {
+      files: [],
+      truncated: [],
+      unavailable: "GitHub linking is switched off on this deployment, so files cannot be browsed here.",
+    };
+  }
+
   const token = await getGithubToken(user.id);
-  if (!token) throw new DecisionError("connect your GitHub account first");
+  if (!token) {
+    return {
+      files: [],
+      truncated: [],
+      unavailable: "Connect your GitHub account in workspace settings to cite files.",
+    };
+  }
 
   const repos = await decisionService.listWorkspaceRepos(workspaceId);
   const results = await Promise.all(

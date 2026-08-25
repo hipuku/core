@@ -32,6 +32,8 @@ export function FileBrowser({
   const [files, setFiles] = useState<WorkspaceFile[] | null>(null);
   const [partial, setPartial] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  /** Browsing is not possible here — GitHub off, or not linked. */
+  const [unavailable, setUnavailable] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   /** The file awaiting a line range, if the author asked to narrow one. */
   const [narrowing, setNarrowing] = useState<WorkspaceFile | null>(null);
@@ -43,6 +45,10 @@ export function FileBrowser({
     listWorkspaceFiles(workspaceId)
       .then((result) => {
         if (!live) return;
+        if (result.unavailable) {
+          setUnavailable(result.unavailable);
+          return;
+        }
         setFiles(result.files);
         setPartial(result.truncated);
       })
@@ -81,6 +87,11 @@ export function FileBrowser({
     setNarrowing(null);
     setLines("");
     setQuery("");
+  }
+
+  // A search box that cannot search is worse than a sentence saying why.
+  if (unavailable) {
+    return <p className={styles.status}>{unavailable}</p>;
   }
 
   if (error) {
