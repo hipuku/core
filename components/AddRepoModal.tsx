@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { connectRepo, listMyGithubRepos } from "@/app/app/actions";
 import type { GithubRepo } from "@/lib/github";
+import { Dropdown } from "./Dropdown";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
 import styles from "./Modal.module.css";
@@ -13,6 +14,7 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
   const [open, setOpen] = useState(false);
   const [repos, setRepos] = useState<GithubRepo[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [chosen, setChosen] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   async function openModal() {
@@ -52,30 +54,31 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
             >
               <label className="field">
                 <span>Repository</span>
-                <select className="select" name="repo" required defaultValue="">
-                  <option value="" disabled>
-                    Choose a repository
-                  </option>
-                  {repos.map((repo) => (
-                    <option
-                      key={repo.fullName}
-                      value={JSON.stringify({
-                        owner: repo.owner,
-                        name: repo.name,
-                        defaultBranch: repo.defaultBranch,
-                      })}
-                    >
-                      {repo.fullName}
-                      {repo.private ? " (private)" : ""}
-                    </option>
-                  ))}
-                </select>
+                {/* The custom Dropdown, like every other choose-a-thing in
+                    this app: a native select's popup cannot be themed, and
+                    "private" reads better as a hint than as parenthetical text
+                    appended to the name. */}
+                <Dropdown
+                  name="repo"
+                  value={chosen}
+                  onChange={setChosen}
+                  placeholder="Choose a repository"
+                  options={repos.map((repo) => ({
+                    value: JSON.stringify({
+                      owner: repo.owner,
+                      name: repo.name,
+                      defaultBranch: repo.defaultBranch,
+                    }),
+                    label: repo.fullName,
+                    hint: repo.private ? "Private" : undefined,
+                  }))}
+                />
               </label>
               <div className={styles.actions}>
                 <button type="button" className="btn" onClick={() => setOpen(false)}>
                   Cancel
                 </button>
-                <SubmitButton className="btn btn--primary">
+                <SubmitButton className="btn btn--primary" disabled={!chosen}>
                   <Plus size={16} />
                   Connect
                 </SubmitButton>
