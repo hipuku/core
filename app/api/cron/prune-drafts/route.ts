@@ -26,12 +26,17 @@ export async function GET(request: Request): Promise<Response> {
   if (secret) {
     const authorization = request.headers.get("authorization");
     if (authorization !== `Bearer ${secret}`) {
+      console.warn("[prune-drafts] refused an unauthorised request");
       return Response.json({ error: "unauthorized" }, { status: 401 });
     }
   }
 
   const email = process.env.DEMO_USER_EMAIL?.trim().toLowerCase();
   if (!email) {
+    // Logged, not just returned. Vercel's log viewer shows console output
+    // rather than response bodies, so a scheduled job that only returns its
+    // result leaves no trace of what it did — and nobody watches a cron run.
+    console.log("[prune-drafts] skipped: no demo account configured");
     return Response.json({ skipped: "no demo account configured" });
   }
 
@@ -41,11 +46,16 @@ export async function GET(request: Request): Promise<Response> {
     .where(eq(userTable.email, email))
     .limit(1);
   if (!demo) {
+    console.log(`[prune-drafts] skipped: no account for ${email}`);
     return Response.json({ skipped: "demo account not found" });
   }
 
   const cutoff = new Date(Date.now() - MAX_AGE_HOURS * 60 * 60 * 1000);
   const removed = await decisionService.pruneDrafts(demo.id, cutoff);
 
+  console.log(
+    `[prune-drafts] removed ${removed} draft${removed === 1 ? "" : "s"} ` +
+      `older than ${cutoff.toISOString()}`,
+  );
   return Response.json({ removed, olderThan: cutoff.toISOString() });
 }
