@@ -261,65 +261,94 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
   /** Set when browsing is not possible here — a state, not a failure. */
   unavailable?: string;
 }> {
-  const user = await requireUser();
-  const role = await decisionService.roleOf(workspaceId, user.id);
-  if (!role) throw new DecisionError("you are not a member of this workspace");
+  /**
+   * This action never throws.
+   *
+   * A server action that rejects reaches the browser as React error #441 — the
+   * real message stripped out of the production build — which the picker then
+   * displays as though it were an explanation. Every way this can fail is
+   * something a person can act on, so each one is returned as words.
+   */
+  try {
+    const user = await requireUser();
+    const role = await decisionService.roleOf(workspaceId, user.id);
+    if (!role) {
+      return { files: [], truncated: [], unreachable: [], unavailable: "You are not a member of this workspace." };
+    }
 
-  // Browsing and linking are separate concerns. `DISABLE_GITHUB` stops the app
-  // storing *other people's* tokens; it does not stop it reading public code
-  // through the deployment's own read-only one. Not having either is an
-  // ordinary condition, so it is reported rather than thrown — a rejected
-  // server action surfaces as an opaque React error in production, which is a
-  // poor way to say "connect your account".
-  const token = await getReadToken(user.id);
-  if (!token) {
+    // Browsing and linking are separate concerns. `DISABLE_GITHUB` stops the
+    // app storing *other people's* tokens; it does not stop it reading public
+    // code through the deployment's own read-only one.
+    const token = await getReadToken(user.id);
+    if (!token) {
+      return {
+        files: [],
+        truncated: [],
+        unreachable: [],
+        unavailable: githubDisabled()
+          ? "GitHub is switched off on this deployment, so files cannot be browsed here."
+          : "Connect your GitHub account in workspace settings to cite files.",
+      };
+    }
+
+    const repos = await decisionService.listWorkspaceRepos(workspaceId);
+    if (repos.length === 0) {
+      return {
+        files: [],
+        truncated: [],
+        unreachable: [],
+        unavailable: "No repositories are connected to this workspace yet.",
+      };
+    }
+
+    const results = await Promise.all(
+      repos.map(async (repo) => {
+        try {
+          const { paths, truncated } = await listRepoFiles(
+            token,
+            repo.owner,
+            repo.name,
+            repo.defaultBranch,
+          );
+          return { repo, paths, truncated, failed: false };
+        } catch {
+          // One unreachable repo must not empty the whole picker — a private
+          // repo, or one the user has lost access to, is common and not worth
+          // failing the search over.
+          return { repo, paths: [] as string[], truncated: false, failed: true };
+        }
+      }),
+    );
+
+    return {
+      files: results.flatMap((r) =>
+        r.paths.map((path) => ({
+          repoId: r.repo.id,
+          repo: `${r.repo.owner}/${r.repo.name}`,
+          path,
+        })),
+      ),
+      truncated: results
+        .filter((r) => r.truncated)
+        .map((r) => `${r.repo.owner}/${r.repo.name}`),
+      // Told apart from truncation on purpose: a repo the deployment's public
+      // token cannot see is a *private* one, and "showing part of it" would be
+      // the wrong story.
+      unreachable: results
+        .filter((r) => r.failed)
+        .map((r) => `${r.repo.owner}/${r.repo.name}`),
+    };
+  } catch (error) {
     return {
       files: [],
       truncated: [],
       unreachable: [],
-      unavailable: githubDisabled()
-        ? "GitHub is switched off on this deployment, so files cannot be browsed here."
-        : "Connect your GitHub account in workspace settings to cite files.",
+      unavailable:
+        error instanceof DecisionError
+          ? error.message
+          : "Could not load files from GitHub just now.",
     };
   }
-
-  const repos = await decisionService.listWorkspaceRepos(workspaceId);
-  const results = await Promise.all(
-    repos.map(async (repo) => {
-      try {
-        const { paths, truncated } = await listRepoFiles(
-          token,
-          repo.owner,
-          repo.name,
-          repo.defaultBranch,
-        );
-        return { repo, paths, truncated, failed: false };
-      } catch {
-        // One unreachable repo must not empty the whole picker — a repo the
-        // user has lost access to is common and not worth failing the search.
-        return { repo, paths: [] as string[], truncated: false, failed: true };
-      }
-    }),
-  );
-
-  return {
-    files: results.flatMap((r) =>
-      r.paths.map((path) => ({
-        repoId: r.repo.id,
-        repo: `${r.repo.owner}/${r.repo.name}`,
-        path,
-      })),
-    ),
-    truncated: results
-      .filter((r) => r.truncated)
-      .map((r) => `${r.repo.owner}/${r.repo.name}`),
-    // Told apart from truncation on purpose: a repo the deployment's public
-    // token cannot see is a *private* one, and "showing part of it" would be
-    // the wrong story.
-    unreachable: results
-      .filter((r) => r.failed)
-      .map((r) => `${r.repo.owner}/${r.repo.name}`),
-  };
 }
 
 function referenceLabel(
