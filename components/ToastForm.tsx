@@ -15,7 +15,7 @@ export function ToastForm({
   style,
   onSuccess,
 }: {
-  action: (formData: FormData) => Promise<ActionResult>;
+  action: (formData: FormData) => Promise<ActionResult | void>;
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;

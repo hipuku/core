@@ -7,7 +7,14 @@ import { signIn, signUp } from "@/lib/auth-client";
 import { PasswordField } from "@/components/PasswordField";
 import styles from "./AuthForm.module.css";
 
-export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
+export function AuthForm({
+  mode,
+  /** Set where sign-up is closed: a link to a page that 404s is worse than none. */
+  hideSignUpLink = false,
+}: {
+  mode: "sign-in" | "sign-up";
+  hideSignUpLink?: boolean;
+}) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -87,17 +94,19 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         {pending ? "…" : isSignUp ? "Create account" : "Sign in"}
       </button>
 
-      <p className={styles.alt}>
-        {isSignUp ? (
-          <>
-            Already have an account? <Link href="/sign-in">Sign in</Link>
-          </>
-        ) : (
-          <>
-            No account yet? <Link href="/sign-up">Create one</Link>
-          </>
-        )}
-      </p>
+      {!(hideSignUpLink && !isSignUp) && (
+        <p className={styles.alt}>
+          {isSignUp ? (
+            <>
+              Already have an account? <Link href="/sign-in">Sign in</Link>
+            </>
+          ) : (
+            <>
+              No account yet? <Link href="/sign-up">Create one</Link>
+            </>
+          )}
+        </p>
+      )}
     </form>
   );
 }

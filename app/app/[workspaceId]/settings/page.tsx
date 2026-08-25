@@ -7,6 +7,7 @@ import { DeleteWorkspaceModal } from "@/components/DeleteWorkspaceModal";
 import { ToastForm } from "@/components/ToastForm";
 import { decisionService } from "@/lib/decisions";
 import { getGithubToken } from "@/lib/github";
+import { githubDisabled } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
 import {
@@ -34,6 +35,7 @@ export default async function SettingsPage({
   const memberUsers = await usersById(members.map((m) => m.userId));
   const repos = await decisionService.listWorkspaceRepos(workspaceId);
   const githubLinked = (await getGithubToken(user.id)) !== null;
+  const githubOff = githubDisabled();
 
   return (
     <div style={{ maxWidth: "42rem" }}>
@@ -117,13 +119,17 @@ export default async function SettingsPage({
           {githubLinked ? (
             <AddRepoModal workspaceId={workspaceId} />
           ) : (
-            <ConnectGithubButton />
+            // Offering a Connect button that cannot work is worse than
+            // offering nothing; the seeded repos still display either way.
+            !githubOff && <ConnectGithubButton />
           )}
         </div>
         {repos.length === 0 ? (
           <p className={styles.hint}>
             No repositories connected.
-            {!githubLinked && " Connect GitHub to link one."}
+            {githubOff
+              ? " GitHub linking is switched off on this deployment."
+              : !githubLinked && " Connect GitHub to link one."}
           </p>
         ) : (
           <ul className={styles.list}>

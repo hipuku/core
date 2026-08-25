@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { haveIBeenPwned } from "better-auth/plugins";
 import { db } from "@/lib/db";
+import { githubDisabled } from "@/lib/demo";
 import * as schema from "@/lib/db/schema";
 
 /**
@@ -11,8 +12,14 @@ import * as schema from "@/lib/db/schema";
  */
 // Only register GitHub when its credentials are present, so a build or a deploy
 // without them still stands up email/password auth.
+//
+// `DISABLE_GITHUB` switches it off even when they are: the app requests the
+// `repo` scope, which is read *and write* on private repositories, and on a
+// public deployment that would mean holding a stranger's credentials with write
+// access to their code. The feature stays in the codebase and in the docs; it
+// is the storing of other people's tokens that is switched off.
 const githubProvider =
-  process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+  !githubDisabled() && process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
     ? {
         github: {
           clientId: process.env.GITHUB_CLIENT_ID,

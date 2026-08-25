@@ -4,6 +4,8 @@ import { ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
 import { Dropdown } from "@/components/Dropdown";
 import { ModalShell } from "@/components/ModalShell";
+import { ToastForm } from "@/components/ToastForm";
+import type { ActionResult } from "@/lib/action-result";
 import styles from "./SupersedeModal.module.css";
 
 /**
@@ -19,7 +21,7 @@ export function SupersedeModal({
   action,
   candidates,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (formData: FormData) => Promise<ActionResult | void>;
   candidates: { id: string; label: string; title: string }[];
 }) {
   const [open, setOpen] = useState(false);
@@ -45,7 +47,7 @@ export function SupersedeModal({
             Pick the decision that replaces this one. This decision stays in the
             log, marked superseded and linked to its replacement.
           </p>
-          <form action={action}>
+          <ToastForm action={action}>
             {/* The key leads and the title is the hint: a reader scans for
                 VAU-014, and a title long enough to matter would otherwise be
                 truncated into uselessness on one line. */}
@@ -69,7 +71,7 @@ export function SupersedeModal({
                 Supersede
               </button>
             </div>
-          </form>
+          </ToastForm>
         </ModalShell>
       )}
     </>

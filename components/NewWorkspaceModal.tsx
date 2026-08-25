@@ -5,6 +5,7 @@ import { useState } from "react";
 import { createWorkspace } from "@/app/app/actions";
 import { ModalShell } from "./ModalShell";
 import styles from "./Modal.module.css";
+import { ToastForm } from "@/components/ToastForm";
 
 export function NewWorkspaceModal() {
   const [open, setOpen] = useState(false);
@@ -22,7 +23,7 @@ export function NewWorkspaceModal() {
 
       {open && (
         <ModalShell title="New workspace" onClose={() => setOpen(false)}>
-          <form action={createWorkspace} className={styles.form}>
+          <ToastForm action={createWorkspace} className={styles.form}>
             <label className="field">
               <span>Name</span>
               <input
@@ -46,7 +47,7 @@ export function NewWorkspaceModal() {
                 Create workspace
               </button>
             </div>
-          </form>
+          </ToastForm>
         </ModalShell>
       )}
     </>

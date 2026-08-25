@@ -21,8 +21,21 @@ import {
   listRepos,
 } from "@/lib/github";
 import type { ActionResult } from "@/lib/action-result";
+import { DEMO_REFUSAL, isDemoAccount } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { findUserByEmail } from "@/lib/users";
+
+/**
+ * Refuse a write from the read-only demo account.
+ *
+ * Called at the top of every action that changes the decision log — and
+ * deliberately *not* by the draft actions, which the demo is allowed to use.
+ * Returning rather than throwing means the existing toast path reports it as a
+ * boundary rather than an error page.
+ */
+function refuseDemo(user: { email: string }): ActionResult | null {
+  return isDemoAccount(user.email) ? { error: DEMO_REFUSAL } : null;
+}
 
 /** Run a mutation, turning a DecisionError into a toastable result. */
 async function attempt(
@@ -51,6 +64,8 @@ function adrBody(formData: FormData) {
 
 export async function createWorkspace(formData: FormData) {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return;
   const workspace = await decisionService.createWorkspace(user.id, name);
@@ -62,6 +77,8 @@ export async function updateWorkspaceGeneral(
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const name = String(formData.get("name") ?? "").trim();
   const key = String(formData.get("key") ?? "").trim();
   if (!name) return { error: "A name is required." };
@@ -76,6 +93,8 @@ export async function deleteWorkspace(
   workspaceId: string,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   return attempt(async () => {
     await decisionService.deleteWorkspace(workspaceId, user.id);
   }, "Workspace deleted.");
@@ -86,6 +105,8 @@ export async function inviteMember(
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const role = (String(formData.get("role") ?? "author") as Role) ?? "author";
   if (!email) return { error: "An email is required." };
@@ -106,6 +127,8 @@ export async function removeMember(
   targetUserId: string,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   return attempt(async () => {
     await decisionService.removeMember(workspaceId, user.id, targetUserId);
     revalidatePath(`/app/${workspaceId}/settings`);
@@ -118,6 +141,8 @@ export async function addReference(
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const url = String(formData.get("url") ?? "").trim();
   if (!url) return { error: "A URL is required." };
   const label = String(formData.get("label") ?? "").trim() || null;
@@ -137,6 +162,8 @@ export async function removeReference(
   referenceId: string,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   return attempt(async () => {
     await decisionService.removeReference(referenceId, user.id);
     revalidatePath(`/app/${workspaceId}/${decisionId}`);
@@ -156,6 +183,8 @@ export async function connectRepo(
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const raw = String(formData.get("repo") ?? "");
   let parsed: { owner?: string; name?: string; defaultBranch?: string };
   try {
@@ -181,6 +210,8 @@ export async function disconnectRepo(
   repoId: string,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   return attempt(async () => {
     await decisionService.disconnectRepo(repoId, user.id);
     revalidatePath(`/app/${workspaceId}`);
@@ -321,6 +352,8 @@ export async function addFileReference(
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const repoId = String(formData.get("repoId") ?? "");
   const path = String(formData.get("path") ?? "").trim();
   const range = parseRange(String(formData.get("lines") ?? ""));
@@ -488,6 +521,8 @@ export async function discardDraft(workspaceId: string, draftId: string) {
 
 export async function propose(workspaceId: string, formData: FormData) {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const title = String(formData.get("title") ?? "").trim();
   if (!title) return;
   const decision = await decisionService.propose(workspaceId, user.id, {
@@ -564,6 +599,8 @@ export async function revise(
   formData: FormData,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   return attempt(async () => {
     await decisionService.revise(decisionId, user.id, adrBody(formData));
     revalidatePath(`/app/${workspaceId}/${decisionId}`);
@@ -576,6 +613,8 @@ export async function changeStatus(
   toStatus: DecisionStatus,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const label =
     toStatus === "accepted"
       ? "accepted"
@@ -672,6 +711,8 @@ export async function supersede(
   formData: FormData,
 ) {
   const user = await requireUser();
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const supersededId = String(formData.get("supersededId") ?? "");
   if (!supersededId) return;
   await decisionService.supersede(supersedingId, supersededId, user.id);
