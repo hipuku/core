@@ -106,12 +106,18 @@ whatever port you are actually running on.
 
 ## Tests and CI
 
-Every pure module has its own suite, exercised directly rather than through a
-component. The two storage ports are covered by running the in-memory store
-against the same tests the domain relies on.
+Two vitest projects, because the suites have different needs. **`domain`** runs
+in Node: every pure module has its own suite, exercised directly rather than
+through a component, and the two storage ports are covered by running the
+in-memory store against the same tests the domain relies on. **`ui`** runs in
+jsdom and covers the behaviour only observable in a browser — draft autosave and
+recovery, the unsaved-navigation guard, and the compose editor's markdown
+keystrokes reaching the caret.
 
 ```
 npm run lint && npm run typecheck && npm test
+npm test -- --project=domain     # just the fast ones
+npm test -- --project=ui
 ```
 
 CI runs exactly those three on every push and pull request, then a production

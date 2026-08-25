@@ -1,18 +1,43 @@
 import { fileURLToPath } from "node:url";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
+const root = fileURLToPath(new URL(".", import.meta.url));
+
+/**
+ * Two projects, because the suites have genuinely different needs.
+ *
+ * The domain and text cores are pure and run in Node — no DOM, no setup file,
+ * nothing to tear down between tests. Widening that project to jsdom to
+ * accommodate the component tests would make 141 fast tests pay for a browser
+ * environment none of them use.
+ */
 export default defineConfig({
   resolve: {
-    // Mirror the `@/*` -> project root alias from tsconfig so tests import the same
-    // way the app does.
-    alias: {
-      "@": fileURLToPath(new URL(".", import.meta.url)),
-    },
+    // Mirror the `@/*` -> project root alias from tsconfig so tests import the
+    // same way the app does.
+    alias: { "@": root },
   },
   test: {
-    // The versioning and decision cores are pure and run in Node. UI/component tests,
-    // when they arrive, will get their own jsdom project rather than widening this.
-    environment: "node",
-    include: ["lib/**/*.test.ts"],
+    projects: [
+      {
+        resolve: { alias: { "@": root } },
+        test: {
+          name: "domain",
+          environment: "node",
+          include: ["lib/**/*.test.ts"],
+        },
+      },
+      {
+        plugins: [react()],
+        resolve: { alias: { "@": root } },
+        test: {
+          name: "ui",
+          environment: "jsdom",
+          setupFiles: ["./test/setup.ts"],
+          include: ["{lib,components}/**/*.test.tsx"],
+        },
+      },
+    ],
   },
 });
