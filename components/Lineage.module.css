@@ -1,0 +1,80 @@
+/* A row on the desk, above the document: this is context about where the
+   decision sits, not part of what it says. */
+.wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 0 0.15rem;
+}
+
+.label {
+  flex: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.chain {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  list-style: none;
+  min-width: 0;
+}
+
+/* The arrow is drawn between steps rather than inside them, so the first has
+   nothing in front of it without a special case. */
+.step + .step::before {
+  content: "→";
+  margin-right: 0.35rem;
+  color: var(--text-faint);
+}
+.step {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.node {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.2rem 0.35rem;
+  border-radius: var(--r-sm);
+  transition: background 0.12s ease;
+}
+a.node:hover {
+  background: var(--surface-2);
+}
+a.node:hover .title {
+  color: var(--text);
+}
+
+/* Where you are: the title stays legible while the others recede, so the chain
+   reads as a position rather than a list of equals. */
+.here .title {
+  color: var(--text);
+  font-weight: 550;
+}
+
+.title {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 14rem;
+  transition: color 0.12s ease;
+}
+
+@media (max-width: 720px) {
+  .title {
+    max-width: 8rem;
+  }
+}

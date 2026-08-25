@@ -6,6 +6,11 @@ export * from "./types";
 export * from "./lifecycle";
 export { referenceDrift, isStale, type DriftStatus } from "./drift";
 export {
+  supersessionChain,
+  type Lineal,
+  type LineageEntry,
+} from "./lineage";
+export {
   compareSnippet,
   extractRange,
   formatRange,

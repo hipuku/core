@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DecisionMeta } from "@/components/DecisionMeta";
 import { DecisionReferences } from "@/components/DecisionReferences";
+import { Lineage } from "@/components/Lineage";
 import { Markdown } from "@/components/Markdown";
 import { StatusBadge } from "@/components/StatusBadge";
 import { SupersedeModal } from "@/components/SupersedeModal";
@@ -14,6 +15,7 @@ import {
   decisionService,
   formatRange,
   isStale,
+  supersessionChain,
 } from "@/lib/decisions";
 import type { Change, Json } from "@/lib/versioning";
 import { requireUser } from "@/lib/session";
@@ -102,9 +104,6 @@ export default async function DecisionPage({
   const canDeprecate = actor.capabilities.includes("deprecate") && decision.status === "accepted";
   const canSupersede = actor.capabilities.includes("supersede") && decision.status === "accepted";
   const supersedable = all.filter((d) => d.id !== decision.id && d.status === "accepted");
-  const supersededBy = decision.supersededById
-    ? all.find((d) => d.id === decision.supersededById)
-    : null;
   const lastOf = (status: string) => [...transitions].reverse().find((t) => t.toStatus === status);
 
   const stale = isStale(references);
@@ -124,6 +123,8 @@ export default async function DecisionPage({
 
   /** The transition that put this decision in its current state. */
   const settled = decision.status === "proposed" ? null : lastOf(decision.status);
+  // The whole chain this decision sits in, not just the next hop.
+  const lineage = supersessionChain(all, decision.id);
   const lastChecked = references.reduce<Date | null>((latest, r) => {
     if (!r.checkedAt) return latest;
     return !latest || r.checkedAt > latest ? r.checkedAt : latest;
@@ -293,20 +294,9 @@ export default async function DecisionPage({
           </div>
         )}
 
-        {supersededBy && (
-          <div className={styles.prop}>
-            <span className={styles.propLabel}>Replaced by</span>
-            <span className={styles.propValue}>
-              <Link
-                href={`/app/${workspaceId}/${supersededBy.id}`}
-                className={styles.propLink}
-              >
-                {decisionLabel(key, supersededBy.number)}
-              </Link>
-            </span>
-          </div>
-        )}
       </DecisionMeta>
+
+      <Lineage workspaceId={workspaceId} workspaceKey={key} chain={lineage} />
 
       {stale && (
         <div className={`${styles.notice} ${styles.noticeWarn}`}>
