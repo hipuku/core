@@ -236,34 +236,94 @@ for code, paths and diffs.
   the reference field on the file flow meant dropping it rather than building
   link-buffering into propose. Markdown links in the prose cover the need, and
   arguably better — a link in the sentence that needs it beats a link in a list.
+- **Auto-tracking files cited inline.** Citing a file in prose does not start
+  watching it for drift. "Mentioned in an argument" is not "this decision
+  governs this code", and conflating them would fill the log with drift from
+  files cited as counter-examples. The gap is real — a chip in the text with no
+  entry in the reference list reads as an inconsistency — and the likely answer
+  is a "track this file" affordance on an untracked citation rather than doing
+  it silently.
 - **The `drizzle-kit` npm-audit warnings are dev-only.** `npm audit fix --force`
   destructively downgrades the migration tool. Leave them.
 
 ---
 
-## Deploying
+## Deployed
 
-Not yet deployed. Three things must be settled first, and one of them is not
-optional.
+[core.hipuku.dev](https://core.hipuku.dev), on Vercel against a Neon database in
+Sydney, with the functions pinned to `syd1`. That last part is not a detail: a
+signed-in page load makes several queries in sequence — session, membership,
+then the data — and with the compute in Virginia every one of them crossed the
+Pacific. Putting them together was the single largest thing that made the
+deployed app feel like the local one.
 
-**The GitHub scope.** The OAuth app requests `repo` — full read *and write* on
+### What is switched off, and why
+
+**Sign-up.** Not gated — absent. An invite code is a shared secret rather than
+access control: whoever holds it can pass it on, and you cannot choose who ends
+up with it. There is one seeded account and nothing for anyone to create.
+
+**Writing to the decision log.** The demo account may write and save drafts,
+because a draft is private to its author and holds no ADR number, so the worst a
+visitor leaves behind is unfinished text. It may not accept, reject, deprecate
+or supersede: that would change what the *next* visitor sees, which is not a
+demo but a shared document nobody owns. Fourteen actions refuse and two do not,
+enforced at the action layer because this is a property of one deployment rather
+than of what a decision log is.
+
+**GitHub linking.** The app requests the `repo` scope — read *and write* on
 private repositories — and better-auth stores those tokens in the `account`
 table. On a single-tenant deployment that is the owner's own token and their own
-risk. On a public URL where strangers connect their GitHub, it means holding
-third-party credentials with write access to their private code. Either drop to
-`public_repo`, move to a GitHub App with fine-grained read-only Contents
-permission, or disable GitHub linking on the public deploy. The GitHub app's
-"Expire user access tokens" option is currently **off**, which is fine for
-development and wrong for production.
+risk; on a public URL it would mean holding a stranger's credentials with write
+access to their code, on a hobby-tier database. The feature stays in the
+codebase, the tests and the docs. Only the storing of other people's tokens is
+switched off.
 
-**Sign-up must be gated.** No email verification, no invite gate, no explicit
-rate limiting. A public URL with open sign-up fills with bot accounts.
+### Browsing without holding anyone's credentials
 
-**A read-only demo account** is what actually sells the project. Nobody
-evaluating this will sign up, create a workspace and write three ADRs; they need
-to land on a workspace with real decisions, real history and a real drift state
-in five seconds. Seed one and print its credentials on the sign-in page.
+Switching off linking would also have switched off citing files, which is the
+feature most worth demonstrating. Those are separate concerns, so they are now
+separated: `GITHUB_PUBLIC_TOKEN` is a read-only, public-repositories-only token
+belonging to the deployment, used when the signed-in person has no account
+linked — which on the demo is everyone.
 
-Then: private GitHub repo, Vercel, the Neon `DATABASE_URL` and
-`BETTER_AUTH_SECRET` as env, `BETTER_AUTH_URL` set to the production origin, and
-the production OAuth callback added to the GitHub app.
+It is safe to hold exactly where a user's `repo` token is not: it is the owner's
+own, it cannot write, and it can reach nothing private. A linked account still
+takes precedence where there is one, because it can see private repositories the
+fallback cannot and it is the person's own access rather than a borrowed one.
+
+Connecting a repository deliberately still requires your own account. Listing
+"your repositories" through the deployment's token would show the *owner's*
+repositories to whoever happened to be signed in.
+
+Repository trees are cached for five minutes per instance. A tree is a few
+hundred KB and changes rarely, while the picker asks for every connected repo on
+every mount — without it, a handful of visitors opening the compose screen would
+spend the hourly API budget on identical answers.
+
+### A server action should not throw
+
+React reports a rejected server action as error #441 — "an error occurred in the
+Server Components render", with the message stripped out of the production
+build. Anything catching it and showing the text displays React's apology as
+though it were an explanation.
+
+Every way the file picker can fail is something a person can act on: not a
+member, GitHub off, no account linked, no repositories connected, GitHub
+unreachable. Each is returned as words. This cost two rounds of fixing the wrong
+throw to learn.
+
+### Bounds on what a stranger can write
+
+A draft may be empty, untitled and half-formed — that is the point of one. What
+it may not be is unbounded, because `saveDraft` is reachable by anyone with a
+session and on a public demo that is a scriptable way to fill a database. 128KB
+per draft, 20 per author per workspace: both far above anything a person writing
+a decision would reach, and low enough that the table cannot be used as free
+storage.
+
+### Still true, and not yet done
+
+Email verification is off, and there is no explicit rate limiting. Neither
+matters while nobody can create an account; both become prerequisites the moment
+sign-up opens.

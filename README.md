@@ -4,6 +4,9 @@ A team decision log. Architecture decision records with a lifecycle, permissions
 two audit trails, and a link to the code they govern — so a decision can tell you
 when the thing it decided has changed underneath it.
 
+**[core.hipuku.dev](https://core.hipuku.dev)** — a read-only demo, credentials on
+the sign-in page. Full feature walkthrough in [FEATURES.md](./FEATURES.md).
+
 The wedge: Notion holds the document but not the governance, Jira holds the
 workflow but is not a document. core is a governed document that knows about
 code.
@@ -71,7 +74,8 @@ every real status is workspace-visible, and it has no transitions, because
 nothing has happened to it yet. Drafts live in their own table so the status enum
 stays an honest description of a decision's life.
 
-More of this reasoning is in [DESIGN.md](./DESIGN.md).
+More of this reasoning is in [DESIGN.md](./DESIGN.md); what the product actually
+does is in [FEATURES.md](./FEATURES.md).
 
 ## Getting started
 
@@ -85,12 +89,26 @@ npm run dev
 A free [Neon](https://neon.tech) or Supabase Postgres works for local
 development. Generate the auth secret with `openssl rand -base64 32`.
 
+**Seed some data.** An empty decision log demonstrates nothing:
+
+```bash
+npm run db:seed
+```
+
+That builds a workspace with five decisions across the whole lifecycle, a
+supersession, two revisions of one record, markdown and Mermaid, a parked draft,
+and a reference that has already drifted. It is idempotent by workspace name —
+re-running replaces what it created and touches nothing else.
+
 **GitHub is optional.** Without `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`,
 everything works except connecting a repository and citing files from it — sign
 up with email and password and the rest of the product is there. To enable it,
 register an OAuth app at github.com/settings/developers with the callback
 `<BETTER_AUTH_URL>/api/auth/callback/github`, and set `BETTER_AUTH_URL` to
 whatever port you are actually running on.
+
+**Nothing else is needed.** No Redis, no queue, no third-party service. Node,
+Postgres and a browser.
 
 ## Scripts
 
@@ -102,6 +120,7 @@ whatever port you are actually running on.
 | `npm run typecheck` | `tsc --noEmit`                           |
 | `npm test`          | Vitest — the domain and text-core suites |
 | `npm run db:push`   | Push the Drizzle schema to the database  |
+| `npm run db:seed`   | Populate a workspace worth looking at    |
 | `npm run db:studio` | Drizzle Studio                           |
 
 ## Tests and CI
@@ -123,6 +142,18 @@ npm test -- --project=ui
 CI runs exactly those three on every push and pull request, then a production
 build once they agree. Each check reports independently, so one run tells you
 everything that is wrong rather than only the first thing.
+
+## Deployment
+
+Vercel, with the functions pinned to the same region as the database — every
+signed-in page makes several queries in sequence, and a continent between them
+is the difference between fast and not.
+
+The public deployment sets three flags: `DISABLE_SIGNUP`, `DISABLE_GITHUB`, and
+a `DEMO_USER_EMAIL` whose account may write drafts but not change the decision
+log. `GITHUB_PUBLIC_TOKEN` lets it browse public repositories without holding
+anyone else's credentials. All four are documented in `.env.example` and none of
+them apply locally.
 
 ## Stack
 
