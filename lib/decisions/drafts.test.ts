@@ -318,3 +318,53 @@ describe("rebaselining", () => {
     expect(untouched!.baselineSha).toBe("sha_original");
   });
 });
+
+describe("pruneDrafts", () => {
+  let service: DecisionService;
+
+  beforeEach(() => {
+    service = makeService();
+  });
+
+  it("discards only what is older than the cutoff", async () => {
+    const ws = await service.createWorkspace(MAINTAINER, "Platform");
+    const old = await service.saveDraft(ws.id, MAINTAINER, {
+      title: "abandoned",
+      body: EMPTY,
+      refs: [],
+    });
+    const recent = await service.saveDraft(ws.id, MAINTAINER, {
+      title: "still being written",
+      body: EMPTY,
+      refs: [],
+    });
+
+    // The clock advances a second per call, so a cutoff between the two splits
+    // them without any real waiting.
+    const removed = await service.pruneDrafts(MAINTAINER, recent.updatedAt);
+
+    expect(removed).toBe(1);
+    const left = await service.listDrafts(ws.id, MAINTAINER);
+    expect(left.map((d) => d.id)).toEqual([recent.id]);
+    expect(left.map((d) => d.id)).not.toContain(old.id);
+  });
+
+  it("never reaches another author's drafts", async () => {
+    const ws = await service.createWorkspace(MAINTAINER, "Platform");
+    await service.addMember(ws.id, AUTHOR, "author");
+    await service.saveDraft(ws.id, AUTHOR, { title: "theirs", body: EMPTY, refs: [] });
+    await service.saveDraft(ws.id, MAINTAINER, { title: "mine", body: EMPTY, refs: [] });
+
+    // A sweep wide enough to catch everything, aimed at one account.
+    const removed = await service.pruneDrafts(MAINTAINER, new Date(Date.now() + 60_000));
+
+    expect(removed).toBe(1);
+    expect(await service.listDrafts(ws.id, AUTHOR)).toHaveLength(1);
+  });
+
+  it("is a no-op when there is nothing old enough", async () => {
+    const ws = await service.createWorkspace(MAINTAINER, "Platform");
+    await service.saveDraft(ws.id, MAINTAINER, { title: "fresh", body: EMPTY, refs: [] });
+    expect(await service.pruneDrafts(MAINTAINER, new Date(0))).toBe(0);
+  });
+});

@@ -186,6 +186,8 @@ export interface DecisionStore {
   /** An author's own drafts in one workspace, newest first. */
   listDrafts(workspaceId: string, authorId: string): Promise<DraftRecord[]>;
   deleteDraft(id: string): Promise<void>;
+  /** Discard an author's drafts last touched before `before`. Returns how many. */
+  deleteDraftsBefore(authorId: string, before: Date): Promise<number>;
 
   addWorkspaceRepo(repo: RepoRecord): Promise<void>;
   listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]>;

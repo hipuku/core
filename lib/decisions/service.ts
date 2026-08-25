@@ -474,6 +474,21 @@ export class DecisionService {
     return draft;
   }
 
+  /**
+   * Discard one author's stale drafts.
+   *
+   * For the public demo, where every visitor writes as the same account: a
+   * draft is private to its author, so on a shared account "private" quietly
+   * means "shared with every future visitor". Ageing them out keeps the demo
+   * showing the seeded draft rather than a stranger's abandoned sentence.
+   *
+   * Scoped to one author on purpose. A sweep that could reach anyone's drafts
+   * would be a much more dangerous thing to schedule.
+   */
+  async pruneDrafts(authorId: string, olderThan: Date): Promise<number> {
+    return this.store.deleteDraftsBefore(authorId, olderThan);
+  }
+
   async deleteDraft(id: string, authorId: string): Promise<void> {
     const draft = await this.store.getDraft(id);
     if (!draft) return;

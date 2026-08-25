@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, max } from "drizzle-orm";
+import { and, asc, count, desc, eq, lt, max } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   decisionDrafts,
@@ -158,6 +158,19 @@ export class DrizzleDecisionStore implements DecisionStore {
 
   async deleteDraft(id: string): Promise<void> {
     await db.delete(decisionDrafts).where(eq(decisionDrafts.id, id));
+  }
+
+  async deleteDraftsBefore(authorId: string, before: Date): Promise<number> {
+    const removed = await db
+      .delete(decisionDrafts)
+      .where(
+        and(
+          eq(decisionDrafts.authorId, authorId),
+          lt(decisionDrafts.updatedAt, before),
+        ),
+      )
+      .returning({ id: decisionDrafts.id });
+    return removed.length;
   }
 
   async peekNextNumber(workspaceId: string): Promise<number> {

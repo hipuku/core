@@ -105,6 +105,14 @@ export class MemoryDecisionStore implements DecisionStore {
     this.drafts.delete(id);
   }
 
+  async deleteDraftsBefore(authorId: string, before: Date): Promise<number> {
+    const stale = [...this.drafts.values()].filter(
+      (d) => d.authorId === authorId && d.updatedAt < before,
+    );
+    for (const draft of stale) this.drafts.delete(draft.id);
+    return stale.length;
+  }
+
   async peekNextNumber(workspaceId: string): Promise<number> {
     return (this.counters.get(workspaceId) ?? 0) + 1;
   }
