@@ -49,3 +49,8 @@ next-env.d.ts
 
 # local agent config
 /.claude/
+
+# the production runbook — names the real project, region and hosts, and is a
+# file people are tempted to paste secrets into. Kept out of a repo that is one
+# setting away from public.
+/DEPLOYMENT.md
