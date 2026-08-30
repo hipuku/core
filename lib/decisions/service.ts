@@ -32,7 +32,7 @@ const uuidGenerator: IdGenerator = { next: () => randomUUID() };
 
 /**
  * How much unsent text one author may park in one workspace. Generous for a
- * person — nobody has twenty half-written decisions on the go — and small
+ * person, since nobody has twenty half-written decisions on the go, and small
  * enough that a script cannot use the draft table as free storage.
  */
 export const MAX_DRAFTS_PER_AUTHOR = 20;
@@ -107,7 +107,7 @@ export class DecisionService {
 
   /**
    * Add someone to a workspace with a role. Managing membership is a maintainer-only
-   * act — distinct from the decision capabilities, which is why it is a direct role
+   * act, distinct from the decision capabilities, which is why it is a direct role
    * check rather than one of the lifecycle guards.
    */
   async inviteMember(
@@ -268,7 +268,7 @@ export class DecisionService {
    * the code the *author* was looking at; the decision itself does not exist
    * until the team accepts it, so that is the moment its reference point should
    * be fixed. Without this, a proposal that sat in review for a fortnight is
-   * flagged as drifted the instant it is agreed — which is how a staleness
+   * flagged as drifted the instant it is agreed, which is how a staleness
    * signal teaches people to ignore it.
    *
    * The fetching happens in the caller: the service holds no GitHub token.
@@ -390,7 +390,7 @@ export class DecisionService {
 
   /* ---- drafts ------------------------------------------------------------
      A draft is scratch work, not a decision. It carries no ADR number, has no
-     transitions, and is visible only to its author — including to maintainers,
+     transitions, and is visible only to its author, including to maintainers,
      who have no business reading unfinished reasoning. Every method here checks
      authorship rather than role, which is why none of them touch `capabilitiesFor`. */
 
@@ -413,7 +413,7 @@ export class DecisionService {
       throw new DecisionError("not a member of this workspace");
     }
 
-    // Bounds, not validation. A draft may be empty, untitled and half-formed —
+    // Bounds rather than validation. A draft may be empty, untitled and half-formed;
     // that is the point of one. What it may not be is unbounded: `saveDraft` is
     // reachable by anyone with a session, and on a public demo that is a
     // scriptable way to fill a database. Both limits sit far above anything a
@@ -429,7 +429,7 @@ export class DecisionService {
 
     if (input.id) {
       const existing = await this.store.getDraft(input.id);
-      // A missing draft is not an error worth surfacing — it was deleted, or
+      // A missing draft is not an error worth surfacing. It was deleted, or
       // proposed, in another tab. Fall through and create a fresh one.
       if (existing && existing.authorId !== authorId) {
         throw new DecisionError("not your draft");
@@ -497,7 +497,7 @@ export class DecisionService {
   }
 
   /**
-   * The label the next proposal in this workspace would carry (`VAU-014`) —
+   * The label the next proposal in this workspace would carry (`VAU-014`):
    * shown while composing so the author knows what they are about to create.
    * A preview, not a reservation: see `DecisionStore.peekNextNumber`.
    */
@@ -522,7 +522,7 @@ export class DecisionService {
   }
 
   /**
-   * Attach a reference (evidence) to a decision. Any workspace member may add one —
+   * Attach a reference (evidence) to a decision. Any workspace member may add one,
    * references augment a decision rather than change its prose, and adding a PR link
    * to an already-accepted decision is a legitimate thing to want to do.
    */
@@ -597,7 +597,7 @@ export class DecisionService {
     return this.store.listReferences(decisionId);
   }
 
-  /** Remove a reference — the person who added it, or any maintainer. */
+  /** Remove a reference: the person who added it, or any maintainer. */
   async removeReference(referenceId: string, userId: string): Promise<void> {
     const reference = await this.store.getReference(referenceId);
     if (!reference) throw new DecisionError("reference not found");

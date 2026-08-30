@@ -20,7 +20,7 @@ const BRAND_HUES: BrandHue[] = [
 ];
 
 /**
- * Repo chips read as identity, not status — but vermilion/gold/fern/rose double as
+ * Repo chips read as identity rather than status, but vermilion/gold/fern/rose double as
  * the status pill colours (rejected/superseded/accepted-ish/deprecated), so a repo
  * chip in those hues could be misread as carrying status meaning. Restricted to the
  * three hues the status palette doesn't use: iris, cobalt, teal.

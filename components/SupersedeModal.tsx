@@ -9,7 +9,7 @@ import type { ActionResult } from "@/lib/action-result";
 import styles from "./SupersedeModal.module.css";
 
 /**
- * Supersede, behind a modal — like every other choose-a-thing action in this
+ * Supersede, behind a modal, like every other choose-a-thing action in this
  * app (adding a member, connecting a repo, deleting a workspace).
  *
  * It used to be a bare `<select>` sitting in a banner, which made it the only

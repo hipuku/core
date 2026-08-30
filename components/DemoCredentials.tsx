@@ -7,7 +7,7 @@ import styles from "./DemoCredentials.module.css";
 /**
  * The way in, on the page where someone needs it.
  *
- * A public demo whose credentials live in a README is not a demo — the person
+ * A public demo whose credentials live in a README asks too much: the person
  * evaluating this arrived from a link and will not go hunting. Shown only where
  * sign-up is closed, so it never appears on a local install.
  *
@@ -45,7 +45,7 @@ function Field({ label, value }: { label: string; value: string }) {
       // before someone reaches for the second field.
       setTimeout(() => setCopied(false), 1600);
     } catch {
-      // Clipboard access can be refused outright — over plain http, or by
+      // Clipboard access can be refused outright, over plain http or by
       // permission. The value is selectable, so there is still a way through.
     }
   }

@@ -1,6 +1,6 @@
 /* Drafts head the decisions list and share its card, so the two read as one
    sequence. The metrics here deliberately match `.list` / `.card` in
-   app.module.css — the difference between a draft and a decision is the tag it
+   app.module.css. The difference between a draft and a decision is the tag it
    carries, not the box it sits in. */
 .list {
   list-style: none;
@@ -36,7 +36,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* A name taken from the body rather than typed as a title — shown dimmer, so a
+/* A name taken from the body rather than typed as a title, shown dimmer so a
    list of drafts still tells you which ones you have actually named. */
 .derived {
   flex: 1;

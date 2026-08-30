@@ -7,7 +7,7 @@ import styles from "./Lineage.module.css";
  * The chain of decisions this one belongs to, oldest first.
  *
  * A single "superseded by" link tells you the next hop and nothing about the
- * conversation — and a decision three revisions deep is often best understood
+ * conversation, and a decision three revisions deep is often best understood
  * as the latest answer to a question that has been answered before. Rendered
  * only where a chain exists, since a lineage of one is chrome around a single
  * item.

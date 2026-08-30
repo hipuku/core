@@ -12,7 +12,7 @@ import { ReferenceField, type ReferenceChip } from "@/components/ReferenceField"
 /**
  * The reference field for a decision that already exists.
  *
- * Identical to composing, by construction — it renders the same
+ * Identical to composing, by construction: it renders the same
  * `ReferenceField`. The only difference is where a citation goes when you pick
  * it: straight to the server rather than into the form, because a decision that
  * exists has somewhere to put it. That difference is invisible, which is the

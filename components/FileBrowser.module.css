@@ -1,4 +1,4 @@
-/* No tray. The search sits directly on whatever surface hosts it — a filled
+/* No tray. The search sits directly on whatever surface hosts it: a filled
    field inside a filled box was two grounds doing one job, and the nested
    rounding read as a seam rather than as structure. */
 .browse {
@@ -71,7 +71,7 @@
   font-size: 0.9em;
 }
 
-/* Results are rows — the shared file row, so a path in the picker looks like a
+/* Results are rows, the shared file row, so a path in the picker looks like a
    path everywhere else. */
 .results {
   list-style: none;

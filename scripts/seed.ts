@@ -2,7 +2,7 @@
  * Seed a workspace with a decision log that has actually been used.
  *
  * Two jobs, one script. It populates the public demo, and it gives anyone who
- * clones this repo something to look at — an empty decision log demonstrates
+ * clones this repo something to look at. An empty decision log demonstrates
  * nothing, and "sign up, create a workspace, write three ADRs" is not a
  * reasonable ask of someone evaluating the project.
  *
@@ -33,7 +33,7 @@ function log(step: string) {
 
 /**
  * better-auth owns password hashing, so accounts are created through its own
- * sign-up path rather than by inserting rows. An existing account is reused —
+ * sign-up path rather than by inserting rows. An existing account is reused:
  * re-seeding must not fail because the demo user is already there.
  */
 async function ensureUser(email: string, password: string, name: string) {
@@ -78,7 +78,7 @@ async function main() {
 
   const workspace = await decisionService.createWorkspace(demoId, WORKSPACE_NAME);
   await decisionService.addMember(workspace.id, authorId, "author");
-  log(`workspace ${workspace.key} — ${workspace.name}`);
+  log(`workspace ${workspace.key}: ${workspace.name}`);
 
   // Connected first, and this matters: an inline `{{owner/repo:path}}` citation
   // only renders as a file chip when its repo is connected to the workspace.
@@ -97,14 +97,14 @@ async function main() {
     title: "Ship design tokens as CSS custom properties",
     body: {
       context:
-        "The palette lives in three places — a Figma file, a Sass map, and a " +
+        "The palette lives in three places: a Figma file, a Sass map, and a " +
         "hand-maintained TypeScript object. They disagree, and the one people " +
         "actually read is whichever they found first.\n\n" +
         "We need a single definition that both the app and the design tooling " +
         "can consume without a build step in between.",
       decision:
         "Publish the palette as **CSS custom properties**, generated from one " +
-        "source file — {{hipuku/haus:packages/tokens/src/tokens.json}}.\n\n" +
+        "source file, {{hipuku/haus:packages/tokens/src/tokens.json}}.\n\n" +
         "1. Primitives and semantics stay in separate layers; no component " +
         "references a primitive directly.\n" +
         "2. The generated file is committed, so a consumer needs no toolchain.\n" +
@@ -133,7 +133,7 @@ async function main() {
         "lightness is not lightness.\n\n" +
         "**And the tooling reads our colours as null.** " +
         "`getComputedStyle` returns `oklch()` verbatim in every current " +
-        "browser, and both halves of our contrast probe assume `rgb()` — see " +
+        "browser, and both halves of our contrast probe assume `rgb()`. See " +
         "{{hipuku/drift:src/probe/colour.ts#L34-L61}}, which falls through to " +
         "the page canvas when a colour fails to parse and so measures contrast " +
         "against the wrong background.\n\n" +
@@ -219,7 +219,7 @@ async function main() {
   await decisionService.revise(culori.id, authorId, {
     context:
       "vault does its own conversion, contrast and harmony maths through " +
-      "culori — see {{hipuku/vault:src/colour/convert.ts#L1-L64}}. haus now " +
+      "culori; see {{hipuku/vault:src/colour/convert.ts#L1-L64}}. haus now " +
       "publishes `haus-colour-utils`, and the obvious tidy-up is to have vault " +
       "consume it.\n\n" +
       "The pull is real: the OKLCH parsing bug in VAU-002 was fixed once, in " +
@@ -269,7 +269,7 @@ async function main() {
       "**Open for review:** the last row is the whole argument, and it is a " +
       "judgement rather than a measurement. Push back on it.",
   });
-  log("VAU-003 proposed by an author, then revised — awaiting review");
+  log("VAU-003 proposed by an author, then revised, awaiting review");
 
   /* ---- VAU-004: rejected ------------------------------------------------ */
   const signing = await decisionService.propose(workspace.id, authorId, {
@@ -293,7 +293,7 @@ async function main() {
     signing.id,
     demoId,
     "rejected",
-    "Unsigned is a documented, deliberate choice for a portfolio app — the " +
+    "Unsigned is a documented, deliberate choice for a portfolio app. The " +
       "README explains the right-click, and the reasoning is itself part of " +
       "what the project demonstrates. Revisit if vault ever has users who did " +
       "not arrive via the repo.",
@@ -328,9 +328,9 @@ async function main() {
 
   /* ---- references -------------------------------------------------------
      Every file cited inline is also attached as a reference, so the chips in
-     the prose and the list at the bottom agree. They are separate concepts —
-     a citation is an argument, a reference is a tracked artifact with a
-     baseline — but a reader seeing one without the other just sees an
+     the prose and the list at the bottom agree. They are separate concepts, in
+     that a citation is an argument and a reference is a tracked artifact with a
+     baseline, but a reader seeing one without the other just sees an
      inconsistency. */
 
   // The cited range, and the one that has drifted since VAU-002 was accepted.
@@ -399,19 +399,19 @@ async function main() {
     path: ".github/workflows/release.yml",
     baselineSha: "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5",
   });
-  log("attached six file references — one of them drifted");
+  log("attached six file references, one of them drifted");
 
   /* ---- a link reference, so both kinds are visible ---------------------- */
   await decisionService.addReference(culori.id, authorId, {
     kind: "link",
-    label: "culori — colour space conversion",
+    label: "culori: colour space conversion",
     url: "https://culorijs.org/api/",
   });
   log("attached a link reference alongside the file ones");
 
   /* ---- a parked draft ---------------------------------------------------
      So the drafts zone is not empty on arrival, and the difference between a
-     draft and a decision — no number, a Draft tag, private to its author — is
+     draft and a decision (no number, a Draft tag, private to its author) is
      visible rather than described. */
   await decisionService.saveDraft(workspace.id, demoId, {
     title: "Adopt a component visual-regression suite",
@@ -434,7 +434,7 @@ async function main() {
   log("parked one draft, still being written");
 
   console.log("\nDone.");
-  console.log(`  workspace : ${workspace.key} — ${workspace.name}`);
+  console.log(`  workspace : ${workspace.key}: ${workspace.name}`);
   console.log(`  sign in as: ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
   console.log(`  author    : ${AUTHOR_EMAIL} / ${AUTHOR_PASSWORD}`);
 }
@@ -462,7 +462,7 @@ function explain(error: unknown): string {
     return [
       "Postgres rejected those credentials.",
       "",
-      "Check the password in DATABASE_URL is the real one — a placeholder left",
+      "Check the password in DATABASE_URL is the real one; a placeholder left",
       "in by mistake fails exactly like this.",
     ].join("\n");
   }

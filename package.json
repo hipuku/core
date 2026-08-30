@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "description": "A team decision log — architecture decision records with a permission-gated lifecycle, two audit trails, and citations to the code they govern.",
+  "description": "A team decision log: architecture decision records with a permission-gated lifecycle, two audit trails, and citations to the code they govern.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

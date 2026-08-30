@@ -3,7 +3,7 @@
  *
  * The public deployment has sign-up disabled and one seeded account, so anyone
  * arriving can see the product without being able to create one of their own.
- * That account has to be able to *do* something, though — a decision log you
+ * That account has to be able to *do* something, though. A decision log you
  * cannot touch teaches you very little about how it feels to use.
  *
  * The line drawn here: **the demo may write drafts, and may not change the
@@ -26,13 +26,13 @@ export function isDemoAccount(email: string | null | undefined): boolean {
 
 /**
  * What the demo account is told when it tries to change the log. Phrased as a
- * deliberate boundary rather than a failure — and it names the thing that *is*
+ * deliberate boundary rather than a failure, and it names the thing that *is*
  * allowed, so the refusal doubles as a signpost.
  */
 export const DEMO_REFUSAL =
   "This is a read-only demo. You can write and save drafts, but the decision log itself stays as it is.";
 
-/** True when sign-up is closed — the public deployment, not local development. */
+/** True when sign-up is closed: the public deployment, not local development. */
 export function signUpDisabled(): boolean {
   return process.env.DISABLE_SIGNUP === "1";
 }

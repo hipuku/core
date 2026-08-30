@@ -11,7 +11,7 @@ describe("draftLabel", () => {
     });
   });
 
-  it("prefers the decision block — the sentence the record exists to hold", () => {
+  it("prefers the decision block, the sentence the record exists to hold", () => {
     expect(
       draftLabel("", {
         context: "We keep losing schema changes.",

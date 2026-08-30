@@ -7,7 +7,7 @@ const root = fileURLToPath(new URL(".", import.meta.url));
 /**
  * Two projects, because the suites have genuinely different needs.
  *
- * The domain and text cores are pure and run in Node — no DOM, no setup file,
+ * The domain and text cores are pure and run in Node: no DOM, no setup file,
  * nothing to tear down between tests. Widening that project to jsdom to
  * accommodate the component tests would make the whole domain suite pay for a
  * browser environment none of it uses.

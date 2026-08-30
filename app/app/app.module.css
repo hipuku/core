@@ -167,8 +167,8 @@
    The decision page
 
    One rule holds it together: **only the document is paper.** The white sheet
-   is the decision itself; everything else — its properties, its notices, its
-   tabs — is annotation *about* the document and sits directly on the desk. That
+   is the decision itself; everything else (its properties, its notices, its
+   tabs) is annotation *about* the document and sits directly on the desk. That
    is what stops the page becoming five cards of varying width arguing about
    which one matters.
 
@@ -202,7 +202,7 @@
 .propValue a:hover {
   color: var(--accent);
 }
-/* A secondary fact inside a property — "3 days ago" beside a date. */
+/* A secondary fact inside a property: "3 days ago" beside a date. */
 .propAside {
   color: var(--text-faint);
   margin-left: 0.4rem;
@@ -210,7 +210,7 @@
 
 /* ---- notice -------------------------------------------------------------
    One shape, one job: something is wrong with this decision that the reader
-   should know before reading it. Tinted, never elevated — raising it would put
+   should know before reading it. Tinted, never elevated, since raising it would put
    it in competition with the sheet, and what makes a notice urgent is what it
    says, not how far off the page it floats.
 
@@ -291,7 +291,7 @@
   font-style: italic;
 }
 
-/* References belong to the document, so they sit on the same paper — below a
+/* References belong to the document, so they sit on the same paper, below a
    rule rather than in a card of their own. One less surface on the page. */
 .docFooter {
   margin-top: 2.25rem;
@@ -336,7 +336,7 @@
 }
 
 /* ---- activity ----------------------------------------------------------
-   Rendered inside the meta card, below its rule — the history of the record
+   Rendered inside the meta card, below its rule: the history of the record
    the card summarises. */
 .activity {
   display: flex;

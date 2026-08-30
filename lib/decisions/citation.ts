@@ -1,5 +1,5 @@
 /**
- * Inline file citations — `{{owner/repo:path#L47-L120}}`.
+ * Inline file citations: `{{owner/repo:path#L47-L120}}`.
  *
  * A reference list under a decision says *which* files matter but never *why*,
  * and a reader six months later has to guess which paragraph each entry belongs
@@ -7,7 +7,7 @@
  * because {{acme/api:src/auth.ts#L12-L40}} already assumes it".
  *
  * The token is deliberately a plain-text form the author can type, paste and
- * edit — the same reason markdown links look the way they do. It survives being
+ * edit, the same reason markdown links look the way they do. It survives being
  * copied into a commit message or a Slack thread, which a rich-editor node
  * would not.
  *
@@ -72,7 +72,7 @@ export function renderCitations(
   });
 }
 
-/** `src/auth.ts · L47-L120` — the filename leads, since that is what is scanned. */
+/** `src/auth.ts · L47-L120`. The filename leads, since that is what is scanned. */
 export function citationLabel(citation: Citation): string {
   const file = citation.path.split("/").pop() || citation.path;
   return citation.lines ? `${file} · ${citation.lines}` : file;
@@ -81,8 +81,8 @@ export function citationLabel(citation: Citation): string {
 /**
  * Citations in the prose that no reference is tracking.
  *
- * Citing a file inline and attaching it as a reference are different acts —
- * one is an argument, the other starts watching for drift — and the app
+ * Citing a file inline and attaching it as a reference are different acts.
+ * One is an argument, the other starts watching for drift, and the app
  * deliberately does not conflate them: "mentioned while reasoning" is not
  * "this decision governs this code", and auto-tracking would fill the log
  * with drift from files cited as counter-examples.
@@ -118,7 +118,7 @@ interface EditState {
 }
 
 /**
- * Insert a citation at the caret, with the spacing a sentence needs — no space
+ * Insert a citation at the caret, with the spacing a sentence needs: no space
  * at the start of a line or after an existing one, exactly one otherwise.
  */
 export function insertCitation(state: EditState, citation: Citation): EditState {

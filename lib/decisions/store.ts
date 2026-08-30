@@ -2,8 +2,8 @@ import type { DecisionStatus, Role } from "./types";
 
 /**
  * Persistence port for the decision domain. The service depends on this interface,
- * not on Drizzle, so its orchestration — which spans the versioning engine, the
- * lifecycle rules and several tables — is exercised in-memory by the tests and
+ * not on Drizzle, so its orchestration, which spans the versioning engine, the
+ * lifecycle rules and several tables, is exercised in-memory by the tests and
  * backed by Postgres in production. The two writes that must not tear (a status
  * change and its transition row; a decision and its first transition) are single
  * methods here so the Drizzle implementation can wrap each in one transaction.
@@ -69,7 +69,7 @@ export interface ReferenceRecord {
   /** A cited line span, 1-based inclusive. Null means the whole file. */
   startLine: number | null;
   endLine: number | null;
-  /** The cited lines as they read when cited — lets a moved block be told from a changed one. */
+  /** The cited lines as they read when cited, so a moved block can be told from a changed one. */
   baselineSnippet: string | null;
   baselineSha: string | null;
   currentSha: string | null;
@@ -79,7 +79,7 @@ export interface ReferenceRecord {
 }
 
 /**
- * An unsent decision, parked by its author. Not a lifecycle state — see the
+ * An unsent decision, parked by its author. Not a lifecycle state; see the
  * `decision_drafts` table comment for why this is kept out of `decisions`.
  */
 export interface DraftRecord {
@@ -87,7 +87,7 @@ export interface DraftRecord {
   workspaceId: string;
   authorId: string;
   title: string;
-  /** Every block may be empty — a draft is under no obligation to be complete. */
+  /** Every block may be empty; a draft is under no obligation to be complete. */
   body: { context: string; decision: string; consequences: string };
   refs: { repoId: string; repo: string; path: string; lines: string | null }[];
   createdAt: Date;
@@ -124,7 +124,7 @@ export interface DecisionStore {
 
   /**
    * The number the next decision in this workspace would take. A *preview* for
-   * the compose screen, not a reservation — nothing is held, and two authors
+   * the compose screen rather than a reservation. Nothing is held, and two authors
    * composing at once will both see the same number. The real number is assigned
    * inside `insertDecision`'s transaction, where the unique constraint settles
    * any race. Kept read-only on purpose: reserving a number for an unsent draft
@@ -156,7 +156,7 @@ export interface DecisionStore {
   deleteReference(id: string): Promise<void>;
   /**
    * Move a file reference's baseline to the state it is in now. Used when a
-   * decision is accepted — the reference point is the code the team agreed to,
+   * decision is accepted: the reference point is the code the team agreed to,
    * not the code the author happened to be looking at while drafting.
    */
   rebaselineReference(

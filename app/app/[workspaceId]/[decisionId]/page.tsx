@@ -91,7 +91,7 @@ export default async function DecisionPage({
 
   const body = content.at(-1)?.state ?? {};
   // The first version is the proposal itself, so "last edited" only exists once
-  // there has been a revision — otherwise created and edited would always match.
+  // there has been a revision. Otherwise created and edited would always match.
   const lastEdited = content.length > 1 ? content.at(-1)!.createdAt : null;
   const editable = canEditContent(
     decision.status,
@@ -110,7 +110,7 @@ export default async function DecisionPage({
   const hasFileRefs = references.some((r) => r.kind === "file");
   /** The most recent drift check across every file reference. */
   /**
-   * The most recent thing that happened to this decision, of either kind — a
+   * The most recent thing that happened to this decision, of either kind: a
    * status change or a revision. Both timelines are already loaded.
    */
   const lastActivity = [
@@ -146,11 +146,11 @@ export default async function DecisionPage({
           </p>
           <h1 className={styles.title}>{decision.title}</h1>
         </div>
-        {/* The page-level action belongs in the page header, once — not floating
+        {/* The page-level action belongs in the page header, once, rather than floating
             above the prose and repeated inside the review banner. */}
         {/* Every action this decision affords, in one place, weighted so the
             consequential one is unmistakable: Edit is quiet, Reject is text,
-            and Approve — an irreversible, audited transition — is the only
+            and Approve, an irreversible and audited transition, is the only
             filled control on the page. */}
         <div className={styles.headActions}>
           {editable.ok && (
@@ -280,7 +280,7 @@ export default async function DecisionPage({
         </div>
 
         {/* What the pill cannot carry: who moved this decision to where it is,
-            and what replaced it. A property, not a banner — it is a fact about
+            and what replaced it. A property rather than a banner: it is a fact about
             the record, and it belongs with the record's other facts. */}
         {settled && (
           <div className={styles.prop}>
@@ -303,7 +303,7 @@ export default async function DecisionPage({
           <div className={styles.noticeText}>
             <span className={styles.noticeTitle}>Referenced code has changed</span>
             <span className={styles.noticeSub}>
-              Code this decision cites has drifted since it was recorded — it may
+              Code this decision cites has drifted since it was recorded, so it may
               be out of date. See References below.
             </span>
           </div>

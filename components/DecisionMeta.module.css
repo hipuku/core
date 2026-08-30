@@ -1,6 +1,6 @@
 /* One card holding the decision's current state and, on request, the history
    behind it. It grows downwards rather than pushing a second surface onto the
-   page — the history is this record at greater depth, not a neighbour of it. */
+   page: the history is this record at greater depth rather than a neighbour of it. */
 .card {
   background: var(--surface);
   border-radius: var(--r-lg);
@@ -22,7 +22,7 @@
 }
 
 /* ---- the handle ---------------------------------------------------------
-   A band of its own, and the whole width of it is the target — far easier to
+   A band of its own, and the whole width of it is the target, far easier to
    hit than a 36px button, and it makes the card visibly continue past its
    properties. */
 .handle {

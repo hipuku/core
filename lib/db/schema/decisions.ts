@@ -56,7 +56,7 @@ export const memberships = pgTable(
  * A decision record. Its editable body lives in a versioning `document` (referenced
  * by `documentId`); the columns here carry the lifecycle axis instead. `number` is
  * the per-workspace ADR number. `supersededById` points at the decision that
- * replaced this one — present only once this decision is superseded — which makes
+ * replaced this one, present only once this decision is superseded, which makes
  * "superseded by" a column read and "supersedes" its inverse query.
  */
 export const decisions = pgTable(
@@ -87,7 +87,7 @@ export const decisions = pgTable(
 );
 
 /**
- * The append-only status audit trail — the decision's own history, distinct from the
+ * The append-only status audit trail: the decision's own history, distinct from the
  * content history the versioning engine keeps. Every proposal, acceptance, rejection
  * and supersession lands one immutable row here. `fromStatus` is null for the
  * decision's creation.
@@ -120,7 +120,7 @@ export const workspaceRepos = pgTable(
 /**
  * Evidence attached to a decision. `link` references are a labelled URL. `file`
  * references point at a specific file in a connected repo (repo + path) and are
- * created from the GitHub picker — the columns exist now so both kinds share one
+ * created from the GitHub picker. The columns exist now so both kinds share one
  * table. Not versioned: references augment a decision, they are not its prose.
  */
 export const decisionReferences = pgTable("decision_references", {
@@ -135,7 +135,7 @@ export const decisionReferences = pgTable("decision_references", {
   path: text("path"),
   // An optional cited span, 1-based inclusive. Without one the reference is the
   // whole file and drift fires on any change to it; with one, only the cited
-  // lines matter. `baselineSnippet` is those lines as they read when cited —
+  // lines matter. `baselineSnippet` is those lines as they read when cited,
   // stored so a block that merely *moved* can be recognised as unchanged.
   startLine: integer("start_line"),
   endLine: integer("end_line"),
@@ -187,7 +187,7 @@ export const decisionDrafts = pgTable("decision_drafts", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   title: text("title").notNull().default(""),
-  /** `{ context, decision, consequences }` — every field may be empty. */
+  /** `{ context, decision, consequences }`. Every field may be empty. */
   body: jsonb("body").notNull(),
   /** Files cited while composing: `[{ repoId, repo, path }]`. */
   refs: jsonb("refs").notNull(),

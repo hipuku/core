@@ -11,7 +11,7 @@ import {
 
 /**
  * `|` marks the caret; `«…»` marks a selection. Guillemets rather than square
- * brackets because markdown itself uses `[` — for links and for task items —
+ * brackets because markdown itself uses `[`, for links and for task items,
  * and a marker that collides with the syntax under test is a trap.
  */
 function at(marked: string): EditState {

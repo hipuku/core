@@ -29,7 +29,7 @@ const Context = createContext<EditorCitations | null>(null);
 
 export const CitationInsertProvider = Context.Provider;
 
-/** Null where there is no editor above — a read-only view. */
+/** Null where there is no editor above, which is a read-only view. */
 export function useEditorCitations(): EditorCitations | null {
   return useContext(Context);
 }

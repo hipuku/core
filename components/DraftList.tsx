@@ -14,14 +14,14 @@ export interface DraftSummary {
 /**
  * The author's own unsent drafts, at the head of the decisions list.
  *
- * They take the same card as a decision — a draft is the same *kind of thing*,
- * just earlier — and are told apart by the tag rather than by the container.
+ * They take the same card as a decision, because a draft is the same *kind of
+ * thing* just earlier, and are told apart by the tag rather than the container.
  * What they cannot take is a number: an ADR number is assigned on proposal, so
  * the key slot is a dashed placeholder that keeps the rows aligned without
  * claiming an identifier the draft does not have.
  *
  * There is deliberately no delete control on the row. Discarding happens inside
- * the draft, where you can read what you are about to throw away — a one-click
+ * the draft, where you can read what you are about to throw away. A one-click
  * bin next to a title you can barely see is how work gets lost. This component
  * needs no client JavaScript as a result.
  */
@@ -50,7 +50,7 @@ export function DraftList({
             <span className={styles.cardNum}>
               <span
                 className="key-chip key-chip--pending"
-                title="Your draft — numbered when you propose it"
+                title="Your draft, numbered when you propose it"
               >
                 {workspaceKey}-&bull;&bull;&bull;
               </span>

@@ -21,8 +21,8 @@ export interface CitationRepo {
  *
  * Citations are rewritten to ordinary markdown links before parsing rather than
  * handled by a remark plugin: the token is a plain-text convention, and turning
- * it into syntax the parser already understands keeps the rendering path — and
- * its escaping — the one react-markdown has already hardened.
+ * it into syntax the parser already understands keeps the rendering path, and
+ * its escaping, the one react-markdown has already hardened.
  */
 export function Markdown({
   children,

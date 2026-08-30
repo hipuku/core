@@ -12,7 +12,7 @@ export interface UserSummary {
 /**
  * User identity lives in better-auth's `user` table, an auth concern. Keeping these
  * lookups here rather than in the decision store keeps that store free of the auth
- * schema — the decision domain deals only in user ids.
+ * schema. The decision domain deals only in user ids.
  */
 export async function findUserByEmail(email: string): Promise<UserSummary | null> {
   const [row] = await db

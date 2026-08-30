@@ -5,21 +5,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { listWorkspaceFiles, type WorkspaceFile } from "@/app/app/actions";
 // Imported from the module, not the `@/lib/decisions` barrel: the barrel also
 // exports the Drizzle store, and pulling it into a client component drags
-// `postgres` — and its `fs` import — into the browser bundle.
+// `postgres`, and its `fs` import, into the browser bundle.
 import { FileRow } from "@/components/FileToken";
 import { parseRange } from "@/lib/decisions/snippet";
 import styles from "./FileBrowser.module.css";
 
 /**
- * Search every connected repo at once and hand the picked file — optionally a
- * line range within it — back to the caller.
+ * Search every connected repo at once and hand the picked file, optionally a
+ * line range within it, back to the caller.
  *
  * The repo is a filter on the results, not a gate in front of them: an author
  * citing a file almost always knows the filename and often not the repo, so
  * asking which repo first put a wait in front of the only step they cared
  * about. Trees are fetched once, in parallel, and filtered in memory.
  *
- * Deliberately owns no form — the compose editor nests it inside its own
+ * Deliberately owns no form: the compose editor nests it inside its own
  * <form>, where a nested form would be invalid HTML.
  */
 export function FileBrowser({
@@ -33,7 +33,7 @@ export function FileBrowser({
   const [partial, setPartial] = useState<string[]>([]);
   const [unreachable, setUnreachable] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  /** Browsing is not possible here — GitHub off, or not linked. */
+  /** Browsing is not possible here: GitHub off, or not linked. */
   const [unavailable, setUnavailable] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   /** The file awaiting a line range, if the author asked to narrow one. */
@@ -123,7 +123,7 @@ export function FileBrowser({
 
       {partial.length > 0 && (
         <p className={styles.status}>
-          Showing part of {partial.join(", ")} — the repository is large enough
+          Showing part of {partial.join(", ")}. The repository is large enough
           that GitHub truncates its file list.
         </p>
       )}
@@ -224,7 +224,7 @@ export function FileBrowser({
 
           {hidden > 0 && (
             <p className={styles.status}>
-              Showing {shown.length} of {matched.length} — keep typing to narrow it down.
+              Showing {shown.length} of {matched.length}. Keep typing to narrow it down.
             </p>
           )}
         </>

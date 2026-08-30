@@ -3,7 +3,7 @@
 
    The governing idea: writing and reading are the same surface. Previously the
    write mode was three grey form fields and only Preview looked like a
-   document, so the product's own promise — this is a document, not a ticket —
+   document, so the product's own promise, that this is a document rather than a ticket,
    was broken during the activity that takes the longest. Now the fields carry
    no fill and no border, the type scale matches the rendered prose exactly, and
    Preview is a check on rendering rather than a mode you have to live in.
@@ -71,7 +71,7 @@
   padding: 0.6rem 0 0.7rem;
   margin-bottom: 1rem;
   /* The bar overlaps the document as it scrolls under, so it needs the desk
-     colour behind it — and a hairline to separate the two once they meet. */
+     colour behind it, and a hairline to separate the two once they meet. */
   background: var(--bg);
   border-bottom: 1px solid transparent;
 }
@@ -118,7 +118,7 @@
 /* ---- formatting toolbar -------------------------------------------------
    Its real job is to *say* this is markdown. Someone who has never typed a `#`
    can still write a heading, and in doing so watches the syntax appear in the
-   text — the toolbar teaches the shortcut it is replacing. */
+   text: the toolbar teaches the shortcut it is replacing. */
 .tools {
   display: flex;
   align-items: center;
@@ -126,7 +126,7 @@
   padding-left: 0.6rem;
   border-left: 1px solid var(--border);
 }
-/* The shared icon affordance, one notch larger — a toolbar is scanned at
+/* The shared icon affordance, one notch larger, since a toolbar is scanned at
    arm's length and its targets are pressed repeatedly. */
 .tool {
   --ib-size: 30px;
@@ -238,7 +238,7 @@
 
 /* No fill, no border, no rounded box. Type identical to `.prose` in Markdown
    .module.css, so a paragraph does not reflow or resize between Write and
-   Preview — the strongest signal that these are one surface, not two. */
+   Preview, the strongest signal that these are one surface rather than two. */
 .area {
   font: inherit;
   font-size: 1rem;
@@ -323,7 +323,7 @@
 
 /* ---- narrow screens ------------------------------------------------------
    The bar wraps to two rows on a phone, which would let the document scroll
-   underneath a taller sticky element — so it stops being sticky there. */
+   underneath a taller sticky element, so it stops being sticky there. */
 @media (max-width: 720px) {
   .bar {
     position: static;

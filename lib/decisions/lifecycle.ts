@@ -41,7 +41,7 @@ export function allowedTransitions(from: DecisionStatus): TransitionRule[] {
   return TRANSITIONS.filter((rule) => rule.from === from);
 }
 
-/** A status with no outgoing transitions — the decision has reached a final resting state. */
+/** A status with no outgoing transitions: the decision has reached a final resting state. */
 export function isTerminal(status: DecisionStatus): boolean {
   return allowedTransitions(status).length === 0;
 }
@@ -66,7 +66,7 @@ export function checkTransition(
 }
 
 /**
- * An accepted decision is immutable — the ADR discipline. To change a decision you
+ * An accepted decision is immutable, which is the ADR discipline. To change a decision you
  * supersede it with a new one, so the record of what was decided, and when, is never
  * quietly rewritten. Content is therefore editable only while `proposed`, and only by
  * its author or an actor holding the `edit` capability.
@@ -79,7 +79,7 @@ export function canEditContent(
   if (status !== "proposed") {
     return {
       ok: false,
-      reason: "a decision is immutable once it leaves 'proposed' — supersede it instead",
+      reason: "a decision is immutable once it leaves 'proposed'; supersede it instead",
     };
   }
   if (isAuthor || actor.capabilities.includes("edit")) {

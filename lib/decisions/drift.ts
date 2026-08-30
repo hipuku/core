@@ -9,10 +9,10 @@ type DriftInput = Pick<
 
 /**
  * Where a file reference stands relative to the code it cited:
- * - `synced`  — the cited code is unchanged since the decision referenced it
- * - `drifted` — it has changed since (the decision may be out of date)
- * - `missing` — the file no longer exists at that path
- * - `unknown` — a link reference, or a file never checked
+ * - `synced`:  the cited code is unchanged since the decision referenced it
+ * - `drifted`: it has changed since (the decision may be out of date)
+ * - `missing`: the file no longer exists at that path
+ * - `unknown`: a link reference, or a file never checked
  *
  * A reference with a line range is judged on its *snippet*, not the file SHA: a
  * commit elsewhere in the file changes the SHA without touching the cited code,

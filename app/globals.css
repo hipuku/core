@@ -1,13 +1,13 @@
 /* ============================================================================
-   core — design system
+   core: design system
    Notion-inspired paper: warm off-white surfaces, warm-grey ink, quiet borders,
    Gabarito for type. Colour appears only where it earns its place, drawn from a
-   retro-print palette — vermilion, mustard, teal, cobalt: saturated but
+   retro-print palette of vermilion, mustard, teal and cobalt: saturated but
    medium-lightness "ink", never neon. Committed light.
    ============================================================================ */
 
 :root {
-  /* neutrals — warm paper ramp. The page is a light-grey "desk"; white cards sit
+  /* neutrals, a warm paper ramp. The page is a light-grey "desk"; white cards sit
      on it and separate by fill, not by borders. */
   --bg: oklch(0.955 0.008 83);
   --surface: oklch(0.998 0.002 85);
@@ -20,14 +20,14 @@
   --text-dim: oklch(0.46 0.012 60);
   --text-faint: oklch(0.6 0.012 65);
 
-  /* accent — retro cobalt */
+  /* accent: retro cobalt */
   --accent: oklch(0.5 0.16 260);
   --accent-hover: oklch(0.44 0.16 260);
   --accent-fg: oklch(0.995 0 0);
   --accent-tint: oklch(0.5 0.16 260 / 0.1);
   --ring: oklch(0.5 0.16 260 / 0.32);
 
-  /* status — retro poster inks (independent of the brand accent) */
+  /* status: retro poster inks (independent of the brand accent) */
   --st-proposed: oklch(0.5 0.16 55); /* flame */
   --st-accepted: oklch(0.5 0.12 165);
   --st-rejected: oklch(0.53 0.2 28);
@@ -36,7 +36,7 @@
 
   --danger: oklch(0.5 0.2 26);
 
-  /* radii — tight, paper-like */
+  /* radii: tight, paper-like */
   --r-sm: 5px;
   --r: 7px;
   --r-lg: 11px;
@@ -109,12 +109,12 @@ h1, h2, h3, h4 {
    attached to.
 
    `.btn` is a **labelled action on the page**. Every one of them carries a
-   background — a transparent button with a word in it reads as a link, and a
+   background. A transparent button with a word in it reads as a link, and a
    row mixing filled and unfilled controls has no rhythm. There is no "ghost"
    variant: the default *is* the quiet one, and it is quiet by being the
    lightest fill rather than by being absent.
 
-   `.iconbtn` is an **icon-only affordance inside a container** — the × on a
+   `.iconbtn` is an **icon-only affordance inside a container**: the × on a
    chip, a formatting tool, a refresh beside a timestamp. Those fill on hover
    only, because eight filled squares in a toolbar is noise, and because they
    belong to the thing they sit in rather than to the page.
@@ -170,7 +170,7 @@ h1, h2, h3, h4 {
 }
 
 /* Approve keeps its own colour: green says "yes, and permanently" in a way the
-   brand accent — which also means "primary" and "link" — cannot. */
+   brand accent, which also means "primary" and "link", cannot. */
 .btn--accept {
   --btn-bg: var(--st-accepted);
   --btn-border: var(--st-accepted);
@@ -182,7 +182,7 @@ h1, h2, h3, h4 {
   --btn-border: color-mix(in oklch, var(--st-accepted) 86%, black);
 }
 
-/* Reversible destructive — Reject, Discard. Tinted, not solid: the weight
+/* Reversible destructive, Reject and Discard. Tinted rather than solid: the weight
    should match the consequence. */
 .btn--danger {
   --btn-bg: color-mix(in oklch, var(--danger) 8%, var(--surface-2));
@@ -192,7 +192,7 @@ h1, h2, h3, h4 {
   --btn-bg: color-mix(in oklch, var(--danger) 15%, var(--surface-2));
 }
 
-/* Irreversible — deleting a workspace. Solid, and rare. */
+/* Irreversible, deleting a workspace. Solid, and rare. */
 .btn--destructive {
   --btn-bg: var(--danger);
   --btn-border: var(--danger);
@@ -204,7 +204,7 @@ h1, h2, h3, h4 {
   --btn-border: color-mix(in oklch, var(--danger) 88%, black);
 }
 
-/* A labelled button reduced to its icon — same height, square. */
+/* A labelled button reduced to its icon: same height, square. */
 .btn--icon {
   width: 36px;
   padding: 0;
@@ -313,7 +313,7 @@ h1, h2, h3, h4 {
   border: 1px solid color-mix(in oklch, var(--pc) 32%, transparent);
   white-space: nowrap;
 }
-/* decision key (VAU-001) — outlined, neutral: an identifier, never a status */
+/* decision key (VAU-001), outlined and neutral: an identifier, never a status */
 .key-chip {
   display: inline-flex;
   align-items: center;
@@ -328,7 +328,7 @@ h1, h2, h3, h4 {
   white-space: nowrap;
 }
 
-/* A draft is not a lifecycle state, so it takes no status ink — neutral grey
+/* A draft is not a lifecycle state, so it takes no status ink. Neutral grey
    marks it as "not yet in the log" rather than as another kind of decision. */
 .pill--draft { --pc: var(--text-faint); }
 

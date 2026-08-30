@@ -2,7 +2,7 @@
  * The decision lifecycle. A decision record (an ADR) moves through a small,
  * explicit state machine; this module owns the rules for that movement and knows
  * nothing about storage or UI. The ADR's editable *content* is versioned separately
- * by lib/versioning — this file governs the orthogonal question of a decision's
+ * by lib/versioning. This file governs the orthogonal question of a decision's
  * *status* over time.
  */
 export type DecisionStatus =

@@ -27,7 +27,7 @@ export interface LineRange {
 export type SnippetVerdict =
   /** The cited lines are unchanged, at the same place. */
   | { status: "synced" }
-  /** Unchanged, but they live somewhere else now — the range is updated. */
+  /** Unchanged, but they live somewhere else now, so the range is updated. */
   | { status: "moved"; range: LineRange }
   /** The cited lines are gone or different. */
   | { status: "changed" };
@@ -122,6 +122,6 @@ export function parseRange(text: string): LineRange | null {
   const start = Number(match[1]);
   const end = match[2] ? Number(match[2]) : start;
   if (start < 1 || end < 1) return null;
-  // A backwards range is a typo, not an empty selection — read it either way.
+  // A backwards range is a typo rather than an empty selection, so read it either way.
   return start <= end ? { start, end } : { start: end, end: start };
 }

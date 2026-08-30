@@ -81,7 +81,7 @@ export default async function WorkspacePage({
         </p>
       ) : decisions.length === 0 ? (
         <p className={styles.empty}>
-          Nothing proposed yet — your draft above is not visible to anyone else
+          Nothing proposed yet. Your draft above is not visible to anyone else
           until you propose it.
         </p>
       ) : (

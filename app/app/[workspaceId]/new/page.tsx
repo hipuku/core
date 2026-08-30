@@ -24,7 +24,7 @@ export default async function NewDecisionPage({
   const nextKey = await decisionService.peekNextLabel(workspaceId);
   const repos = await decisionService.listWorkspaceRepos(workspaceId);
 
-  // Only ever the acting user's own draft — `getDraft` returns null otherwise,
+  // Only ever the acting user's own draft. `getDraft` returns null otherwise,
   // so a guessed id opens an empty compose screen rather than someone's work.
   const draft = draftId ? await decisionService.getDraft(draftId, user.id) : null;
 

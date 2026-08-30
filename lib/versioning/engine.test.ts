@@ -44,7 +44,7 @@ describe("Versioning", () => {
     const restored = await engine.restore(document.id, first.id, "user_b");
 
     const history = await engine.history(document.id);
-    // Three entries: create, bump, restore — the restore adds to history.
+    // Three entries: create, bump, restore. The restore adds to history.
     expect(history).toHaveLength(3);
     expect(restored.state).toEqual({ n: 1 });
     expect(restored.message).toContain("Restored version");

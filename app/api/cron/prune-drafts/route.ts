@@ -7,7 +7,7 @@ import { decisionService } from "@/lib/decisions";
  * Age out the demo account's abandoned drafts.
  *
  * On the public deployment every visitor writes as the same account, so a
- * draft — private to its author by design — is in practice shared with every
+ * draft, private to its author by design, is in practice shared with every
  * future visitor. Left alone, the drafts list fills with strangers' unfinished
  * sentences and stops showing the seeded one.
  *
@@ -45,7 +45,7 @@ export async function GET(request: Request): Promise<Response> {
   if (!email) {
     // Logged, not just returned. Vercel's log viewer shows console output
     // rather than response bodies, so a scheduled job that only returns its
-    // result leaves no trace of what it did — and nobody watches a cron run.
+    // result leaves no trace of what it did, and nobody watches a cron run.
     console.log("[prune-drafts] skipped: no demo account configured");
     return Response.json({ skipped: "no demo account configured" });
   }

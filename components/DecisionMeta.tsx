@@ -9,14 +9,14 @@ import styles from "./DecisionMeta.module.css";
  * The decision's dossier: what is true of it now, and how it got that way.
  *
  * The properties and the audit trail were two things on the page, which is one
- * too many — a decision's status, owner and dates *are* the current state of its
+ * too many: a decision's status, owner and dates *are* the current state of its
  * history. So the history expands inside the card that summarises it, and the
  * page is left with two surfaces: this record, and the document it describes.
  *
  * The control lives in its own band along the bottom rather than inline with
  * the properties. Everything in that row is `label / value`; a button sharing
  * their baseline is a different grammar in the same sentence. In a band of its
- * own it reads as what it is — a handle on a drawer, attached to the thing it
+ * own it reads as what it is, a handle on a drawer attached to the thing it
  * opens.
  *
  * The handle carries a summary rather than a count. "3 events" is a number;

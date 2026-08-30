@@ -36,7 +36,7 @@ describe("compareSnippet", () => {
     });
   });
 
-  it("ignores changes elsewhere in the file — the whole point of a range", () => {
+  it("ignores changes elsewhere in the file, which is the point of a range", () => {
     const edited = ["ONE", "two", "three", "FOUR", "FIVE"].join("\n");
     expect(compareSnippet({ baseline, content: edited, range })).toEqual({
       status: "synced",
@@ -80,7 +80,7 @@ describe("compareSnippet", () => {
     });
   });
 
-  it("does fire on changed indentation — that is a real change of scope", () => {
+  it("does fire on changed indentation, which is a real change of scope", () => {
     const reindented = ["one", "  two", "  three", "four"].join("\n");
     expect(compareSnippet({ baseline, content: reindented, range }).status).toBe(
       "changed",

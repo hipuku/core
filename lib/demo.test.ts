@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe("isDemoAccount", () => {
-  it("is nobody when DEMO_USER_EMAIL is unset — the local default", async () => {
+  it("is nobody when DEMO_USER_EMAIL is unset, the local default", async () => {
     const { isDemoAccount } = await load({ DEMO_USER_EMAIL: undefined });
     expect(isDemoAccount("demo@core.hipuku.dev")).toBe(false);
     expect(isDemoAccount("anyone@example.com")).toBe(false);
@@ -70,7 +70,7 @@ describe("deployment flags", () => {
     expect(off.signUpDisabled()).toBe(false);
     expect(off.githubDisabled()).toBe(false);
 
-    // Anything other than "1" is not a switch — "true" or "yes" reading as on
+    // Anything other than "1" is not a switch. "true" or "yes" reading as on
     // would make a typo silently change what a deployment allows.
     const loose = await load({ DISABLE_SIGNUP: "true", DISABLE_GITHUB: "yes" });
     expect(loose.signUpDisabled()).toBe(false);

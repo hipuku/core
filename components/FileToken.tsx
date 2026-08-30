@@ -4,8 +4,8 @@ import styles from "./FileToken.module.css";
 /**
  * How a cited file looks, everywhere it appears.
  *
- * There were four renderings of the same idea — inline in prose, as a pill in
- * the editor, as a plain line in the document, as a search result — which meant
+ * There were four renderings of the same idea (inline in prose, as a pill in
+ * the editor, as a plain line in the document, as a search result) which meant
  * a path looked like a different kind of object depending on which screen you
  * were on. Two arrangements are enough, and the difference between them is
  * structural rather than decorative:
@@ -28,7 +28,7 @@ export interface FileTokenProps {
   lines?: string | null;
 }
 
-/** Just the filename — what a reader scans for in a sentence. */
+/** Just the filename: what a reader scans for in a sentence. */
 export function fileName(path: string): string {
   return path.split("/").pop() || path;
 }
@@ -80,7 +80,7 @@ export function FileRow({
 }: FileTokenProps & {
   /** Makes the name a link out to the code. */
   href?: string;
-  /** Makes the name a button — used where picking the row is the action. */
+  /** Makes the name a button, used where picking the row is the action. */
   onClick?: () => void;
   title?: string;
   children?: React.ReactNode;

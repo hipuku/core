@@ -1,5 +1,5 @@
 /**
- * "just now" / "12 minutes ago" — enough to judge whether a draft is the one.
+ * "just now" / "12 minutes ago": enough to judge whether a draft is the one.
  *
  * Deliberately its own module with no `"use client"` directive: it is called
  * from both a server component (the drafts list) and a client one (the editor's

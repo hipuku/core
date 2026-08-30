@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "r
  * Writing the reasoning behind an architectural decision is twenty minutes of
  * work, and until it is proposed it exists nowhere but this tab. A stray ⌘W, a
  * dev-server reload or a mis-clicked Cancel used to end it. The draft is kept in
- * `localStorage` — deliberately *not* on the server, because an unproposed draft
+ * `localStorage`, deliberately *not* on the server, because an unproposed draft
  * is not yet a decision and should not appear in anyone's workspace or history.
  *
  * A found draft is never silently applied: it is offered. Silently replacing
@@ -32,9 +32,9 @@ export interface Found<T> {
 export interface Draft<T> {
   /** A draft found in storage, offered for recovery. */
   found: Found<T> | null;
-  /** Stop offering it — the editor has taken the contents. */
+  /** Stop offering it: the editor has taken the contents. */
   dismiss: () => void;
-  /** Forget it — after a successful submit, or a deliberate discard. */
+  /** Forget it, after a successful submit or a deliberate discard. */
   clear: () => void;
 }
 
@@ -59,7 +59,7 @@ function read<T>(key: string): Found<T> | null {
 /**
  * `localStorage` is an external store, so it is read through
  * `useSyncExternalStore` rather than an effect that calls `setState`. That gets
- * the server snapshot right for free — there is no storage during SSR, so the
+ * the server snapshot right for free: there is no storage during SSR, so the
  * server renders "no draft" and the client re-reads after hydration, rather
  * than flashing a recovery banner into markup that never contained one.
  */
@@ -97,7 +97,7 @@ export function useDraft<T>({
   pristine,
   enabled = true,
 }: {
-  /** Stable per document — the new-decision form and each revision differ. */
+  /** Stable per document: the new-decision form and each revision differ. */
   key: string;
   /** Current editor contents, serialisable. */
   value: T;
@@ -145,7 +145,7 @@ export function useDraft<T>({
     try {
       window.localStorage.removeItem(storageKey);
     } catch {
-      /* nothing to do — the draft simply ages out */
+      /* nothing to do; the draft simply ages out */
     }
   }, [storageKey, store]);
 

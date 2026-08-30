@@ -7,7 +7,7 @@ import { DecisionEditor } from "./DecisionEditor";
 /**
  * The compose editor, exercised through the DOM.
  *
- * The text manipulation itself is covered by `lib/markdown/editing` — pure,
+ * The text manipulation itself is covered by `lib/markdown/editing`: pure,
  * 27 tests. What is only observable here is the *wiring*: that a keystroke
  * reaches those functions and the caret survives, that leaving with unsaved
  * work is caught, and that the three ways out of the modal do different things.
@@ -64,7 +64,7 @@ beforeEach(() => {
   push.mockClear();
 });
 
-describe("DecisionEditor — markdown behaviour", () => {
+describe("DecisionEditor: markdown behaviour", () => {
   it("continues a list on Enter", async () => {
     const { user } = setup();
     const field = decisionField();
@@ -120,7 +120,7 @@ describe("DecisionEditor — markdown behaviour", () => {
   });
 });
 
-describe("DecisionEditor — leaving with unsaved work", () => {
+describe("DecisionEditor: leaving with unsaved work", () => {
   it("cancels straight out while nothing has been written", async () => {
     const { user } = setup();
     const cancel = screen.getByRole("link", { name: "Cancel" });
@@ -162,7 +162,7 @@ describe("DecisionEditor — leaving with unsaved work", () => {
     // Submitted through `requestSubmit(button)` rather than a click: the button
     // carries its own `formAction`, and that only takes effect when the submit
     // event knows its submitter. jsdom does not populate `event.submitter` from
-    // a plain click, so a click here silently runs the *form's* action — which
+    // a plain click, so a click here silently runs the *form's* action, which
     // would propose the decision instead of parking it.
     const save = screen.getByRole("button", { name: /Save as draft/ });
     await act(async () => {
@@ -188,7 +188,7 @@ describe("DecisionEditor — leaving with unsaved work", () => {
   });
 });
 
-describe("DecisionEditor — the document it is writing", () => {
+describe("DecisionEditor: the document it is writing", () => {
   it("marks the decision as a draft until it is proposed", () => {
     setup({ nextKey: "VAU-014" });
     expect(screen.getByText("Draft")).toBeInTheDocument();

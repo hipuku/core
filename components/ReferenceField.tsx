@@ -7,7 +7,7 @@ import type { WorkspaceFile } from "@/app/app/actions";
 import styles from "./ReferenceField.module.css";
 
 export interface ReferenceChip {
-  /** Stable per row — the reference id when live, repo:path:lines when buffered. */
+  /** Stable per row: the reference id when live, repo:path:lines when buffered. */
   key: string;
   repo: string;
   path: string;
@@ -16,7 +16,7 @@ export interface ReferenceChip {
 }
 
 /**
- * Citing code — the one interface, used by both composing and revising.
+ * Citing code. One interface, used by both composing and revising.
  *
  * These were two different screens for the same task. Whether the write lands
  * now or on submit is a persistence detail, and it had been allowed to leak all
@@ -24,7 +24,7 @@ export interface ReferenceChip {
  * citing a file looks and feels, so the two views cannot drift apart again.
  *
  * Deliberately shows **no drift status**. A file cited moments ago is in sync by
- * construction — a badge that can only ever say one thing is not a status — and
+ * construction, since a badge that can only ever say one thing states nothing, and
  * auditing what moved underneath a decision is a thing you do while reading it,
  * not while writing it.
  */

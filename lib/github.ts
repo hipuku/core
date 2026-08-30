@@ -68,7 +68,7 @@ interface RepoResponse {
   default_branch: string;
 }
 
-/** Repos the user can access — owned, collaborator, or via an org. */
+/** Repos the user can access: owned, collaborator, or via an org. */
 export async function listRepos(token: string): Promise<GithubRepo[]> {
   const res = await fetch(
     `${API}/user/repos?per_page=100&sort=updated&affiliation=owner,collaborator,organization_member`,
@@ -120,7 +120,7 @@ export function fileUrl(
   repo: string,
   branch: string,
   path: string,
-  /** `L47-L120` — GitHub highlights the span when the fragment is present. */
+  /** `L47-L120`. GitHub highlights the span when the fragment is present. */
   lines?: string | null,
 ): string {
   const base = `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
@@ -131,7 +131,7 @@ export function fileUrl(
  * A file's contents and current blob SHA, or null if it no longer exists.
  *
  * One call for both, because every caller that wants the text also wants the
- * SHA it belongs to — fetching them separately risks reading a file at one
+ * SHA it belongs to. Fetching them separately risks reading a file at one
  * commit and stamping it with another's SHA.
  */
 export async function getFileContent(

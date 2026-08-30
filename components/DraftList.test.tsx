@@ -72,7 +72,7 @@ describe("DraftList", () => {
     );
   });
 
-  it("offers no delete control — discarding happens where the text is readable", () => {
+  it("offers no delete control; discarding happens where the text is readable", () => {
     render(<DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[draft()]} />);
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });

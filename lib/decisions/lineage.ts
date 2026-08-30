@@ -5,7 +5,7 @@
  * one hop at a time: this record links forward to what replaced it, and finding
  * what *it* replaced means searching. A decision three revisions deep therefore
  * shows no sign of the two before it, which is precisely the history someone
- * arriving at it needs — a decision is often best understood as the latest
+ * arriving at it needs. A decision is often best understood as the latest
  * answer to a question that has been answered before.
  *
  * Pure: give it every decision in the workspace and it walks both directions.
@@ -46,7 +46,7 @@ export function supersessionChain<T extends Lineal>(
 
   // One `seen` set across *both* walks, not one each. A cycle is reachable in
   // both directions, so two separate guards each stop correctly and still
-  // collect the same decision twice — a chain longer than the workspace, with a
+  // collect the same decision twice: a chain longer than the workspace, with a
   // repeat in it. The service cannot create a cycle; a database restored by
   // hand could.
   const seen = new Set<string>([currentId]);

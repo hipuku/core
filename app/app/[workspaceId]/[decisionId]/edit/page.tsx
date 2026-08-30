@@ -24,7 +24,7 @@ function field(body: Json, key: string): string {
  * Revising a decision is its own page, not a mode the read view slips into.
  *
  * Inline editing left the properties, the review banner and the tabs stacked
- * above the editor — chrome about a decision, sitting on top of the act of
+ * above the editor: chrome about a decision, sitting on top of the act of
  * rewriting it, with two Edit affordances visible at once. Writing deserves the
  * same undistracted page whether the document is new or already numbered.
  */
@@ -48,7 +48,7 @@ export default async function EditDecisionPage({
     { id: user.id, capabilities: capabilitiesFor(role) },
     decision.authorId === user.id,
   );
-  // An accepted ADR is immutable — you supersede it, you do not edit it. Anyone
+  // An accepted ADR is immutable: you supersede it rather than editing it. Anyone
   // arriving here by URL goes back to the document rather than seeing a form
   // whose submit would be refused.
   if (!editable.ok) redirect(base);
@@ -82,9 +82,9 @@ export default async function EditDecisionPage({
       headingKey={decisionLabel(workspace?.key ?? "ADR", decision.number)}
       headingTitle={decision.title}
       status={decision.status}
-      note="Saved as a new revision — the previous version stays in the history."
+      note="Saved as a new revision. The previous version stays in the history."
       /* References are not versioned, so they are managed live rather than
-         submitted with the form — but this is the only place they can be
+         submitted with the form, but this is the only place they can be
          changed, which is why the panel lives here and not on the document. */
       previewCited={references
         .filter((r) => r.kind === "file" && r.repo && r.path)

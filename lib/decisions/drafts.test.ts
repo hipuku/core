@@ -94,7 +94,7 @@ describe("drafts", () => {
     expect(drafts.map((d) => d.title)).toEqual(["newer", "older"]);
   });
 
-  it("is private to its author — a maintainer cannot see or read it", async () => {
+  it("is private to its author; a maintainer cannot see or read it", async () => {
     const ws = await workspace();
     const draft = await service.saveDraft(ws.id, AUTHOR, {
       title: "half-formed",
@@ -219,7 +219,7 @@ describe("drafts", () => {
     expect(theirs.title).toBe("mine");
   });
 
-  it("burns no ADR number — a draft leaves the sequence untouched", async () => {
+  it("burns no ADR number; a draft leaves the sequence untouched", async () => {
     const ws = await workspace();
     await service.saveDraft(ws.id, AUTHOR, { title: "never sent", body: EMPTY, refs: [] });
     await service.saveDraft(ws.id, AUTHOR, { title: "also never sent", body: EMPTY, refs: [] });

@@ -50,7 +50,7 @@ describe("supersessionChain", () => {
 
   it("does not loop, or repeat itself, on a cycle", () => {
     // The service cannot create this; a hand-edited database could. Both walks
-    // can reach the same decision, so terminating is not enough — it also has
+    // can reach the same decision, so terminating is not enough. It also has
     // to appear once.
     const cyclic = [d(1, "id-2"), { ...d(2), supersededById: "id-1" }];
     const chain = supersessionChain(cyclic, "id-1");

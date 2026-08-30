@@ -29,7 +29,7 @@ import { findUserByEmail } from "@/lib/users";
 /**
  * Refuse a write from the read-only demo account.
  *
- * Called at the top of every action that changes the decision log — and
+ * Called at the top of every action that changes the decision log, and
  * deliberately *not* by the draft actions, which the demo is allowed to use.
  * Returning rather than throwing means the existing toast path reports it as a
  * boundary rather than an error page.
@@ -256,16 +256,16 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
   files: WorkspaceFile[];
   /** Repos whose tree GitHub returned only part of. */
   truncated: string[];
-  /** Repos this token could not read at all — private, or gone. */
+  /** Repos this token could not read at all: private, or gone. */
   unreachable: string[];
-  /** Set when browsing is not possible here — a state, not a failure. */
+  /** Set when browsing is not possible here. A state rather than a failure. */
   unavailable?: string;
 }> {
   /**
    * This action never throws.
    *
-   * A server action that rejects reaches the browser as React error #441 — the
-   * real message stripped out of the production build — which the picker then
+   * A server action that rejects reaches the browser as React error #441, with
+   * the real message stripped out of the production build, which the picker then
    * displays as though it were an explanation. Every way this can fail is
    * something a person can act on, so each one is returned as words.
    */
@@ -312,7 +312,7 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
           );
           return { repo, paths, truncated, failed: false };
         } catch {
-          // One unreachable repo must not empty the whole picker — a private
+          // One unreachable repo must not empty the whole picker. A private
           // repo, or one the user has lost access to, is common and not worth
           // failing the search over.
           return { repo, paths: [] as string[], truncated: false, failed: true };
@@ -362,8 +362,8 @@ function referenceLabel(
 }
 
 /**
- * Snapshot what a citation points at, right now: the file's blob SHA, and — when
- * a line range was given — the cited text itself. The snippet is what later lets
+ * Snapshot what a citation points at, right now: the file's blob SHA, and where
+ * a line range was given, the cited text itself. The snippet is what later lets
  * a moved block be told apart from a changed one.
  *
  * A range that does not land on any lines is dropped rather than stored: a
@@ -398,7 +398,7 @@ async function snapshotFile(
     path,
     repo.defaultBranch,
   );
-  // Missing, or too large to inline — fall back to whole-file citation.
+  // Missing, or too large to inline. Fall back to whole-file citation.
   if (!file) {
     return { baselineSha: null, baselineSnippet: null, range: null };
   }
@@ -484,7 +484,7 @@ export async function checkReferenceDrift(
       const ranged =
         ref.startLine !== null && ref.endLine !== null && ref.baselineSnippet !== null;
 
-      // A whole-file reference only needs the SHA — no reason to pull contents.
+      // A whole-file reference only needs the SHA, so there is no reason to pull contents.
       if (!ranged) {
         const sha = await getFileSha(token, owner, name, ref.path, repo.defaultBranch);
         await decisionService.recordReferenceState(ref.id, user.id, sha);
@@ -516,7 +516,7 @@ export async function checkReferenceDrift(
       // Synced or moved: the cited code is intact, so the reference stays in
       // sync regardless of what the rest of the file did. Recording the
       // baseline SHA rather than the file's current one is what keeps
-      // `referenceDrift` — a pure read of stored state — telling the truth.
+      // `referenceDrift`, a pure read of stored state, telling the truth.
       await decisionService.recordReferenceState(
         ref.id,
         user.id,
@@ -534,7 +534,7 @@ export async function checkReferenceDrift(
     if (missing) parts.push(`${missing} missing`);
     if (moved) parts.push(`${moved} moved but unchanged`);
     if (!changed && !missing) parts.push("all in sync");
-    return { ok: parts.join(" — ") };
+    return { ok: parts.join(", ") };
   } catch (e) {
     if (e instanceof Error) return { error: e.message };
     throw e;
@@ -556,7 +556,7 @@ function citedRefs(formData: FormData) {
 }
 
 /**
- * Park an unsent decision. Nothing is validated — an empty draft is legitimate,
+ * Park an unsent decision. Nothing is validated: an empty draft is legitimate,
  * which is precisely what distinguishes a draft from a proposal.
  */
 export async function saveDraft(
@@ -597,7 +597,7 @@ export async function propose(workspaceId: string, formData: FormData) {
   // baseline SHA is the one the author was actually looking at when deciding.
   await attachCitedFiles(workspaceId, decision.id, user.id, formData);
 
-  // The draft became a decision — it has no reason to keep existing. Deleted
+  // The draft became a decision, so it has no reason to keep existing. Deleted
   // last, so a failure anywhere above leaves the author's text recoverable.
   const draftId = String(formData.get("draftId") ?? "");
   if (draftId) {
@@ -651,7 +651,7 @@ async function attachCitedFiles(
         baselineSha: snapshot.baselineSha,
       });
     } catch {
-      // The decision itself is already recorded — a failed citation must not
+      // The decision itself is already recorded, and a failed citation must not
       // discard it. The author can re-add the file from the decision page.
     }
   }

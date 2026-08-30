@@ -7,7 +7,7 @@ const connectionString = process.env.DATABASE_URL;
 /**
  * postgres-js opens connections lazily, so constructing the client without a URL
  * does not fail the build; the first query does, with a clear error. Deliberately no
- * throw at import time — that would break `next build`, which runs as production and
+ * throw at import time, which would break `next build`: it runs as production and
  * evaluates route modules before any secret is set. The client is cached on
  * globalThis so Next's dev HMR does not leak a new pool on every reload.
  */

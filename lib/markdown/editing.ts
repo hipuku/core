@@ -1,7 +1,7 @@
 /**
  * Markdown editing as pure functions over a textarea's state.
  *
- * The compose editor is a plain <textarea> by choice — no CodeMirror, no
+ * The compose editor is a plain <textarea> by choice: no CodeMirror, no
  * contenteditable, no third-party editor to keep in sync with how the document
  * later renders. What makes it *feel* like a markdown editor is behaviour while
  * typing: a list that continues itself, Tab that indents, ⌘B that wraps a
@@ -9,7 +9,7 @@
  * tested, and the component only applies the result.
  *
  * Every function takes the full value plus the caret (or selection) and returns
- * the same shape. Returning `null` means "this keystroke is not ours" — the
+ * the same shape. Returning `null` means "this keystroke is not ours", so the
  * caller lets the browser handle it.
  */
 
@@ -24,7 +24,7 @@ export interface EditState {
 /** How far a marker is indented, and what marker it is. */
 interface ListItem {
   indent: string;
-  /** `-`, `*`, `+`, `1.`, or `>` — the literal marker text. */
+  /** `-`, `*`, `+`, `1.`, or `>`: the literal marker text. */
   marker: string;
   /** `[ ]` / `[x]` for a task item, else null. */
   checkbox: string | null;
@@ -89,7 +89,7 @@ function replaceRange(
 
 /**
  * Enter inside a list continues it; Enter on an *empty* item ends the list
- * instead of stacking another empty bullet — the behaviour every markdown
+ * instead of stacking another empty bullet, the behaviour every markdown
  * editor has and every plain textarea lacks. Returns null when the caret is not
  * in a list, so a normal newline falls through to the browser.
  */
@@ -117,7 +117,7 @@ export function continueList(state: EditState): EditState | null {
 const INDENT = "  ";
 
 /**
- * Tab indents, Shift+Tab outdents — across every line the selection touches, so
+ * Tab indents, Shift+Tab outdents, across every line the selection touches, so
  * nesting a whole sub-list is one keystroke. Without this, Tab leaves the field
  * and there is no way to nest at all.
  */
@@ -153,7 +153,7 @@ export function indent(state: EditState, direction: 1 | -1): EditState {
 }
 
 /**
- * Wrap the selection in `marker`, or unwrap it if it is already wrapped —
+ * Wrap the selection in `marker`, or unwrap it if it is already wrapped:
  * ⌘B on bold text un-bolds it rather than producing `****text****`.
  * With nothing selected, inserts the pair and puts the caret between them.
  */

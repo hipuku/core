@@ -14,14 +14,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "core — decision log",
+  title: "core: decision log",
   description:
     "A team decision log for architecture decision records, with a permission-gated lifecycle and full history.",
 };
 
 // Typed explicitly rather than with Next's generated `LayoutProps`: that global
-// lives in `.next/types`, so `tsc --noEmit` on a clean checkout — which is what
-// CI does — cannot see it. The root layout takes no route params, so the
+// lives in `.next/types`, so `tsc --noEmit` on a clean checkout, which is what
+// CI does, cannot see it. The root layout takes no route params, so the
 // generated type was buying nothing.
 export default function RootLayout({
   children,

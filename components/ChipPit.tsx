@@ -24,7 +24,7 @@ const WORDS = [
   "ADR",
 ];
 
-/** Retro poster inks — the one place they all appear together. */
+/** Retro poster inks: the one place they all appear together. */
 const COLORS = [
   "#E15E42",
   "#F78D2C",

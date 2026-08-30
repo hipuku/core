@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { defineConfig } from "drizzle-kit";
 
 /**
- * `.env.local` is a Next.js convention — Next loads it, drizzle-kit does not,
+ * `.env.local` is a Next.js convention: Next loads it, drizzle-kit does not,
  * so `db:push` sees an empty `DATABASE_URL` and refuses. Load it here rather
  * than duplicating the connection string into a second file drizzle-kit does
  * read: one source of truth, and the credentials stay in the gitignored file.

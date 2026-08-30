@@ -81,7 +81,7 @@ type DraftShape = { title: string; body: Body; cited: Cited[] };
 
 /**
  * The toolbar's real job is to say "this is markdown". Someone who has never
- * typed a `#` can still write a heading — and watches the syntax appear in the
+ * typed a `#` can still write a heading, and watches the syntax appear in the
  * text as they do, which teaches the shortcut the button is standing in for.
  *
  * Each entry is a pure `EditState -> EditState`; the component supplies the
@@ -182,7 +182,7 @@ function MarkdownArea({
     const el = event.currentTarget;
     const mod = isMacPlatform() ? event.metaKey : event.ctrlKey;
 
-    // ⌘↵ submits from anywhere in the document — the form's own submit button
+    // ⌘↵ submits from anywhere in the document; the form's own submit button
     // is far away once the document is long.
     if (mod && event.key === "Enter") {
       event.preventDefault();
@@ -253,7 +253,7 @@ export function DecisionEditor({
   action,
   cancelHref,
   submitLabel,
-  /** Only the propose flow sets a title — an accepted ADR's title is immutable. */
+  /** Only the propose flow sets a title; an accepted ADR's title is immutable. */
   withTitle = false,
   defaultTitle = "",
   defaults,
@@ -283,7 +283,7 @@ export function DecisionEditor({
   withTitle?: boolean;
   defaultTitle?: string;
   defaults: Body;
-  /** Files already cited — set when reopening a draft. */
+  /** Files already cited, set when reopening a draft. */
   defaultCited?: Cited[];
   /** Set when files can be cited while composing. */
   workspaceId?: string;
@@ -378,7 +378,7 @@ export function DecisionEditor({
   /**
    * A local draft is only worth offering if it differs from what the editor
    * opened with. Reopening a saved draft rehydrates the same text from the
-   * server, so the local copy matches it exactly — offering to "restore" that
+   * server, so the local copy matches it exactly, and offering to "restore" that
    * is noise, and worse, implies there is unsent work when there is none.
    */
   const recoverable = useMemo(() => {
@@ -439,7 +439,7 @@ export function DecisionEditor({
           draft.clear();
           if (result?.ok) toast.success(result.ok);
         } catch (error) {
-          // A redirect is thrown, not returned — that path is a success, and the
+          // A redirect is thrown rather than returned. That path is a success, and the
           // draft has to go before the navigation completes.
           draft.clear();
           throw error;
@@ -449,7 +449,7 @@ export function DecisionEditor({
       {/* ---- properties: what this document becomes once proposed ---------- */}
       {draftId && <input type="hidden" name="draftId" value={draftId} />}
 
-      {/* The chips carry their own meaning — an identifier and a state — so they
+      {/* The chips carry their own meaning, an identifier and a state, so they
           are shown without labels explaining what an identifier is. The tag says
           Draft, because that is what this is until it is proposed; the key is
           what it *will* take, which is why it stays dashed until then. */}
@@ -508,7 +508,7 @@ export function DecisionEditor({
                   key={tool.label}
                   type="button"
                   className={`iconbtn ${styles.tool}`}
-                  // Keep the caret in the textarea — a focused button would lose
+                  // Keep the caret in the textarea; a focused button would lose
                   // the selection the edit is about to act on.
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => format(tool.edit)}
@@ -611,10 +611,10 @@ export function DecisionEditor({
               <p className={styles.blockHint}>
                 Files this decision governs. Their state is recorded now, and
                 you&rsquo;ll be told when the cited code changes. Cite specific
-                lines where you can — a whole file drifts on any edit to it.
+                lines where you can. A whole file drifts on any edit to it.
               </p>
               {/* The slot comes from a server component, so it cannot be
-                  handed a callback — context reaches it where props cannot. */}
+                  handed a callback: context reaches it where props cannot. */}
               <CitationInsertProvider
                 value={{
                   insert: (citable) =>

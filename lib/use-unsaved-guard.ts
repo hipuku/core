@@ -5,7 +5,7 @@ import { useEffect } from "react";
 /**
  * Catch in-app navigation away from unsaved work.
  *
- * `beforeunload` only covers leaving the site — a reload, a closed tab. Client
+ * `beforeunload` only covers leaving the site: a reload, a closed tab. Client
  * routing never touches it, so the topbar's back arrow, the workspace name and
  * any other link would silently discard a half-written decision. The App Router
  * exposes no navigation event to hook, so this intercepts the click itself, in
@@ -13,7 +13,7 @@ import { useEffect } from "react";
  *
  * Deliberately narrow: it only claims plain left-clicks on same-origin links.
  * A modified click (new tab), a download, an external target and anything the
- * user has already handled are all left alone — a guard that swallows those
+ * user has already handled are all left alone. A guard that swallows those
  * feels broken rather than protective.
  */
 export function useUnsavedGuard({

@@ -87,7 +87,7 @@ export class Versioning {
 
   /**
    * Restore is a forward action, not a rewind: it writes a NEW commit whose state
-   * equals the target version's. History stays append-only and auditable — you can
+   * equals the target version's. History stays append-only and auditable, so you can
    * always see that a restore happened, and restore the restore. This is git revert,
    * not git reset, and it is the only choice that survives multiple users editing the
    * same document without one silently erasing another's history.

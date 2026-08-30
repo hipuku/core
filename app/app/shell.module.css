@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  /* Seamless with the page — same ramp, no contrasting bar. */
+  /* Seamless with the page: same ramp, no contrasting bar. */
   background: var(--bg);
 }
 
