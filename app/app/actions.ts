@@ -3,12 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  adrBody,
+  citedRefs,
   compareSnippet,
   decisionService,
   DecisionError,
   extractRange,
   formatRange,
   parseRange,
+  referenceLabel,
 } from "@/lib/decisions";
 import type { LineRange } from "@/lib/decisions";
 import type { DecisionStatus, Role } from "@/lib/decisions";
@@ -37,14 +40,6 @@ import { findUserByEmail } from "@/lib/users";
  */
 function refuseDemo(user: { email: string }): ActionResult | null {
   return isDemoAccount(user.email) ? { error: DEMO_REFUSAL } : null;
-}
-
-function adrBody(formData: FormData) {
-  return {
-    context: String(formData.get("context") ?? "").trim(),
-    decision: String(formData.get("decision") ?? "").trim(),
-    consequences: String(formData.get("consequences") ?? "").trim(),
-  };
 }
 
 export async function createWorkspace(formData: FormData) {
@@ -335,16 +330,6 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
   }
 }
 
-function referenceLabel(
-  owner: string,
-  name: string,
-  path: string,
-  range: LineRange | null,
-): string {
-  const suffix = range ? ` · ${formatRange(range)}` : "";
-  return `${owner}/${name} · ${path}${suffix}`;
-}
-
 /**
  * Snapshot what a citation points at, right now: the file's blob SHA, and where
  * a line range was given, the cited text itself. The snippet is what later lets
@@ -526,19 +511,6 @@ export async function checkReferenceDrift(
 }
 
 /** Files cited while composing, as buffered by the editor's hidden inputs. */
-function citedRefs(formData: FormData) {
-  const repoIds = formData.getAll("refRepoId").map(String);
-  const repos = formData.getAll("refRepoLabel").map(String);
-  const paths = formData.getAll("refPath").map(String);
-  const lines = formData.getAll("refLines").map(String);
-  return repoIds.map((repoId, i) => ({
-    repoId,
-    repo: repos[i] ?? "",
-    path: paths[i] ?? "",
-    lines: lines[i] || null,
-  }));
-}
-
 /**
  * Park an unsent decision. Nothing is validated: an empty draft is legitimate,
  * which is precisely what distinguishes a draft from a proposal.

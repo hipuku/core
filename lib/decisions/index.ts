@@ -29,6 +29,7 @@ export type {
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";
+export { adrBody, citedRefs, referenceLabel, type CitedRef } from "./form";
 export { DecisionError, DecisionService } from "./service";
 export { MemoryDecisionStore } from "./memory-store";
 export { DrizzleDecisionStore } from "./drizzle-store";
