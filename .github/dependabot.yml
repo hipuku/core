@@ -16,8 +16,12 @@ updates:
         patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
       database:
         patterns: ['drizzle-orm', 'drizzle-kit', 'postgres']
+      # The test runner and its environments are their own group. Grouped with
+      # the linters, one vitest or jsdom major holds every lint patch behind it.
+      test:
+        patterns: ['vitest', '@vitest/*', '@vitejs/*', 'jsdom', '@testing-library/*']
       tooling:
-        patterns: ['eslint*', '@eslint/*', 'typescript-eslint', 'vitest', '@vitejs/*', 'jsdom', '@testing-library/*']
+        patterns: ['eslint*', '@eslint/*', 'typescript-eslint', 'prettier*']
     commit-message:
       prefix: 'deps'
     ignore:
@@ -25,6 +29,11 @@ updates:
       # the newest release line. A major here typechecks the app against APIs
       # the running Node does not have.
       - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # TypeScript 7 is the native rewrite, deferred across every repo here so
+      # they move together. Recorded rather than closed: a closed pull request
+      # comes back on the next run and says nothing about why it was refused.
+      - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
