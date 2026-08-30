@@ -35,7 +35,7 @@
     "sonner": "^2.0.8"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.6",
     "@types/matter-js": "^0.20.2",
@@ -44,9 +44,9 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.1.0",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-config-next": "16.3.2",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "tsx": "^4.23.12",
     "typescript": "^5",
     "vitest": "^4.1.11"
