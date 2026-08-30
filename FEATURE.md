@@ -1,6 +1,6 @@
 # Features
 
-What core does, as built. Everything here is live — nothing in this file is
+What core does, as built. Everything here is live: nothing in this file is
 planned or partial. The reasoning behind each choice is in
 [DESIGN.md](./DESIGN.md); this is the walkthrough.
 
@@ -19,12 +19,12 @@ proposed ──accept──▶ accepted ──deprecate──▶ deprecated
 rejected            superseded
 ```
 
-`rejected`, `deprecated` and `superseded` are terminal — no row starts from
+`rejected`, `deprecated` and `superseded` are terminal, since no row starts from
 them. Every transition is recorded with who made it, when, and optionally why.
 
 **Accepted decisions are immutable.** Past `proposed`, the body cannot be
-edited. You supersede a decision and link its replacement; a log whose entries
-can be quietly rewritten is not a log.
+edited. You supersede a decision and link its replacement, so what was decided
+and when cannot be quietly rewritten later.
 
 ### Roles
 
@@ -36,7 +36,7 @@ through the code:
 | **author** | ✓ | ✓ | | | | |
 | **maintainer** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
-An author sees no lifecycle actions at all — not disabled ones, absent ones. But
+An author sees no lifecycle actions at all. Not disabled ones, absent ones. But
 every guard returns a *reason* rather than a boolean, so where an action is
 shown and refused, the interface can say why instead of failing silently.
 
@@ -46,17 +46,17 @@ shown and refused, the interface can say why instead of failing silently.
 
 Deliberately separate, because they answer different questions.
 
-**Content history** — every revision of the body, as a structural JSON diff over
+**Content history.** Every revision of the body, as a structural JSON diff over
 RFC 6901 pointers. Restoring an old version writes a *new* commit whose state
 equals the target rather than rewinding the head: `git revert`, not `git reset`.
 History stays append-only, and two people editing one document cannot silently
 erase each other.
 
-**Status history** — an append-only log of every transition, with actor, time
+**Status history.** An append-only log of every transition, with actor, time
 and reason.
 
 Both live behind one **Activity** drawer on the decision, which carries a summary
-when closed — "last activity 2 days ago · 3 events" — so you know whether
+when closed ("last activity 2 days ago · 3 events") so you know whether
 opening it is worth the click.
 
 ---
@@ -67,7 +67,7 @@ opening it is worth the click.
 
 No field fills, no borders, and type metrics matching the rendered prose
 exactly, so a paragraph does not reflow between Write and Preview. The ADR's
-three blocks — Context, Decision, Consequences — are marked by a left gutter
+three blocks (Context, Decision, Consequences) are marked by a left gutter
 rule that takes the accent on focus. That rule is the editor's only chrome.
 
 None of the three is labelled optional. An ADR with no context is a chat message
@@ -77,7 +77,7 @@ with a database row.
 
 A plain `<textarea>`, with the behaviour that makes one feel like an editor:
 
-- **Enter continues a list** — bullets, ordered (`3.` becomes `4.`), task items,
+- **Enter continues a list**: bullets, ordered (`3.` becomes `4.`), task items,
   blockquotes, preserving indentation. Enter on an *empty* item ends the list.
 - **Tab indents**, Shift+Tab outdents, across every line the selection touches.
 - **⌘B / ⌘I / ⌘K / ⌘E** wrap, and unwrap if already wrapped.
@@ -90,8 +90,8 @@ DOM.
 
 ### What renders
 
-Full markdown with GitHub extensions — headings, tables, task lists,
-blockquotes, fenced code — plus **Mermaid diagrams** in ```mermaid fences,
+Full markdown with GitHub extensions (headings, tables, task lists,
+blockquotes, fenced code) plus **Mermaid diagrams** in ```mermaid fences,
 rendered client-side with `securityLevel: strict`.
 
 ---
@@ -112,11 +112,11 @@ An unsent decision, parked by its author.
 
 Three layers, doing different jobs:
 
-1. **Local autosave** while composing — the net for a session that has never
+1. **Local autosave** while composing, the net for a session that has never
    reached the server. Offered on return, never silently applied.
-2. **Save as draft** — the deliberate act of parking something, visible in the
+2. **Save as draft**, the deliberate act of parking something, visible in the
    decisions list.
-3. **A navigation guard** — leaving with unsaved work asks first, and catches
+3. **A navigation guard**: leaving with unsaved work asks first, and catches
    in-app navigation as well as closing the tab, because client routing never
    touches `beforeunload`.
 
@@ -131,26 +131,26 @@ The part that makes a decision code-aware.
 ### Finding a file
 
 One search across **every connected repository at once**. Picking a repo first
-was a gate in front of the only step that mattered — an author citing a file
+was a gate in front of the only step that mattered, an author citing a file
 knows the filename far more often than they know which repo it is in.
 
 ### Citing a range, not just a file
 
 A reference may name a line span. This changes the claim from *"this file
-changed"* to *"the code this decision governs changed"* — and the difference is
+changed"* to *"the code this decision governs changed"*, and the difference is
 whether the staleness signal is worth reading. A whole-file reference drifts on
 any commit touching the file, which is how a warning becomes noise.
 
 ### Citing inside the prose
 
 `{{owner/repo:path#L47-L120}}` renders as a file chip linking to those exact
-lines. Inserted with a click from the reference list, so nobody types it — but
+lines. Inserted with a click from the reference list, so nobody types it, but
 it stays plain text on purpose, and survives being copied into a commit message
 or a chat thread, which a rich-editor node would not.
 
 ### Drift
 
-Citing a file records its blob SHA, and — where a range was given — the cited
+Citing a file records its blob SHA, and where a range was given, the cited
 text itself.
 
 **The baseline moves when the decision is accepted.** A citation made while
@@ -164,7 +164,7 @@ anything is called drift, and a block found intact has its range updated to
 follow it. Trailing whitespace is normalised away, so a formatter run is not
 drift; changed indentation *is*, because it means the block changed scope.
 
-Three outcomes: **in sync**, **changed**, **missing** — reported on the
+Three outcomes, **in sync**, **changed** and **missing**, reported on the
 document, where you would decide whether to act, and never while writing, where
 a file cited moments ago can only be in sync.
 
@@ -173,7 +173,7 @@ a file cited moments ago can only be in sync.
 ## Workspaces
 
 Each has its own membership, its own connected repositories, and its own ADR
-numbering — a Jira-style key derived from the name, so decisions read as
+numbering: a Jira-style key derived from the name, so decisions read as
 `VAU-001`. The key is editable; the numbers are not.
 
 Maintainers manage members, repositories and the workspace itself from a
@@ -187,19 +187,19 @@ decision, so two simultaneous proposals cannot take the same one.
 [core.hipuku.dev](https://core.hipuku.dev) runs the same code with three
 deployment flags set.
 
-**No sign-up.** Not a gated one — an invite code is a shared secret, not access
+**No sign-up.** Not a gated one. An invite code is a shared secret, not access
 control, since whoever holds it can pass it on. The page does not exist.
 
 **One read-only account**, credentials on the sign-in page. It may write and
 save drafts; it may not change the decision log. A draft is private and holds no
-number, so the worst a visitor leaves behind is unfinished text — where
+number, so the worst a visitor leaves behind is unfinished text, where
 accepting a seeded decision would change what the next visitor sees.
 
 **No GitHub linking.** The app requests the `repo` scope, which is read *and
 write* on private repositories, and a public deployment holding a stranger's
 token with that reach is not a risk worth taking for a demo. File browsing still
 works, through a read-only public-repositories token belonging to the
-deployment — safe to hold exactly where a user's would not be.
+deployment, safe to hold exactly where a user's would not be.
 
 Running it locally has none of these restrictions. See the
 [README](./README.md).
@@ -211,7 +211,7 @@ Running it locally has none of these restrictions. See the
 - **Real-time collaborative editing.** ADRs are drafted by one person and
   reviewed by others. CRDT co-editing would be an impressive answer to a
   question this domain does not ask.
-- **A `draft` lifecycle status.** See above — drafts are their own table.
+- **A `draft` lifecycle status.** See above: drafts are their own table.
 - **Adding link references from the UI.** Composing never had it, and unifying
   the reference field on the file flow meant dropping it rather than building
   link-buffering into propose. A markdown link in the sentence that needs it

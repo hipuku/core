@@ -3,8 +3,8 @@
 ## Context
 
 core is the portfolio's range slot: the one project outside design tooling. A
-signed-in, multi-user product aimed at Atlassian's problem space — workflow,
-permissions, audit trail — rather than at design systems.
+signed-in, multi-user product aimed at Atlassian's problem space (workflow,
+permissions, audit trail) rather than at design systems.
 
 The domain is a **team decision log**: architecture decision records with a
 lifecycle. The centrepiece is the lifecycle state machine plus permission-gated
@@ -25,20 +25,55 @@ about the code it decided.
 ### core depends on no local package
 
 Not `haus-components`, not `haus-tokens`, not anything else in the portfolio. Its
-independence is the point — it is the range slot, and coupling it to a library
+independence is the point: it is the range slot, and coupling it to a library
 under active development would undermine exactly what it exists to show. It has
 its own CSS and its own visual language.
 
+### The module map
+
+```
+lib/versioning/     append-only document history: pure, tested, domain-agnostic
+  diff.ts             structural JSON diff over RFC 6901 pointers
+  engine.ts           snapshot / commit / restore / history over a storage port
+  memory-store.ts     in-memory VersionStore
+  drizzle-store.ts    Postgres-backed VersionStore, same interface
+
+lib/decisions/      the domain
+  lifecycle.ts        the state machine as a data table, capability-gated
+  service.ts          orchestration over lifecycle + versioning + a store port
+  snippet.ts          comparing a cited range of a file, and finding it if it moved
+  citation.ts         the {{repo:path#lines}} token
+  drift.ts            where a reference stands relative to the code it cited
+  key.ts              per-workspace ADR keys (VAU-001)
+  retry.ts            the one write that can lose a race, and what it does about it
+  memory-store.ts     in-memory DecisionStore
+  drizzle-store.ts    Postgres-backed DecisionStore, same interface
+
+lib/markdown/       textarea editing behaviour: lists, indent, wrapping
+lib/db/             Drizzle schema and client
+lib/github.ts       repo trees, file contents, blob SHAs
+```
+
 ### Storage is a port, never a dependency
 
-Both engines depend on a store *interface*. `memory-store` and `drizzle-store`
+Both engines depend on a store interface. `memory-store` and `drizzle-store`
 implement the same contract, so the test suite exercises real domain behaviour
 rather than mocks, and swapping storage changes where data lives and nothing
 about how the domain behaves.
 
-The two writes that must not tear — a decision and its opening transition, a
-status change and its audit row — are single methods on that interface, so the
-Drizzle implementation can wrap each in one transaction.
+The two writes that must not tear are single methods on that interface, so the
+Drizzle implementation can wrap each in one transaction: a decision and its
+opening transition, and a status change and its audit row.
+
+**What the suite proves, and what it does not.** Every domain test constructs
+`memory-store`. `drizzle-store` runs no test at all, so what the suite
+establishes about permissions and the lifecycle is established about the double.
+`store-parity.test.ts` holds both to the port's 32 methods, which catches a
+method added to one side and forgotten on the other, and catches nothing about
+behaviour: an ordering difference, a null handled differently, a transaction
+boundary in the wrong place would all pass. The answer is one suite run against
+both implementations, which needs a Postgres in CI. Recorded in the trade-offs
+below rather than implied by silence here.
 
 ### Restore is a forward commit
 
@@ -57,7 +92,7 @@ times, and collapsing them into one timeline would answer neither well.
 ### Accepted decisions are immutable
 
 Past `proposed`, the body cannot be edited. You supersede a decision and link the
-replacement. A decision log whose entries can be quietly rewritten is not a log.
+replacement, so what was decided and when cannot be quietly rewritten later.
 
 ### Guards return a reason rather than throwing
 
@@ -72,7 +107,7 @@ permission system people understand and one they resent.
 A draft is **not a lifecycle status**, and lives in its own table.
 
 - It holds **no ADR number**. Reserving one would leave permanent gaps in the
-  sequence every time a draft is abandoned — and gaps in a numbered audit trail
+  sequence every time a draft is abandoned, and gaps in a numbered audit trail
   are exactly the wrong kind of mystery, with no way to repair them, because
   numbers are how people cite decisions.
 - It is **private to its author**, including from maintainers, who have no
@@ -93,7 +128,7 @@ see how a decision's text evolved. A draft has no audience yet.
 ### Two layers of draft safety, doing different jobs
 
 `localStorage` is the crash net for a compose session that has never reached the
-server — the browser dies twenty minutes in and there is nothing in any list to
+server. The browser dies twenty minutes in and there is nothing in any list to
 recover from. A **server draft** is the deliberate act of parking something, and
 appears in the decisions list. Once a server draft exists the local copy is
 disabled, because the list is the better recovery route.
@@ -109,14 +144,14 @@ someone sees on screen with older text is its own kind of data loss.
 
 A whole-file reference drifts on any commit touching the file, so a typo in an
 unrelated function marks the decision stale. False positives scale with file
-size, and a staleness signal that cries wolf gets ignored — which defeats the
+size, and a staleness signal that cries wolf gets ignored, which defeats the
 entire feature. Citing lines 47–120 changes the claim from "this file changed"
 to "the code this decision governs changed".
 
 ### Movement is not change
 
 The cited text is stored alongside the range. When a range no longer matches, the
-text is searched for elsewhere in the file before anything is called drift —
+text is searched for elsewhere in the file before anything is called drift:
 insert twenty lines above a block and it is untouched but now lives at 67–140.
 Trailing whitespace is normalised away, so a formatter run is not drift; changed
 indentation *is* drift, because it means the block changed scope.
@@ -128,7 +163,7 @@ decision does not exist until the team accepts it, so that is when its reference
 point should be fixed. Without this, a proposal that sat in review for a
 fortnight is flagged as drifted the instant it is agreed.
 
-A block that moved during review is *followed* rather than re-pinned — pinning
+A block that moved during review is *followed* rather than re-pinned. Pinning
 the old line numbers blind would silently re-point the citation at whatever now
 occupies them. Re-baselining is best-effort: the acceptance is an audited
 transition that has already happened, and a GitHub outage must not undo it.
@@ -143,7 +178,7 @@ question you ask *before* deciding to edit it, so it belongs on the document.
 ### Citations are plain text
 
 `{{owner/repo:path#L47-L120}}` is a form the author can type, paste and edit, and
-it survives being copied into a commit message or a chat thread — which a rich
+it survives being copied into a commit message or a chat thread, which a rich
 editor node would not. Tokens are rewritten into ordinary markdown links before
 parsing, so the renderer needs no plugin and inherits the escaping that
 react-markdown has already hardened. An unresolvable token renders as inline code
@@ -158,13 +193,13 @@ rather than vanishing, so a typo is visible instead of silently swallowed.
 The compose editor carries no field fills, no borders, and type metrics matching
 the rendered prose exactly, so a paragraph does not reflow between Write and
 Preview. The ADR's structure survives as a left gutter rule that takes the accent
-on focus — the editor's only chrome. Preview is then a check on rendering rather
+on focus, the editor's only chrome. Preview is then a check on rendering rather
 than a mode you have to live in.
 
 The editor is a plain `<textarea>` by choice: no CodeMirror, no contenteditable,
 no third-party editor to keep in sync with how the document later renders. What
-makes it *feel* like markdown is behaviour while typing — lists that continue
-themselves, Tab that indents, wrapping shortcuts — and all of that is pure
+makes it *feel* like markdown is behaviour while typing: lists that continue
+themselves, Tab that indents, wrapping shortcuts. All of that is pure
 text-in / text-out, tested directly.
 
 ### Editing is a page, not a mode
@@ -177,7 +212,7 @@ undistracted page whether the document is new or already numbered.
 
 The decision page had grown five cards across three widths, two grounds and two
 elevations, and nothing said which surface mattered. One white sheet holds the
-document; everything else — properties, notices, tabs — is annotation about it
+document; everything else (properties, notices, tabs) is annotation about it
 and sits on the desk. Every region shares the sheet's measure, so the page has
 two vertical edges rather than six.
 
@@ -189,20 +224,20 @@ inside the card that summarises it rather than beside it.
 
 Raising a notice puts it in competition with the sheet. What makes a notice
 urgent is what it says, not how far off the page it floats. Only one notice
-survives — the drift warning; everything else that used to be a banner is a
+survives, the drift warning. Everything else that used to be a banner is a
 property, because state and authorship are facts about the record rather than
 warnings about it.
 
 ### Two button families
 
-`.btn` is a labelled action on the page, and every one carries a background — a
+`.btn` is a labelled action on the page, and every one carries a background: a
 transparent button with a word in it reads as a link, and a row mixing filled and
 unfilled controls has no rhythm. There is no ghost variant: the default *is* the
 quiet one, quiet by being the lightest fill rather than by being absent. One
 filled accent per view; Approve keeps its own green, because it says "yes, and
 permanently" in a way an accent that also means "primary" and "link" cannot.
 
-`.iconbtn` is an icon-only affordance inside a container — the × on a row, a
+`.iconbtn` is an icon-only affordance inside a container: the × on a row, a
 formatting tool, a refresh beside a timestamp. Those fill on hover only, because
 eight filled squares in a toolbar is noise, and because they belong to the thing
 they sit in rather than to the page.
@@ -213,13 +248,13 @@ A path rendered four different ways looked like a different kind of object
 depending on the screen. A **chip** sits inside a line of text and carries the
 filename only, because a full path cannot sit mid-sentence. A **row** sits in a
 list, carries the whole path, and offers a slot on the right for what that list
-needs — a drift badge, a remove control, a range picker.
+needs: a drift badge, a remove control, a range picker.
 
 ### Visual language
 
 Notion-inspired warm paper: an off-white desk, white cards separated by fill
 rather than borders, Gabarito for type. Colour is drawn from a retro-print
-palette — vermilion, mustard, teal, cobalt — saturated but medium-lightness
+palette (vermilion, mustard, teal, cobalt) saturated but medium-lightness
 "ink", never neon, and used only where it earns its place. No monospace except
 for code, paths and diffs.
 
@@ -235,16 +270,14 @@ for code, paths and diffs.
 - **No `Add link` reference from the UI.** Composing never had one, and unifying
   the reference field on the file flow meant dropping it rather than building
   link-buffering into propose. Markdown links in the prose cover the need, and
-  arguably better — a link in the sentence that needs it beats a link in a list.
+  enough. A link sits in the sentence that needs it.
 - **Auto-tracking files cited inline.** Citing a file in prose does not start
   watching it for drift. "Mentioned in an argument" is not "this decision
   governs this code", and conflating them would fill the log with drift from
-  files cited as counter-examples. The gap is real — a chip in the text with no
-  entry in the reference list reads as an inconsistency — and the likely answer
+  files cited as counter-examples. The gap is real: a chip in the text with no
+  entry in the reference list reads as an inconsistency, and the likely answer
   is a "track this file" affordance on an untracked citation rather than doing
   it silently.
-- **The `drizzle-kit` npm-audit warnings are dev-only.** `npm audit fix --force`
-  destructively downgrades the migration tool. Leave them.
 
 ---
 
@@ -252,14 +285,14 @@ for code, paths and diffs.
 
 [core.hipuku.dev](https://core.hipuku.dev), on Vercel against a Neon database in
 Sydney, with the functions pinned to `syd1`. That last part is not a detail: a
-signed-in page load makes several queries in sequence — session, membership,
-then the data — and with the compute in Virginia every one of them crossed the
+signed-in page load makes several queries in sequence (session, membership,
+then the data) and with the compute in Virginia every one of them crossed the
 Pacific. Putting them together was the single largest thing that made the
 deployed app feel like the local one.
 
 ### What is switched off, and why
 
-**Sign-up.** Not gated — absent. An invite code is a shared secret rather than
+**Sign-up.** Not gated, absent. An invite code is a shared secret rather than
 access control: whoever holds it can pass it on, and you cannot choose who ends
 up with it. There is one seeded account and nothing for anyone to create.
 
@@ -271,8 +304,8 @@ demo but a shared document nobody owns. Fourteen actions refuse and two do not,
 enforced at the action layer because this is a property of one deployment rather
 than of what a decision log is.
 
-**GitHub linking.** The app requests the `repo` scope — read *and write* on
-private repositories — and better-auth stores those tokens in the `account`
+**GitHub linking.** The app requests the `repo` scope, which is read *and
+write* on private repositories, and better-auth stores those tokens in the `account`
 table. On a single-tenant deployment that is the owner's own token and their own
 risk; on a public URL it would mean holding a stranger's credentials with write
 access to their code, on a hobby-tier database. The feature stays in the
@@ -285,7 +318,7 @@ Switching off linking would also have switched off citing files, which is the
 feature most worth demonstrating. Those are separate concerns, so they are now
 separated: `GITHUB_PUBLIC_TOKEN` is a read-only, public-repositories-only token
 belonging to the deployment, used when the signed-in person has no account
-linked — which on the demo is everyone.
+linked, which on the demo is everyone.
 
 It is safe to hold exactly where a user's `repo` token is not: it is the owner's
 own, it cannot write, and it can reach nothing private. A linked account still
@@ -298,12 +331,12 @@ repositories to whoever happened to be signed in.
 
 Repository trees are cached for five minutes per instance. A tree is a few
 hundred KB and changes rarely, while the picker asks for every connected repo on
-every mount — without it, a handful of visitors opening the compose screen would
+every mount. Without it, a handful of visitors opening the compose screen would
 spend the hourly API budget on identical answers.
 
 ### A server action should not throw
 
-React reports a rejected server action as error #441 — "an error occurred in the
+React reports a rejected server action as error #441, "an error occurred in the
 Server Components render", with the message stripped out of the production
 build. Anything catching it and showing the text displays React's apology as
 though it were an explanation.
@@ -315,15 +348,39 @@ throw to learn.
 
 ### Bounds on what a stranger can write
 
-A draft may be empty, untitled and half-formed — that is the point of one. What
+A draft may be empty, untitled and half-formed, which is the point of one. What
 it may not be is unbounded, because `saveDraft` is reachable by anyone with a
 session and on a public demo that is a scriptable way to fill a database. 128KB
 per draft, 20 per author per workspace: both far above anything a person writing
 a decision would reach, and low enough that the table cannot be used as free
 storage.
 
-### Still true, and not yet done
+---
 
-Email verification is off, and there is no explicit rate limiting. Neither
-matters while nobody can create an account; both become prerequisites the moment
+# Known trade-offs / next
+
+**The Postgres store is tested by nothing.** All 172 domain tests run against
+`memory-store`, so the permission model, which is the product, is proved against
+a double. `store-parity.test.ts` checks that both stores implement the port's 32
+methods and can check no more than that. The fix is one contract suite
+parameterised over both implementations, with a Postgres service in CI. It is the
+largest piece of work outstanding in this repo.
+
+**`app/app/actions.ts` is 785 lines and has no tests.** It is also the security
+boundary, holding `requireUser` and the demo refusals. Several helpers inside it
+are pure enough to test on their own once they are lifted out: `attachCitedFiles`,
+`rebaselineOnAccept`, `parseRange`.
+
+**FEATURE.md has no screenshots.** The house standard for a repo with a UI is a
+screenshot-led walkthrough, and this one is prose. The product is deployed, so
+the pictures exist to be taken.
+
+**Email verification is off and there is no explicit rate limiting.** Neither
+matters while nobody can create an account. Both are prerequisites the moment
 sign-up opens.
+
+**No dependency automation.** No `dependabot.yml`, no `renovate.json`. This repo
+ships a runtime to users, so it ranks above the libraries in the portfolio.
+
+**The `drizzle-kit` npm-audit warnings are dev-only.** `npm audit fix --force`
+destructively downgrades the migration tool. Leave them.

@@ -1,83 +1,37 @@
 # core
 
-A team decision log. Architecture decision records with a lifecycle, permissions,
-two audit trails, and a link to the code they govern — so a decision can tell you
-when the thing it decided has changed underneath it.
+A team decision log: architecture decision records with a lifecycle, permissions,
+two audit trails, and a link to the code they govern, so a decision can tell you
+when the thing it decided has changed underneath it. Next.js and React over
+Postgres, for a team that keeps its architecture decisions somewhere nobody
+reads.
 
-**[core.hipuku.dev](https://core.hipuku.dev)** — a read-only demo, credentials on
-the sign-in page. Full feature walkthrough in [FEATURES.md](./FEATURES.md).
+**[core.hipuku.dev](https://core.hipuku.dev)** is a read-only demo, with
+credentials on the sign-in page.
 
-The wedge: Notion holds the document but not the governance, Jira holds the
-workflow but is not a document. core is a governed document that knows about
-code.
+Notion holds the document but not the governance. Jira holds the workflow and is
+not a document. core is a governed document that knows about code.
 
-## What it does
+## Features
 
-- **Propose → accept → deprecate / supersede**, as a state machine with
+- **Propose, accept, deprecate or supersede**, as a state machine with
   permission-gated transitions. Accepted records are immutable: you supersede
-  them, you do not edit them.
+  them rather than editing them.
 - **Two audit trails.** Content revisions live in a versioning engine; status
-  transitions live in their own append-only log. "How did the text change" and
-  "how did the decision move" are different questions, and are stored as such.
-- **Markdown and Mermaid** in the body, with inline file citations —
+  transitions live in their own append-only log. How the text changed and how the
+  decision moved are different questions, and are stored as such.
+- **Markdown and Mermaid** in the body, with inline file citations.
   `{{owner/repo:path#L47-L120}}` renders as a link to the exact lines.
-- **Staleness detection.** Citing a file records the code as it stands; the
+- **Staleness detection.** Citing a file records the code as it stands, the
   baseline moves to what the team agreed when the decision is accepted, and a
-  drift check tells you whether the cited code has changed since. A citation can
-  name a line range, so drift means *this code* changed rather than *this file*
-  was touched.
+  drift check reports whether the cited code has changed since. A citation can
+  name a line range, so drift means this code changed rather than this file was
+  touched.
 - **Drafts.** Unsent decisions, private to their author, holding no ADR number.
 
-## Architecture
+The full walkthrough is in [FEATURE.md](./FEATURE.md).
 
-```
-lib/versioning/     append-only document history — pure, tested, domain-agnostic
-  diff.ts             structural JSON diff over RFC 6901 pointers
-  engine.ts           snapshot / commit / restore / history over a storage port
-  memory-store.ts     in-memory VersionStore (tests)
-  drizzle-store.ts    Postgres-backed VersionStore (same interface)
-
-lib/decisions/      the domain
-  lifecycle.ts        the state machine as a data table, capability-gated
-  service.ts          orchestration over lifecycle + versioning + a store port
-  snippet.ts          comparing a cited *range* of a file, and finding it if it moved
-  citation.ts         the {{repo:path#lines}} token
-  drift.ts            where a reference stands relative to the code it cited
-  key.ts              per-workspace ADR keys (VAU-001)
-  memory-store.ts     in-memory DecisionStore (tests)
-  drizzle-store.ts    Postgres-backed DecisionStore (same interface)
-
-lib/markdown/       textarea editing behaviour — lists, indent, wrapping
-lib/db/             Drizzle schema and client
-lib/github.ts       repo trees, file contents, blob SHAs
-```
-
-Both engines depend on a **store interface**, never on Drizzle. The in-memory
-store and the Postgres store implement the same contract, so the suite exercises
-real behaviour and swapping storage changes where data lives and nothing about
-how the domain behaves.
-
-### Why restore is a forward action
-
-Restoring an old version writes a **new** commit whose state equals the target,
-rather than rewinding the head. History stays append-only and auditable — a
-restore is itself a versioned event you can see and undo. This is `git revert`,
-not `git reset`, and it is the only design that survives multiple people editing
-one document without one silently erasing another's history.
-
-### Why a draft is not a status
-
-A draft holds no ADR number, because reserving one would leave permanent gaps in
-the sequence every time a draft is abandoned, and gaps in a numbered audit trail
-are exactly the wrong kind of mystery. It is also private to its author, where
-every real status is workspace-visible, and it has no transitions, because
-nothing has happened to it yet. Drafts live in their own table so the status enum
-stays an honest description of a decision's life.
-
-More of this reasoning is in [DESIGN.md](./DESIGN.md); what the product actually
-does is in [FEATURES.md](./FEATURES.md).
-
-## Getting started
+## Install
 
 ```bash
 cp .env.example .env.local   # fill in DATABASE_URL and BETTER_AUTH_SECRET
@@ -89,6 +43,11 @@ npm run dev
 A free [Neon](https://neon.tech) or Supabase Postgres works for local
 development. Generate the auth secret with `openssl rand -base64 32`.
 
+Nothing else is needed. No Redis, no queue, no third-party service. Node,
+Postgres and a browser.
+
+## Develop
+
 **Seed some data.** An empty decision log demonstrates nothing:
 
 ```bash
@@ -97,66 +56,60 @@ npm run db:seed
 
 That builds a workspace with five decisions across the whole lifecycle, a
 supersession, two revisions of one record, markdown and Mermaid, a parked draft,
-and a reference that has already drifted. It is idempotent by workspace name —
+and a reference that has already drifted. It is idempotent by workspace name:
 re-running replaces what it created and touches nothing else.
 
-**GitHub is optional.** Without `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`,
-everything works except connecting a repository and citing files from it — sign
-up with email and password and the rest of the product is there. To enable it,
+**GitHub is optional.** Without `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`,
+everything works except connecting a repository and citing files from it. Sign up
+with email and password and the rest of the product is there. To enable it,
 register an OAuth app at github.com/settings/developers with the callback
 `<BETTER_AUTH_URL>/api/auth/callback/github`, and set `BETTER_AUTH_URL` to
 whatever port you are actually running on.
 
-**Nothing else is needed.** No Redis, no queue, no third-party service. Node,
-Postgres and a browser.
+**Before committing:**
 
-## Scripts
-
-| Script              | What it does                             |
-| ------------------- | ---------------------------------------- |
-| `npm run dev`       | Next dev server                          |
-| `npm run build`     | Production build                         |
-| `npm run lint`      | eslint                                   |
-| `npm run typecheck` | `tsc --noEmit`                           |
-| `npm test`          | Vitest — the domain and text-core suites |
-| `npm run db:push`   | Push the Drizzle schema to the database  |
-| `npm run db:seed`   | Populate a workspace worth looking at    |
-| `npm run db:studio` | Drizzle Studio                           |
-
-## Tests and CI
-
-Two vitest projects, because the suites have different needs. **`domain`** runs
-in Node: every pure module has its own suite, exercised directly rather than
-through a component, and the two storage ports are covered by running the
-in-memory store against the same tests the domain relies on. **`ui`** runs in
-jsdom and covers the behaviour only observable in a browser — draft autosave and
-recovery, the unsaved-navigation guard, and the compose editor's markdown
-keystrokes reaching the caret.
-
-```
+```bash
 npm run lint && npm run typecheck && npm test
 npm test -- --project=domain     # just the fast ones
 npm test -- --project=ui
 ```
 
-CI runs exactly those three on every push and pull request, then a production
-build once they agree. Each check reports independently, so one run tells you
-everything that is wrong rather than only the first thing.
+Two vitest projects, because the suites have different needs. `domain` runs in
+Node: every pure module has its own suite, exercised directly rather than through
+a component. `ui` runs in jsdom and covers what is only observable in a browser,
+which is draft autosave and recovery, the unsaved-navigation guard, and the
+compose editor's markdown keystrokes reaching the caret.
 
-## Deployment
+The domain suite runs against the in-memory store. The Postgres store implements
+the same port and is checked against it structurally, not behaviourally; see
+[DESIGN.md](./DESIGN.md) for what that does and does not prove.
 
-Vercel, with the functions pinned to the same region as the database — every
-signed-in page makes several queries in sequence, and a continent between them
-is the difference between fast and not.
+CI runs lint, typecheck and test on every push and pull request, then a
+production build once they agree. Each check reports independently, so one run
+tells you everything that is wrong rather than only the first thing.
 
-The public deployment sets three flags: `DISABLE_SIGNUP`, `DISABLE_GITHUB`, and
-a `DEMO_USER_EMAIL` whose account may write drafts but not change the decision
-log. `GITHUB_PUBLIC_TOKEN` lets it browse public repositories without holding
-anyone else's credentials. All four are documented in `.env.example` and none of
-them apply locally.
+## Scripts
+
+| Script              | What it does                            |
+| ------------------- | --------------------------------------- |
+| `npm run dev`       | Next dev server                         |
+| `npm run build`     | Production build                        |
+| `npm run lint`      | eslint                                  |
+| `npm run typecheck` | `tsc --noEmit`                          |
+| `npm test`          | Vitest, the domain and ui suites        |
+| `npm run db:push`   | Push the Drizzle schema to the database |
+| `npm run db:seed`   | Populate a workspace worth looking at   |
+| `npm run db:studio` | Drizzle Studio                          |
+
+## More
+
+[FEATURE.md](./FEATURE.md) walks through what the product does.
+[DESIGN.md](./DESIGN.md) covers the architecture, the storage port, why restore
+is a forward action, why a draft is not a status, and what is deliberately left
+out.
 
 ## Stack
 
 Next.js (App Router) · React · TypeScript · Postgres · Drizzle ORM ·
-better-auth · Vitest. No Tailwind — CSS modules and a small token layer in
+better-auth · Vitest. No Tailwind: CSS modules and a small token layer in
 `app/globals.css`.
