@@ -1,0 +1,33 @@
+# Weekly and grouped, so a review is one pull request rather than nine. Grouped
+# by what moves together: a Next major drags its eslint config with it, and the
+# database packages only make sense bumped as a set.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      next:
+        patterns: ['next', 'eslint-config-next', '@next/*']
+      react:
+        patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
+      database:
+        patterns: ['drizzle-orm', 'drizzle-kit', 'postgres']
+      tooling:
+        patterns: ['eslint*', '@eslint/*', 'typescript-eslint', 'vitest', '@vitejs/*', 'jsdom', '@testing-library/*']
+    commit-message:
+      prefix: 'deps'
+    ignore:
+      # @types/node describes the runtime CI installs, currently 22, rather than
+      # the newest release line. A major here typechecks the app against APIs
+      # the running Node does not have.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
