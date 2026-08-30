@@ -79,8 +79,9 @@ export const decisions = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  // ADR numbers are unique per workspace. If two proposals race for the same number,
-  // one insert loses on this constraint and retries — the integrity guarantee the
+  // ADR numbers are unique per workspace. If two proposals race for the same
+  // number, one insert loses on this constraint and the store retries it: see
+  // insertDecision in drizzle-store.ts. This is the integrity guarantee the
   // application-level max()+1 cannot make on its own.
   (table) => [unique("decisions_workspace_number_key").on(table.workspaceId, table.number)],
 );

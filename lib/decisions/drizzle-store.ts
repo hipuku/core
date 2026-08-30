@@ -19,6 +19,10 @@ import type {
   TransitionRecord,
   WorkspaceRecord,
 } from "./store";
+import { isUniqueViolation, withRetry } from "./retry";
+
+/** The per-workspace ADR number constraint, named so only it triggers a retry. */
+const NUMBER_CONSTRAINT = "decisions_workspace_number_key";
 
 /** jsonb comes back as `unknown`; the draft's shape is asserted at this edge. */
 function toDraft(row: typeof decisionDrafts.$inferSelect): DraftRecord {
@@ -95,24 +99,39 @@ export class DrizzleDecisionStore implements DecisionStore {
       );
   }
 
+  /**
+   * `max(number) + 1` is computed here rather than by a sequence, because ADR
+   * numbers restart per workspace and must have no gaps a reader could mistake
+   * for a deleted decision. Under READ COMMITTED two proposals can read the same
+   * max, so the unique constraint refuses one of them and it tries again with
+   * the number it can now see. Three attempts covers a race between humans; a
+   * conflict that survives that is not contention and should surface.
+   */
   async insertDecision(input: {
     decision: Omit<DecisionRecord, "number">;
     transition: TransitionRecord;
   }): Promise<DecisionRecord> {
-    return db.transaction(async (tx) => {
-      const [{ current }] = await tx
-        .select({ current: max(decisions.number) })
-        .from(decisions)
-        .where(eq(decisions.workspaceId, input.decision.workspaceId));
-      const number = (current ?? 0) + 1;
+    return withRetry(
+      () =>
+        db.transaction(async (tx) => {
+          const [{ current }] = await tx
+            .select({ current: max(decisions.number) })
+            .from(decisions)
+            .where(eq(decisions.workspaceId, input.decision.workspaceId));
+          const number = (current ?? 0) + 1;
 
-      const [row] = await tx
-        .insert(decisions)
-        .values({ ...input.decision, number })
-        .returning();
-      await tx.insert(decisionTransitions).values(input.transition);
-      return toDecision(row);
-    });
+          const [row] = await tx
+            .insert(decisions)
+            .values({ ...input.decision, number })
+            .returning();
+          await tx.insert(decisionTransitions).values(input.transition);
+          return toDecision(row);
+        }),
+      {
+        attempts: 3,
+        retryable: (error) => isUniqueViolation(error, NUMBER_CONSTRAINT),
+      },
+    );
   }
 
   async upsertDraft(draft: DraftRecord): Promise<DraftRecord> {
