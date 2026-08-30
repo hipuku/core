@@ -22,6 +22,7 @@ import {
   listRepos,
 } from "@/lib/github";
 import type { ActionResult } from "@/lib/action-result";
+import { attempt } from "@/lib/attempt";
 import { DEMO_REFUSAL, githubDisabled, isDemoAccount } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { findUserByEmail } from "@/lib/users";
@@ -36,23 +37,6 @@ import { findUserByEmail } from "@/lib/users";
  */
 function refuseDemo(user: { email: string }): ActionResult | null {
   return isDemoAccount(user.email) ? { error: DEMO_REFUSAL } : null;
-}
-
-/** Run a mutation, turning a DecisionError into a toastable result. */
-async function attempt(
-  run: () => Promise<void>,
-  ok: string,
-): Promise<ActionResult> {
-  try {
-    await run();
-  } catch (e) {
-    if (e instanceof DecisionError) return { error: e.message };
-    if (e instanceof Error && e.message.startsWith("GitHub")) {
-      return { error: e.message };
-    }
-    throw e;
-  }
-  return { ok };
 }
 
 function adrBody(formData: FormData) {
