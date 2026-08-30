@@ -31,8 +31,8 @@ jobs:
 
       - run: npm ci
 
-      # `if: always()` on each step so one failure does not hide the others —
-      # a run that reports "lint failed" and nothing else wastes a round trip.
+      # `if: always()` on each step so one failure does not hide the others.
+      # A run that reports "lint failed" and nothing else wastes a round trip.
       - name: Lint
         run: npm run lint
 
@@ -59,8 +59,8 @@ jobs:
       - run: npm ci
 
       - name: Build
-        # `lib/db` connects lazily, so a build needs no reachable database —
-        # but better-auth reads its secret at module load, and these values must
+        # `lib/db` connects lazily, so a build needs no reachable database, but
+        # better-auth reads its secret at module load, and these values must
         # be present and syntactically valid for the module graph to evaluate.
         # They are deliberately fake: nothing here talks to a real service.
         env:
