@@ -2,19 +2,16 @@
 
 ## Context
 
-core is the portfolio's range slot: the one project outside design tooling. A
-signed-in, multi-user product aimed at Atlassian's problem space (workflow,
-permissions, audit trail) rather than at design systems.
+core is a team decision log: architecture decision records with a lifecycle,
+permissions and an audit trail, for a signed-in team.
 
-The domain is a **team decision log**: architecture decision records with a
-lifecycle. The centrepiece is the lifecycle state machine plus permission-gated
-transitions and the supersession graph, chosen over real-time collaborative
-editing because it is product-true (ADRs are drafted by one person and reviewed
-by others, not co-typed) and because it is the more legible axis for the
-audience.
+The centrepiece is the lifecycle state machine, its permission-gated
+transitions, and the supersession graph. Real-time collaborative editing was the
+alternative and it answers a question this domain does not ask: ADRs are drafted
+by one person and reviewed by others.
 
 **North star:** governed design documents connected to the code they govern.
-Notion holds the document but not the governance; Jira holds the workflow but is
+Notion holds the document but not the governance. Jira holds the workflow and is
 not a document. The gap is a document that carries its own governance and knows
 about the code it decided.
 
@@ -24,10 +21,8 @@ about the code it decided.
 
 ### core depends on no local package
 
-Not `haus-components`, not `haus-tokens`, not anything else in the portfolio. Its
-independence is the point: it is the range slot, and coupling it to a library
-under active development would undermine exactly what it exists to show. It has
-its own CSS and its own visual language.
+It has its own CSS and its own visual language. Depending on a library under
+active development would mean its interface moved whenever that library did.
 
 ### The module map
 
@@ -54,7 +49,7 @@ lib/db/             Drizzle schema and client
 lib/github.ts       repo trees, file contents, blob SHAs
 ```
 
-### Storage is a port, never a dependency
+### Storage is a port
 
 Both engines depend on a store interface. `memory-store` and `drizzle-store`
 implement the same contract, so the test suite exercises real domain behaviour
@@ -78,7 +73,7 @@ below rather than implied by silence here.
 ### Restore is a forward commit
 
 Restoring an old version writes a new commit whose state equals the target,
-rather than rewinding the head. `git revert`, not `git reset`. History stays
+rather than rewinding the head, the way `git revert` works. History stays
 append-only and auditable, a restore is itself a versioned event, and multiple
 people editing one document cannot silently erase each other's history.
 
@@ -97,8 +92,8 @@ replacement, so what was decided and when cannot be quietly rewritten later.
 ### Guards return a reason rather than throwing
 
 Every lifecycle check returns `{ ok: false, reason }`. The UI can then say *why*
-an action is unavailable instead of hiding it, which is the difference between a
-permission system people understand and one they resent.
+an action is unavailable, so a person can tell a missing capability from a
+decision that has already moved on.
 
 ---
 
@@ -133,14 +128,14 @@ recover from. A **server draft** is the deliberate act of parking something, and
 appears in the decisions list. Once a server draft exists the local copy is
 disabled, because the list is the better recovery route.
 
-A found local draft is **offered, never applied**. Silently replacing what
-someone sees on screen with older text is its own kind of data loss.
+A found local draft is **offered**, and applied only when someone accepts it.
+Replacing what they see on screen with older text is its own kind of data loss.
 
 ---
 
 ## Code references and drift
 
-### A citation names a range, not just a file
+### A citation names a range
 
 A whole-file reference drifts on any commit touching the file, so a typo in an
 unrelated function marks the decision stale. False positives scale with file
@@ -182,7 +177,7 @@ it survives being copied into a commit message or a chat thread, which a rich
 editor node would not. Tokens are rewritten into ordinary markdown links before
 parsing, so the renderer needs no plugin and inherits the escaping that
 react-markdown has already hardened. An unresolvable token renders as inline code
-rather than vanishing, so a typo is visible instead of silently swallowed.
+rather than vanishing, so a typo stays visible.
 
 ---
 
@@ -202,7 +197,7 @@ makes it *feel* like markdown is behaviour while typing: lists that continue
 themselves, Tab that indents, wrapping shortcuts. All of that is pure
 text-in / text-out, tested directly.
 
-### Editing is a page, not a mode
+### Editing is a page
 
 Inline editing left the properties, the notices and the tabs stacked above the
 editor, with two Edit affordances visible at once. Writing deserves the same
@@ -216,26 +211,25 @@ document; everything else (properties, notices, tabs) is annotation about it
 and sits on the desk. Every region shares the sheet's measure, so the page has
 two vertical edges rather than six.
 
-The **dossier** card is the exception that proves it: status, owner and dates
-*are* the current state of a decision's history, so the audit trail expands
-inside the card that summarises it rather than beside it.
+The **dossier** card is the one exception. Status, owner and dates *are* the
+current state of a decision's history, so the audit trail expands inside the card
+that summarises it.
 
-### Notices are tinted, never elevated
+### Notices are tinted
 
-Raising a notice puts it in competition with the sheet. What makes a notice
-urgent is what it says, not how far off the page it floats. Only one notice
-survives, the drift warning. Everything else that used to be a banner is a
-property, because state and authorship are facts about the record rather than
-warnings about it.
+Raising a notice puts it in competition with the sheet. What makes one urgent is
+what it says. Only one notice survives, the drift warning; everything else that
+used to be a banner is a property, because state and authorship are facts about
+the record.
 
 ### Two button families
 
 `.btn` is a labelled action on the page, and every one carries a background: a
 transparent button with a word in it reads as a link, and a row mixing filled and
-unfilled controls has no rhythm. There is no ghost variant: the default *is* the
-quiet one, quiet by being the lightest fill rather than by being absent. One
-filled accent per view; Approve keeps its own green, because it says "yes, and
-permanently" in a way an accent that also means "primary" and "link" cannot.
+unfilled controls has no rhythm. There is no ghost variant. The default *is* the
+quiet one, and it is quiet by carrying the lightest fill. One filled accent per
+view; Approve keeps its own green, because it says "yes, and permanently" in a
+way an accent that also means "primary" and "link" cannot.
 
 `.iconbtn` is an icon-only affordance inside a container: the × on a row, a
 formatting tool, a refresh beside a timestamp. Those fill on hover only, because
@@ -254,9 +248,9 @@ needs: a drift badge, a remove control, a range picker.
 
 Notion-inspired warm paper: an off-white desk, white cards separated by fill
 rather than borders, Gabarito for type. Colour is drawn from a retro-print
-palette (vermilion, mustard, teal, cobalt) saturated but medium-lightness
-"ink", never neon, and used only where it earns its place. No monospace except
-for code, paths and diffs.
+palette of vermilion, mustard, teal and cobalt, at the saturation and lightness
+of printed ink, and used only where it earns its place. Monospace is for code,
+paths and diffs.
 
 ---
 
@@ -323,7 +317,7 @@ linked, which on the demo is everyone.
 It is safe to hold exactly where a user's `repo` token is not: it is the owner's
 own, it cannot write, and it can reach nothing private. A linked account still
 takes precedence where there is one, because it can see private repositories the
-fallback cannot and it is the person's own access rather than a borrowed one.
+fallback cannot, and it is the person's own access.
 
 Connecting a repository deliberately still requires your own account. Listing
 "your repositories" through the deployment's token would show the *owner's*
@@ -364,23 +358,18 @@ storage.
 a double. `store-parity.test.ts` checks that both stores implement the port's 32
 methods and can check no more than that. The fix is one contract suite
 parameterised over both implementations, with a Postgres service in CI. It is the
-largest piece of work outstanding in this repo.
+largest piece of work outstanding here, and it is tracked as issue #1.
 
-**`app/app/actions.ts` is 785 lines and has no tests.** It is also the security
-boundary, holding `requireUser` and the demo refusals. Several helpers inside it
-are pure enough to test on their own once they are lifted out: `attachCitedFiles`,
-`rebaselineOnAccept`, `parseRange`.
-
-**FEATURE.md has no screenshots.** The house standard for a repo with a UI is a
-screenshot-led walkthrough, and this one is prose. The product is deployed, so
-the pictures exist to be taken.
+**`app/app/actions.ts` is 741 lines and has no tests of its own.** It is the
+security boundary, holding `requireUser` and the demo refusals. The pure helpers
+have been lifted out and tested: `attempt` in `lib/attempt.ts`, and the form
+readers in `lib/decisions/form.ts`. What remains inside are `snapshotFile`,
+`attachCitedFiles` and `rebaselineOnAccept`, which each need GitHub and a store,
+so they want fakes rather than extraction.
 
 **Email verification is off and there is no explicit rate limiting.** Neither
 matters while nobody can create an account. Both are prerequisites the moment
 sign-up opens.
-
-**No dependency automation.** No `dependabot.yml`, no `renovate.json`. This repo
-ships a runtime to users, so it ranks above the libraries in the portfolio.
 
 **The `drizzle-kit` npm-audit warnings are dev-only.** `npm audit fix --force`
 destructively downgrades the migration tool. Leave them.

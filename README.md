@@ -1,22 +1,24 @@
 # core
 
-A team decision log: architecture decision records with a lifecycle, permissions,
-two audit trails, and a link to the code they govern, so a decision can tell you
-when the thing it decided has changed underneath it. Next.js and React over
-Postgres, for a team that keeps its architecture decisions somewhere nobody
-reads.
+A team decision log: architecture decision records with a lifecycle,
+permissions, two audit trails, and a link to the code they govern, so a decision
+can tell you when the thing it decided has changed underneath it. Next.js and
+React over Postgres.
 
 **[core.hipuku.dev](https://core.hipuku.dev)** is a read-only demo, with
 credentials on the sign-in page.
 
+![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status pill, above the connected repositories](./screenshots/decisions-list.png)
+
 Notion holds the document but not the governance. Jira holds the workflow and is
-not a document. core is a governed document that knows about code.
+not a document. core is a governed document that knows about the code it
+decided.
 
 ## Features
 
 - **Propose, accept, deprecate or supersede**, as a state machine with
-  permission-gated transitions. Accepted records are immutable: you supersede
-  them rather than editing them.
+  permission-gated transitions. Accepted records are immutable, and you supersede
+  them to change one.
 - **Two audit trails.** Content revisions live in a versioning engine; status
   transitions live in their own append-only log. How the text changed and how the
   decision moved are different questions, and are stored as such.
@@ -25,8 +27,7 @@ not a document. core is a governed document that knows about code.
 - **Staleness detection.** Citing a file records the code as it stands, the
   baseline moves to what the team agreed when the decision is accepted, and a
   drift check reports whether the cited code has changed since. A citation can
-  name a line range, so drift means this code changed rather than this file was
-  touched.
+  name a line range, so drift means the cited lines changed.
 - **Drafts.** Unsent decisions, private to their author, holding no ADR number.
 
 The full walkthrough is in [FEATURE.md](./FEATURE.md).
@@ -81,8 +82,8 @@ which is draft autosave and recovery, the unsaved-navigation guard, and the
 compose editor's markdown keystrokes reaching the caret.
 
 The domain suite runs against the in-memory store. The Postgres store implements
-the same port and is checked against it structurally, not behaviourally; see
-[DESIGN.md](./DESIGN.md) for what that does and does not prove.
+the same port and is checked against it structurally: see [DESIGN.md](./DESIGN.md)
+for what that does and does not prove.
 
 CI runs lint, typecheck and test on every push and pull request, then a
 production build once they agree. Each check reports independently, so one run
