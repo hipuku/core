@@ -41,16 +41,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# dev-only palette explorer, never committed
-/app/brand/
-
 # retired files staged for deletion, never committed
 /_to_delete/
 
-# local agent config
-/.claude/
-
-# the production runbook — names the real project, region and hosts, and is a
-# file people are tempted to paste secrets into. Kept out of a repo that is one
+# The production runbook. It names the real project, region and hosts, and it is
+# a file people are tempted to paste secrets into. Kept out of a repo that is one
 # setting away from public.
 /DEPLOYMENT.md

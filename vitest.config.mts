@@ -9,8 +9,8 @@ const root = fileURLToPath(new URL(".", import.meta.url));
  *
  * The domain and text cores are pure and run in Node — no DOM, no setup file,
  * nothing to tear down between tests. Widening that project to jsdom to
- * accommodate the component tests would make 141 fast tests pay for a browser
- * environment none of them use.
+ * accommodate the component tests would make the whole domain suite pay for a
+ * browser environment none of it uses.
  */
 export default defineConfig({
   resolve: {

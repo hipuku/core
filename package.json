@@ -2,6 +2,7 @@
   "name": "core",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "A team decision log — architecture decision records with a permission-gated lifecycle, two audit trails, and citations to the code they govern.",
   "scripts": {
     "dev": "next dev",
@@ -51,6 +52,6 @@
     "vitest": "^4.1.11"
   },
   "engines": {
-    "node": ">=20.9"
+    "node": "^20.9.0 || ^22.0.0 || >=24.0.0"
   }
 }
