@@ -19,10 +19,21 @@ import { decisionService } from "@/lib/decisions";
 const MAX_AGE_HOURS = 24;
 
 export async function GET(request: Request): Promise<Response> {
+  const email = process.env.DEMO_USER_EMAIL?.trim().toLowerCase();
+  const secret = process.env.CRON_SECRET;
+
   // Vercel signs its cron requests with this header. Without the check the
   // route is a public endpoint that deletes things, which is not a thing to
   // leave lying around even when what it deletes is disposable.
-  const secret = process.env.CRON_SECRET;
+  //
+  // A missing secret refuses rather than skipping the check. The route only has
+  // work to do where DEMO_USER_EMAIL is set, which is production, and that is
+  // exactly where an unset CRON_SECRET would turn the guard off. Deleting
+  // nothing for a night is recoverable; a public delete endpoint is not.
+  if (email && !secret) {
+    console.error("[prune-drafts] refused: CRON_SECRET is not configured");
+    return Response.json({ error: "not configured" }, { status: 500 });
+  }
   if (secret) {
     const authorization = request.headers.get("authorization");
     if (authorization !== `Bearer ${secret}`) {
@@ -31,7 +42,6 @@ export async function GET(request: Request): Promise<Response> {
     }
   }
 
-  const email = process.env.DEMO_USER_EMAIL?.trim().toLowerCase();
   if (!email) {
     // Logged, not just returned. Vercel's log viewer shows console output
     // rather than response bodies, so a scheduled job that only returns its
