@@ -20,7 +20,7 @@
 }
 .searchRow:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-tint);
+  box-shadow: var(--focus-ring);
 }
 .searchIcon {
   flex: none;
@@ -133,7 +133,7 @@
 .rangeInput:focus-visible {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-tint);
+  box-shadow: var(--focus-ring);
 }
 .rangeInput[aria-invalid="true"] {
   border-color: var(--danger);

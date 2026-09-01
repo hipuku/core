@@ -47,8 +47,8 @@
   color: var(--text);
 }
 .handle:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 /* Open, the panel below owns the card's bottom corners. */
 .cardOpen .handle {

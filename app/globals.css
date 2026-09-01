@@ -25,7 +25,19 @@
   --accent-hover: oklch(0.44 0.16 260);
   --accent-fg: oklch(0.995 0 0);
   --accent-tint: oklch(0.5 0.16 260 / 0.1);
-  --ring: oklch(0.5 0.16 260 / 0.32);
+
+  /* Focus. Ruling A1: a double ring, an inner band of the element's own backdrop
+     separating it from an outer band of the accent, which is the only one of the
+     three shapes across the portfolio that is contrast-safe.
+
+     --ring is the accent at full strength. It used to be the same colour at 32%
+     alpha, which composites to #b9cbe8 on a card and #b1c1dc on the page: 1.63:1
+     and 1.60:1 against their own backdrops, where WCAG 2.2 SC 1.4.11 asks for
+     3:1. Opaque it measures 6.12:1 and 5.42:1. Derived with haus-colour-utils
+     rather than picked; at this hue and chroma the ring stays above 3:1 up to
+     L 0.62, so 0.5 has room. */
+  --ring: var(--accent);
+  --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--ring);
 
   /* status: retro poster inks (independent of the brand accent) */
   --st-proposed: oklch(0.5 0.16 55); /* flame */
@@ -148,8 +160,8 @@ h1, h2, h3, h4 {
   --btn-bg: var(--surface-3);
 }
 .btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 .btn:disabled {
   opacity: 0.5;
@@ -231,8 +243,8 @@ h1, h2, h3, h4 {
   background: var(--surface-3);
 }
 .iconbtn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 .iconbtn:disabled {
   opacity: 0.45;
@@ -287,7 +299,17 @@ h1, h2, h3, h4 {
 .select:focus-visible {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-tint);
+  box-shadow: var(--focus-ring);
+}
+
+/* Every ring here is a box-shadow, and forced-colors mode drops box-shadows
+   entirely: without this, a Windows high-contrast user gets no focus indicator at
+   all. `outline` survives, and `Highlight` is the system's own focus colour. */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
 }
 
 /* cards / panels */
