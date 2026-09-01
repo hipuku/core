@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), ' +
@@ -18,6 +18,13 @@ const FOCUSABLE =
  * This is the second copy, so the signature is kept identical to vault's on
  * purpose: the two want to stay diffable until one of them moves to haus.
  *
+ * `onEscape` is held in a ref rather than taken as a dependency. Every caller passes
+ * an inline arrow, so as a dependency it tears the effect down and sets it up again on
+ * every render of the parent: the cleanup hands focus back to the opener and the setup
+ * pulls it to the first field, so a click inside an open modal bounced focus out of
+ * whatever the user was using. ModalShell carried this workaround itself at first; it
+ * belongs here, where vault's copy has it too.
+ *
  * @param open      whether the overlay is showing
  * @param container the element to trap within
  * @param onEscape  called on Escape, if the caller wants it handled here
@@ -27,6 +34,11 @@ export function useFocusTrap(
   container: React.RefObject<HTMLElement | null>,
   onEscape?: () => void,
 ): void {
+  const latestEscape = useRef(onEscape);
+  useEffect(() => {
+    latestEscape.current = onEscape;
+  }, [onEscape]);
+
   useEffect(() => {
     if (!open) return;
     const opener = document.activeElement as HTMLElement | null;
@@ -40,7 +52,7 @@ export function useFocusTrap(
 
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        onEscape?.();
+        latestEscape.current?.();
         return;
       }
       if (e.key !== "Tab" || !node) return;
@@ -61,5 +73,5 @@ export function useFocusTrap(
       window.removeEventListener("keydown", onKey);
       opener?.focus();
     };
-  }, [open, container, onEscape]);
+  }, [open, container]);
 }

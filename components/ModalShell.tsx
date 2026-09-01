@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { useFocusTrap } from "@/lib/use-focus-trap";
 import styles from "./Modal.module.css";
 
@@ -16,17 +16,9 @@ export function ModalShell({
   const panel = useRef<HTMLDivElement>(null);
   const titleId = useId();
 
-  // Every caller passes an inline arrow, so `onClose` is a new function each
-  // render. Handed straight to the trap it would tear the effect down and set
-  // it up again on every keystroke inside the dialog, stealing focus back to
-  // the first field. The ref keeps the callback current behind a stable one.
-  const latestClose = useRef(onClose);
-  useEffect(() => {
-    latestClose.current = onClose;
-  }, [onClose]);
-  const close = useCallback(() => latestClose.current(), []);
-
-  useFocusTrap(true, panel, close);
+  // The trap holds onClose in a ref of its own, so an inline arrow from a caller
+  // does not re-run it.
+  useFocusTrap(true, panel, onClose);
 
   // The page behind a modal should not scroll under it. Restoring the previous
   // value rather than clearing it keeps a modal opened from inside another one
