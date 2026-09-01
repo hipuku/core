@@ -285,9 +285,12 @@ async function main() {
         "One version line for consumers. A sixth package on the release path.",
     },
   });
+  // Proposed by the author, rejected by the owner: the author role has no reject
+  // capability, which is the permission model showing rather than describing
+  // itself. Seeding this the other way round is how that was found.
   await decisionService.changeStatus(
     meta.id,
-    authorId,
+    demoId,
     "rejected",
     "The convenience was worth less than it looked. Going to 1.x already " +
       "fixed what motivated it — under a caret a minor now reaches a consumer " +
