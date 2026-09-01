@@ -55,10 +55,13 @@ Postgres and a browser.
 npm run db:seed
 ```
 
-That builds a workspace with five decisions across the whole lifecycle, a
-supersession, two revisions of one record, markdown and Mermaid, a parked draft,
-and a reference that has already drifted. It is idempotent by workspace name:
-re-running replaces what it created and touches nothing else.
+That builds a workspace with five decisions covering the whole lifecycle:
+accepted, superseded, proposed and awaiting review, rejected, deprecated. Plus a
+revision, markdown and Mermaid, a parked draft, seven references and one that has
+already drifted.
+
+It is idempotent by workspace name: re-running replaces what it created and
+touches nothing else.
 
 **GitHub is optional.** Without `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`,
 everything works except connecting a repository and citing files from it. Sign up
@@ -66,6 +69,18 @@ with email and password and the rest of the product is there. To enable it,
 register an OAuth app at github.com/settings/developers with the callback
 `<BETTER_AUTH_URL>/api/auth/callback/github`, and set `BETTER_AUTH_URL` to
 whatever port you are actually running on.
+
+**To see it as the public demo does.** The deployment closes sign-up and signs
+everyone into one seeded account that may write drafts but may not change the
+decision log. To reproduce that locally, add to `.env.local`:
+
+```bash
+DISABLE_SIGNUP=1                              # /sign-up 404s, its link disappears
+DEMO_USER_EMAIL=demo@core.hipuku.dev          # the account db:seed creates
+DEMO_USER_PASSWORD=read-only-demo-2026
+DISABLE_GITHUB=1                              # optional: hides Connect GitHub
+```
+
 
 **Before committing:**
 
