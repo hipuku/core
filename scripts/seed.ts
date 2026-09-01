@@ -1,6 +1,18 @@
 /**
  * Seed a workspace with a decision log that has actually been used.
  *
+ * The decisions here are **real**: they are haus's own rulings, the same ones
+ * recorded in that repository's `docs/decisions/`, with their genuine statuses.
+ * HAU-001 really was superseded, HAU-003 really did propose the cheap option
+ * and argue itself out of it, HAU-004 really was rejected, and the draft is
+ * genuinely undecided. It used to be a plausible invention about a product
+ * called Vault, and two of those invented records had quietly drifted into
+ * being false — one asserted a rule this codebase breaks, another described a
+ * dependency the repository has since taken.
+ *
+ * A decision log demoing itself with fiction is the wrong advertisement for a
+ * decision log.
+ *
  * Two jobs, one script. It populates the public demo, and it gives anyone who
  * clones this repo something to look at. An empty decision log demonstrates
  * nothing, and "sign up, create a workspace, write three ADRs" is not a
@@ -21,7 +33,9 @@ import { decisionService } from "@/lib/decisions";
 const DEMO_EMAIL = process.env.DEMO_USER_EMAIL ?? "demo@core.hipuku.dev";
 const DEMO_PASSWORD = process.env.DEMO_USER_PASSWORD ?? "read-only-demo-2026";
 const DEMO_NAME = "Demo";
-const WORKSPACE_NAME = "Vault";
+const WORKSPACE_NAME = "haus";
+/** The workspace this seed used to build, cleared on the way past. */
+const RETIRED_NAME = "Vault";
 
 /** A second member, so the permission story is visible rather than described. */
 const AUTHOR_EMAIL = "author@core.hipuku.dev";
@@ -66,14 +80,22 @@ async function main() {
 
   // Replace rather than append: cascades clear the decisions, documents,
   // transitions and references belonging to the old copy.
-  const [stale] = await db
-    .select({ id: workspaces.id })
-    .from(workspaces)
-    .where(eq(workspaces.name, WORKSPACE_NAME))
-    .limit(1);
-  if (stale) {
-    await db.delete(workspaces).where(eq(workspaces.id, stale.id));
-    log(`removed the previous "${WORKSPACE_NAME}" workspace`);
+  //
+  // RETIRED_NAME is here because this seed used to build a workspace called
+  // "Vault" holding invented decisions. Idempotency is keyed on the name, so
+  // renaming the workspace would otherwise leave that one standing beside the
+  // new one and the demo would show both. It can be deleted once every
+  // environment has been re-seeded at least once.
+  for (const name of [WORKSPACE_NAME, RETIRED_NAME]) {
+    const [stale] = await db
+      .select({ id: workspaces.id })
+      .from(workspaces)
+      .where(eq(workspaces.name, name))
+      .limit(1);
+    if (stale) {
+      await db.delete(workspaces).where(eq(workspaces.id, stale.id));
+      log(`removed the previous "${name}" workspace`);
+    }
   }
 
   const workspace = await decisionService.createWorkspace(demoId, WORKSPACE_NAME);
@@ -85,348 +107,317 @@ async function main() {
   // Without these the tokens below fall back to plain code, which is the
   // graceful degradation working correctly and looking like a bug.
   for (const repo of [
-    { owner: "hipuku", name: "vault", defaultBranch: "main" },
     { owner: "hipuku", name: "haus", defaultBranch: "main" },
+    { owner: "hipuku", name: "drift", defaultBranch: "main" },
   ]) {
     await decisionService.connectRepo(workspace.id, demoId, repo);
   }
-  log("connected hipuku/vault and hipuku/haus");
+  log("connected hipuku/haus and hipuku/drift");
 
-  /* ---- VAU-001: accepted, then superseded ------------------------------- */
-  const tokens = await decisionService.propose(workspace.id, demoId, {
-    title: "Ship design tokens as CSS custom properties",
+  /* ---- HAU-001: accepted, then superseded -------------------------------
+     The claim the README carried for months. It was true of the intent and not
+     of the file, which is the whole reason 002 exists. */
+  const oneLayer = await decisionService.propose(workspace.id, demoId, {
+    title: "Theming lives entirely in the semantics layer",
     body: {
       context:
-        "The palette lives in three places: a Figma file, a Sass map, and a " +
-        "hand-maintained TypeScript object. They disagree, and the one people " +
-        "actually read is whichever they found first.\n\n" +
-        "We need a single definition that both the app and the design tooling " +
-        "can consume without a build step in between.",
+        "The token layers are primitives, semantics and motion. A consumer who " +
+        "wants haus's structure under their own brand needs somewhere to put " +
+        "that brand, and the semantics layer is where every role is already " +
+        "named.",
       decision:
-        "Publish the palette as **CSS custom properties**, generated from one " +
-        "source file, {{hipuku/haus:packages/tokens/src/tokens.json}}.\n\n" +
-        "1. Primitives and semantics stay in separate layers; no component " +
-        "references a primitive directly.\n" +
-        "2. The generated file is committed, so a consumer needs no toolchain.\n" +
-        "3. `haus-tokens` ships the CSS; nothing else ships colour.",
+        "Brand and role swaps live in {{hipuku/haus:packages/tokens/src/semantics.css}}. " +
+        "A theme swap is a single-file change with **zero component edits**.\n\n" +
+        "1. Primitives hold raw values and no component reads one directly.\n" +
+        "2. Semantics hold intent: `--color-surface-default`, `--color-ink-primary`.\n" +
+        "3. A consumer overrides the semantics layer and changes nothing else.",
       consequences:
-        "Easier: theming, because a custom property can be overridden per " +
-        "subtree. Harder: any consumer that needs values at build time, which " +
-        "now has to parse CSS or import the source.\n\n" +
-        "We accept that trade: runtime theming is the case we actually have.",
+        "Easier: one file to look at, and one sentence to put in the README.\n\n" +
+        "Harder: nothing yet, which should have been the warning. No consumer " +
+        "had tried it at the time this was written.",
     },
   });
-  await decisionService.changeStatus(tokens.id, demoId, "accepted");
-  log("VAU-001 proposed and accepted");
+  await decisionService.changeStatus(oneLayer.id, demoId, "accepted");
 
-  /* ---- VAU-002: accepted, supersedes 001 --------------------------------
-     The showcase record: headings, a table, a task list, a blockquote, inline
-     code, a fenced block, and inline file citations that resolve to the repos
+  /* ---- HAU-002: accepted, supersedes 001 --------------------------------
+     The showcase record: headings, a table, a task list, a blockquote, a
+     mermaid diagram and inline file citations that resolve to the repos
      connected above. */
-  const oklch = await decisionService.propose(workspace.id, demoId, {
-    title: "Move the palette to OKLCH",
+  const split = await decisionService.propose(workspace.id, demoId, {
+    title: "Split the brand out of the role layer",
     body: {
       context:
-        "Since VAU-001 shipped, two problems have surfaced.\n\n" +
-        "**The ramps are not perceptually even.** Our 400 and 500 steps look " +
-        "identical in the blues and miles apart in the yellows, because hex " +
-        "lightness is not lightness.\n\n" +
-        "**And the tooling reads our colours as null.** " +
-        "`getComputedStyle` returns `oklch()` verbatim in every current " +
-        "browser, and both halves of our contrast probe assume `rgb()`. See " +
-        "{{hipuku/drift:src/probe/colour.ts#L34-L61}}, which falls through to " +
-        "the page canvas when a colour fails to parse and so measures contrast " +
-        "against the wrong background.\n\n" +
-        "> This is a live bug for any modern OKLCH site, not just ours.\n\n" +
-        "| Colour space | Even ramps | Readable from the DOM | Browser support |\n" +
-        "|---|---|---|---|\n" +
-        "| hex / `rgb()` | no | yes | universal |\n" +
-        "| HSL | no | yes | universal |\n" +
-        "| **OKLCH** | **yes** | needs a parser | all current browsers |",
+        "HAU-001 was checked against the code and did not survive it.\n\n" +
+        "{{hipuku/haus:packages/tokens/src/semantics.css}} is 242 lines. Lines " +
+        "37 to 121 are colour roles that alias palette ramps directly: " +
+        "`--color-surface-default` is `var(--damson-0)`, and the four feedback " +
+        "families are named after fruit. Lines 122 to 242 are type, spacing, " +
+        "radius, elevation and motion. **The brand and the role system are the " +
+        "same file**, so taking the roles means taking the brand.\n\n" +
+        "There is no scoping selector anywhere: a search for `data-theme` or " +
+        "`:root[` returns nothing, so every token sits on a bare `:root` and " +
+        "`--space-4` is in the global namespace where a consumer running " +
+        "Tailwind collides with it.\n\n" +
+        "> Two products had already answered this. One declared 159 custom " +
+        "> properties of its own. The other declared 348 lines and took no " +
+        "> dependency on the token tier at all, with all five packages already " +
+        "> published.\n\n" +
+        "The role layer is not what they rejected. Of the 40 differing values, " +
+        "six differ only by decimal padding and about thirty are palette-name " +
+        "swaps. **The roles work. The brand is the part that cannot move.**",
       decision:
-        "Define every colour in **OKLCH**, keeping the custom-property " +
-        "delivery from VAU-001 unchanged.\n\n" +
-        "The primitive layer holds the raw ramps and the semantic layer names " +
-        "them; no component references a primitive directly. The generated " +
-        "files are {{hipuku/haus:packages/tokens/src/primitives.css#L1-L48}} " +
-        "and {{hipuku/haus:packages/tokens/src/semantics.css}}.\n\n" +
+        "Split them, and give the brand a layer of its own.\n\n" +
         "```mermaid\n" +
         "graph TD\n" +
-        "  subgraph source[Source of truth]\n" +
-        "    F[Figma variables]\n" +
-        "    T[tokens.json]\n" +
-        "  end\n" +
-        "  subgraph build[Generated, committed]\n" +
-        "    P[primitives.css<br/>raw OKLCH ramps]\n" +
-        "    S[semantics.css<br/>named roles]\n" +
-        "    M[motion.css]\n" +
-        "  end\n" +
-        "  subgraph consume[Consumers]\n" +
-        "    C[haus-components]\n" +
-        "    A[Applications]\n" +
-        "    D[drift crawler]\n" +
-        "  end\n" +
-        "  F -->|export| T\n" +
-        "  T -->|generate| P\n" +
-        "  P --> S\n" +
-        "  T -->|generate| M\n" +
-        "  S --> C\n" +
-        "  S --> A\n" +
-        "  C --> A\n" +
-        "  A -.->|getComputedStyle| D\n" +
-        "  D -.->|reports drift| T\n" +
-        "  classDef gen fill:#eef2ff,stroke:#4f46e5\n" +
-        "  class P,S,M gen\n" +
+        "  P[haus.primitives<br/>raw values] --> S[haus.semantics<br/>roles]\n" +
+        "  B[haus.brand<br/>the one file a consumer owns] --> S\n" +
+        "  S --> M[haus.motion]\n" +
+        "  S --> C[haus.components]\n" +
+        "  linkStyle 1 stroke:#7c5cbf,stroke-width:2\n" +
         "```\n\n" +
-        "Migration, in order:\n\n" +
-        "- [x] Convert the primitive ramps\n" +
-        "- [x] Re-point the semantic layer\n" +
-        "- [ ] Teach the contrast probe to parse OKLCH\n" +
-        "- [ ] Re-baseline the visual regression snapshots",
+        "- [x] Agree the contract before writing it — " +
+        "{{hipuku/haus:docs/decisions/0003-brand-and-roles-are-separate-layers.md}}\n" +
+        "- [ ] A fourth cascade layer for the brand map\n" +
+        "- [ ] `--haus-` on every property at every layer\n" +
+        "- [ ] A `data-haus-theme` scoping selector\n" +
+        "- [ ] A generated TypeScript map type, so a consumer knows what they owe\n" +
+        "- [ ] One complete worked example brand beside the default\n\n" +
+        "This **supersedes HAU-001** rather than revising it. The intent was " +
+        "right and the file was wrong.",
       consequences:
-        "**Easier.** Even ramps, and lightness that means what it says. " +
-        "Theming stays a custom-property override, exactly as before.\n\n" +
-        "**Harder.** Anything reading colours out of the DOM has to parse " +
-        "OKLCH. That is a real migration for the contrast checker, and the " +
-        "reason the last two boxes above are unticked.\n\n" +
-        "```ts\n" +
-        "// The shape every consumer now needs\n" +
-        "import { toHex } from \"haus-colour-utils\";\n" +
-        "\n" +
-        "const measured = getComputedStyle(el).color; // 'oklch(0.52 0.138 300)'\n" +
-        "const hex = toHex(measured);                 // '#7c5cbf'\n" +
-        "```\n\n" +
-        "This **supersedes VAU-001** rather than revising it: the delivery " +
-        "mechanism was right, the colour space was not.",
+        "| | One layer | Brand split out |\n" +
+        "|---|---|---|\n" +
+        "| Files a consumer owns | none that work | one |\n" +
+        "| Global namespace collisions | yes | prefixed |\n" +
+        "| Breaking for token readers | — | **yes** |\n" +
+        "| Consumers today | 1 | 1 |\n\n" +
+        "Breaking, so it lands with the 1.x cut and a migration guide rather " +
+        "than on its own. It is cheapest now: one consumer reads the token " +
+        "tier today and three are planned.\n\n" +
+        "**One worked example does not prove a contract.** This is not " +
+        "demonstrated until a second brand map exists on a codebase that was " +
+        "not written to flatter it.",
     },
   });
-  await decisionService.changeStatus(oklch.id, demoId, "accepted");
-  await decisionService.supersede(oklch.id, tokens.id, demoId);
-  log("VAU-002 accepted, superseding VAU-001");
+  await decisionService.changeStatus(split.id, demoId, "accepted");
+  await decisionService.supersede(split.id, oneLayer.id, demoId);
+  log("HAU-002 accepted, superseding HAU-001");
 
-  /* ---- VAU-003: proposed, revised twice, awaiting review ---------------- */
-  const culori = await decisionService.propose(workspace.id, authorId, {
-    title: "Keep vault's colour maths on culori, not haus-colour-utils",
+  /* ---- HAU-003: proposed, revised, awaiting review ----------------------
+     A real reversal: the cheap option was written down first and argued out
+     of. The revision is the argument. */
+  const guard = await decisionService.propose(workspace.id, authorId, {
+    title: "Guard the token contract at the package boundary",
     body: {
       context:
-        "vault does its own conversion, contrast and harmony maths through " +
-        "culori. haus now publishes `haus-colour-utils`, and the obvious tidy-up " +
-        "is to have vault consume it.",
-      decision: "Keep culori. Do not adopt haus-colour-utils in vault.",
-      consequences: "Two implementations of the same maths, maintained separately.",
+        "`var(--x)` for an undefined `--x` drops the declaration silently: no " +
+        "console warning, no build error, and a focus ring that is simply absent.",
+      decision:
+        "Export a function consumers call from their own suite, given the CSS " +
+        "they load. The cheapest of the three shapes on the table.",
+      consequences:
+        "The contract becomes testable rather than enforced. Each consumer has " +
+        "to remember to call it.",
     },
   });
-  await decisionService.revise(culori.id, authorId, {
+  await decisionService.revise(guard.id, authorId, {
     context:
-      "vault does its own conversion, contrast and harmony maths through " +
-      "culori; see {{hipuku/vault:src/colour/convert.ts#L1-L64}}. haus now " +
-      "publishes `haus-colour-utils`, and the obvious tidy-up is to have vault " +
-      "consume it.\n\n" +
-      "The pull is real: the OKLCH parsing bug in VAU-002 was fixed once, in " +
-      "{{hipuku/haus:packages/colour-utils/src/toHex.ts}}, and vault would have " +
-      "had it for free.\n\n" +
-      "> The question is not whether sharing is cheaper. It is what vault is " +
-      "> for.",
+      "`var(--x)` for an undefined `--x` drops the declaration silently: no " +
+      "console warning, no build error, and a focus ring that is simply absent.\n\n" +
+      "This is not hypothetical. The one consumer that wrote the check found " +
+      "five undefined roles before they reached a screen — " +
+      "{{hipuku/drift:client/src/tokens/tokens.test.ts}} — and then caught a " +
+      "sixth defect in a *published* package within an hour of upgrading: " +
+      "three control-height roles read by `haus-components` and not declared " +
+      "by the `haus-tokens` version it depends on. Button, Input and Select " +
+      "had shipped with no `min-height` for two minor versions and nothing " +
+      "said so.\n\n" +
+      "> That test lives in the consumer. Every future consumer either writes " +
+      "> it again or ships a dropped declaration.\n\n" +
+      "There is a second problem underneath, and only one of the three options " +
+      "touches it: `styles.css` is unlayered while the tokens are layered, so " +
+      "it competes with a consumer's own module CSS by **source order**.",
     decision:
-      "**Keep culori. Do not adopt `haus-colour-utils` in vault.**\n\n" +
-      "vault is the one shipped product in the portfolio, and its value as a " +
-      "reference is that it stands alone. Coupling it to a design system still " +
-      "under active development would make it a demo of that system instead.\n\n" +
-      "```mermaid\n" +
-      "graph LR\n" +
-      "  subgraph ds[Design system]\n" +
-      "    T[haus-tokens]\n" +
-      "    U[haus-colour-utils]\n" +
-      "    C[haus-components]\n" +
-      "  end\n" +
-      "  subgraph apps[Applications]\n" +
-      "    L[loom<br/>consumes haus]\n" +
-      "    V[vault<br/>stands alone]\n" +
-      "  end\n" +
-      "  T --> C\n" +
-      "  U --> C\n" +
-      "  C --> L\n" +
-      "  T --> L\n" +
-      "  V -->|culori| X[Own colour maths]\n" +
-      "  U -.->|deliberately not| V\n" +
-      "  linkStyle 5 stroke:#c2410c,stroke-dasharray:4\n" +
-      "```\n\n" +
-      "What we will do instead:\n\n" +
-      "- [x] Document the decoupling in vault's DESIGN.md\n" +
-      "- [x] Port the OKLCH parsing fix by hand\n" +
-      "- [ ] Add a test in vault pinning the conversion results\n" +
-      "- [ ] Revisit if a third consumer appears",
+      "**Wrap the component stylesheet in its own cascade layer.** Not the " +
+      "exported function this record originally proposed.\n\n" +
+      "Three shapes were on the table:\n\n" +
+      "| | Exported function | stylelint config | Cascade layer |\n" +
+      "|---|---|---|---|\n" +
+      "| Cost | half a day | a day | a day |\n" +
+      "| Enforced | no | at lint time | by the cascade |\n" +
+      "| Constrains consumer CSS | no | **yes** | no |\n" +
+      "| Fixes the unlayered stylesheet | no | no | **yes** |\n" +
+      "| Breaking | no | no | yes |\n\n" +
+      "The layer is the only one that makes the package declare its own " +
+      "precedence instead of relying on how a consumer arranges their CSS, " +
+      "and the only one that also fixes the second problem.\n\n" +
+      "```css\n" +
+      "@layer haus.components {\n" +
+      "  .button { /* a consumer's own CSS now wins without a specificity fight */ }\n" +
+      "}\n" +
+      "```",
     consequences:
-      "**Accepted cost.** Two implementations of the same maths, maintained " +
-      "separately. A fix in one has to be carried to the other by hand, which " +
-      "we have already done once.\n\n" +
-      "| | Adopt haus-colour-utils | Keep culori |\n" +
-      "|---|---|---|\n" +
-      "| Fixes shared | yes | by hand |\n" +
-      "| vault independent of a moving library | no | **yes** |\n" +
-      "| Bundle size | smaller | larger |\n" +
-      "| Demonstrates | consistency | range |\n\n" +
-      "**Open for review:** the last row is the whole argument, and it is a " +
-      "judgement rather than a measurement. Push back on it.",
+      "Breaking for anyone relying on current source order.\n\n" +
+      "**The timing is the whole argument.** It costs nothing while one " +
+      "consumer reads the component tier. Two more are planned, and each one " +
+      "added before this lands makes it more expensive.\n\n" +
+      "- [x] Establish that the cheap option leaves the layering bug\n" +
+      "- [x] Confirm only one consumer reads the component tier today\n" +
+      "- [ ] Land it with the 1.x cut, not before\n\n" +
+      "**Open for review:** the reversal is the part to push back on. This " +
+      "record proposed the cheap option and argued itself out of it.",
   });
-  log("VAU-003 proposed by an author, then revised, awaiting review");
+  log("HAU-003 proposed by an author, then revised, awaiting review");
 
-  /* ---- VAU-004: rejected ------------------------------------------------ */
-  const signing = await decisionService.propose(workspace.id, authorId, {
-    title: "Ship signed and notarised macOS installers",
+  /* ---- HAU-004: rejected ------------------------------------------------ */
+  const meta = await decisionService.propose(workspace.id, authorId, {
+    title: "Ship a haus meta-package",
     body: {
       context:
-        "vault ships unsigned `.dmg` builds for Apple silicon and Intel. On " +
-        "first launch macOS refuses to open them until the user right-clicks " +
-        "and confirms, which reads as broken to anyone who has not seen it " +
-        "before.",
+        "A consumer wanting the token layer, the components and the colour " +
+        "maths tracks four version lines that are only ever released together " +
+        "in practice. A `haus` meta-package depending on a compatible set at " +
+        "exact versions would let them take one.",
       decision:
-        "Join the Apple Developer Program and sign and notarise every release " +
-        "in {{hipuku/vault:.github/workflows/release.yml}}.",
+        "Publish `haus`, a sixth package, pinning the other five at exact " +
+        "versions and re-exporting nothing.",
       consequences:
-        "Easier: installation stops looking like a warning. Harder: an annual " +
-        "fee, credentials in CI, and a notarisation step that can fail a " +
-        "release for reasons unrelated to the code.",
+        "One version line for consumers. A sixth package on the release path.",
     },
   });
   await decisionService.changeStatus(
-    signing.id,
-    demoId,
+    meta.id,
+    authorId,
     "rejected",
-    "Unsigned is a documented, deliberate choice for a portfolio app. The " +
-      "README explains the right-click, and the reasoning is itself part of " +
-      "what the project demonstrates. Revisit if vault ever has users who did " +
-      "not arrive via the repo.",
+    "The convenience was worth less than it looked. Going to 1.x already " +
+      "fixed what motivated it — under a caret a minor now reaches a consumer " +
+      "on their next install — so the pain was the 0.x caret rule rather than " +
+      "the package count. What is left is a second place a version is stated, " +
+      "and two sources of truth for one fact is the failure mode this project " +
+      "keeps paying for. Tier-per-package is also what a tiered system should " +
+      "look like from outside: one bundled version line claims the tiers " +
+      "cannot be released independently, which is not true.",
   );
-  log("VAU-004 rejected, with a reason");
+  log("HAU-004 rejected");
 
-  /* ---- VAU-005: accepted, then deprecated ------------------------------- */
-  const store = await decisionService.propose(workspace.id, demoId, {
-    title: "Persist vault preferences with electron-store",
+  /* ---- HAU-005: accepted, then deprecated ------------------------------- */
+  const zeroX = await decisionService.propose(workspace.id, demoId, {
+    title: "Stay on 0.x until the API settles",
     body: {
       context:
-        "Window size, the last palette and the export format need to survive a " +
-        "restart. Writing them by hand means picking a location per platform " +
-        "and handling a corrupted file.",
+        "Five packages, an API still moving, and no consumer outside this " +
+        "repository yet. Committing to a stable major before the component " +
+        "props have settled would mean majors for changes nobody has to " +
+        "migrate through.",
       decision:
-        "Use `electron-store` for all persisted preferences.",
+        "Keep every package on `0.x`. Breaking changes go out as minors, which " +
+        "is what `0.x` means.",
       consequences:
-        "One dependency, sensible defaults per platform, and atomic writes. " +
-        "Preferences become JSON on disk that a user can edit or delete.",
+        "Freedom to move, at the cost of the caret rule: under `^0.2.1` a " +
+        "minor cannot reach a consumer while a patch can.",
     },
   });
-  await decisionService.changeStatus(store.id, demoId, "accepted");
+  await decisionService.changeStatus(zeroX.id, demoId, "accepted");
   await decisionService.changeStatus(
-    store.id,
+    zeroX.id,
     demoId,
     "deprecated",
-    "Superseded in practice rather than by a decision: preferences moved into " +
-      "the renderer's own storage when the app became single-window. The " +
-      "record stays for the reasoning, not the instruction.",
+    "The cost stopped being theoretical. `haus-colour-utils` 0.3.0 refitted " +
+      "the hue bins; both consumers were pinned to `^0.2.1`, neither picked it " +
+      "up, and the refit sat unshipped until someone went looking. Replaced by " +
+      "the 1.x ruling and the bump table in " +
+      "{{hipuku/haus:RELEASING.md}} — where a token rename is a major at an " +
+      "identical value, and a contrast change is a major even when the hex " +
+      "barely moves.",
   );
-  log("VAU-005 accepted, then deprecated");
+  log("HAU-005 accepted, then deprecated");
 
   /* ---- references -------------------------------------------------------
      Every file cited inline is also attached as a reference, so the chips in
-     the prose and the list at the bottom agree. They are separate concepts, in
-     that a citation is an argument and a reference is a tracked artifact with a
-     baseline, but a reader seeing one without the other just sees an
-     inconsistency. */
-
-  // The cited range, and the one that has drifted since VAU-002 was accepted.
-  const drifted = await decisionService.addReference(oklch.id, demoId, {
-    kind: "file",
-    label: "hipuku/haus · packages/tokens/src/primitives.css · L1-L48",
-    url: "https://github.com/hipuku/haus/blob/main/packages/tokens/src/primitives.css#L1-L48",
-    repo: "hipuku/haus",
-    path: "packages/tokens/src/primitives.css",
-    startLine: 1,
-    endLine: 48,
-    baselineSnippet: ":root {\n  --aronia-850: oklch(0.32 0.05 320);\n}",
-    baselineSha: "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
-  });
-  // A different SHA from the baseline: the cited code has moved on.
-  await decisionService.recordReferenceState(
-    drifted.id,
-    demoId,
-    "0f1e2d3c4b5a6978879665544332211000ffeedd",
-  );
-
-  await decisionService.addReference(oklch.id, demoId, {
+     the sidebar and the inline citations show the same set. */
+  const drifted = await decisionService.addReference(split.id, demoId, {
     kind: "file",
     label: "hipuku/haus · packages/tokens/src/semantics.css",
     url: "https://github.com/hipuku/haus/blob/main/packages/tokens/src/semantics.css",
     repo: "hipuku/haus",
     path: "packages/tokens/src/semantics.css",
-    baselineSha: "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
+    baselineSnippet:
+      "@layer haus.semantics {\n  :root {\n    --color-surface-default: var(--damson-0);\n  }\n}",
+    baselineSha: "8f2c1a4e9d3b7f6a5c8e2d1b4a7f9c3e6d8b2a5f",
   });
-
-  await decisionService.addReference(tokens.id, demoId, {
+  await decisionService.recordReferenceState(
+    drifted.id,
+    demoId,
+    "3c9e7b1d5a8f2e6c4b0d9a7f3e1c8b5d2a6f4e9c",
+  );
+  await decisionService.addReference(split.id, demoId, {
     kind: "file",
-    label: "hipuku/haus · packages/tokens/src/tokens.json",
-    url: "https://github.com/hipuku/haus/blob/main/packages/tokens/src/tokens.json",
+    label: "hipuku/haus · docs/decisions/0003-brand-and-roles-are-separate-layers.md",
+    url: "https://github.com/hipuku/haus/blob/main/docs/decisions/0003-brand-and-roles-are-separate-layers.md",
     repo: "hipuku/haus",
-    path: "packages/tokens/src/tokens.json",
-    baselineSha: "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+    path: "docs/decisions/0003-brand-and-roles-are-separate-layers.md",
   });
-
-  await decisionService.addReference(culori.id, authorId, {
+  await decisionService.addReference(oneLayer.id, demoId, {
     kind: "file",
-    label: "hipuku/vault · src/colour/convert.ts · L1-L64",
-    url: "https://github.com/hipuku/vault/blob/main/src/colour/convert.ts#L1-L64",
-    repo: "hipuku/vault",
-    path: "src/colour/convert.ts",
-    startLine: 1,
-    endLine: 64,
-    baselineSnippet: 'import { converter, formatHex } from "culori";',
-    baselineSha: "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3",
-  });
-
-  await decisionService.addReference(culori.id, authorId, {
-    kind: "file",
-    label: "hipuku/haus · packages/colour-utils/src/toHex.ts",
-    url: "https://github.com/hipuku/haus/blob/main/packages/colour-utils/src/toHex.ts",
+    label: "hipuku/haus · packages/tokens/src/primitives.css",
+    url: "https://github.com/hipuku/haus/blob/main/packages/tokens/src/primitives.css",
     repo: "hipuku/haus",
-    path: "packages/colour-utils/src/toHex.ts",
-    baselineSha: "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4",
+    path: "packages/tokens/src/primitives.css",
   });
-
-  await decisionService.addReference(signing.id, authorId, {
+  await decisionService.addReference(guard.id, authorId, {
     kind: "file",
-    label: "hipuku/vault · .github/workflows/release.yml",
-    url: "https://github.com/hipuku/vault/blob/main/.github/workflows/release.yml",
-    repo: "hipuku/vault",
-    path: ".github/workflows/release.yml",
-    baselineSha: "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5",
+    label: "hipuku/drift · client/src/tokens/tokens.test.ts",
+    url: "https://github.com/hipuku/drift/blob/main/client/src/tokens/tokens.test.ts",
+    repo: "hipuku/drift",
+    path: "client/src/tokens/tokens.test.ts",
   });
-  log("attached six file references, one of them drifted");
+  await decisionService.addReference(guard.id, authorId, {
+    kind: "file",
+    label: "hipuku/haus · packages/components/src/tokens.test.ts",
+    url: "https://github.com/hipuku/haus/blob/main/packages/components/src/tokens.test.ts",
+    repo: "hipuku/haus",
+    path: "packages/components/src/tokens.test.ts",
+  });
+  await decisionService.addReference(zeroX.id, demoId, {
+    kind: "file",
+    label: "hipuku/haus · RELEASING.md",
+    url: "https://github.com/hipuku/haus/blob/main/RELEASING.md",
+    repo: "hipuku/haus",
+    path: "RELEASING.md",
+  });
 
   /* ---- a link reference, so both kinds are visible ---------------------- */
-  await decisionService.addReference(culori.id, authorId, {
+  await decisionService.addReference(guard.id, authorId, {
     kind: "link",
-    label: "culori: colour space conversion",
-    url: "https://culorijs.org/api/",
+    label: "MDN · CSS cascade layers",
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/@layer",
   });
-  log("attached a link reference alongside the file ones");
 
   /* ---- a parked draft ---------------------------------------------------
      So the drafts zone is not empty on arrival, and the difference between a
      draft and a decision (no number, a Draft tag, private to its author) is
-     visible rather than described. */
+     visible rather than described. This one is genuinely undecided. */
   await decisionService.saveDraft(workspace.id, demoId, {
-    title: "Adopt a component visual-regression suite",
+    title: "Reopen polarity, so dark mode can exist",
     body: {
       context:
-        "Three token migrations have each broken something visually that no " +
-        "unit test could have caught. We find out from screenshots in review, " +
-        "or later.",
+        "Surface polarity is fixed by the contract: white cards on a subtle " +
+        "page, and not a brand-map axis. Every surface role is paired with the " +
+        "ink that is safe on it, and that pairing is what makes contrast " +
+        "decidable once at the token layer.\n\n" +
+        "The consequence nobody wrote down until recently is that **a dark " +
+        "theme cannot arrive as a brand map**, because it is a polarity " +
+        "inversion. It is the first thing anyone asks a design system.",
       decision:
-        "Still deciding between Chromatic and a self-hosted Playwright " +
-        "snapshot job. Chromatic is less to run and more to pay for; " +
-        "Playwright is the reverse.\n\n" +
-        "- [ ] Cost at our story count\n" +
-        "- [ ] How each handles OKLCH rendering differences across platforms\n" +
-        "- [ ] Whether review comments belong in the tool or in the PR",
+        "Still deciding. Three shapes, none costed:\n\n" +
+        "- [ ] Leave it. Say plainly that dark mode is out of scope and why\n" +
+        "- [ ] Make polarity an axis, and pair ink per polarity — doubles the " +
+        "colour decision surface\n" +
+        "- [ ] A second contract rather than a second brand, so the pairing " +
+        "guarantee survives\n\n" +
+        "The third is the only one that keeps the promise the roles make. It " +
+        "is also the most work, and it is not obvious it should happen before " +
+        "a consumer asks for it.",
       consequences: "",
     },
     refs: [],
