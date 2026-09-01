@@ -49,7 +49,13 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
             </label>
             <label className="field">
               <span>Role</span>
-              <Dropdown name="role" value={role} onChange={setRole} options={ROLE_OPTIONS} />
+              <Dropdown
+                label="Role"
+                name="role"
+                value={role}
+                onChange={setRole}
+                options={ROLE_OPTIONS}
+              />
             </label>
             <div className={styles.actions}>
               <button type="button" className="btn" onClick={() => setOpen(false)}>

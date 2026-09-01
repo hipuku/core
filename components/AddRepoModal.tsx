@@ -59,6 +59,7 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
                     "private" reads better as a hint than as parenthetical text
                     appended to the name. */}
                 <Dropdown
+                  label="Repository"
                   name="repo"
                   value={chosen}
                   onChange={setChosen}

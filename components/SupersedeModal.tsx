@@ -52,6 +52,7 @@ export function SupersedeModal({
                 VAU-014, and a title long enough to matter would otherwise be
                 truncated into uselessness on one line. */}
             <Dropdown
+              label="Decision to supersede"
               name="supersededId"
               value={chosen}
               onChange={setChosen}
