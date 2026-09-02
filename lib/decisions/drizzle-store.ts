@@ -1,5 +1,7 @@
 import { and, asc, count, desc, eq, lt, max } from "drizzle-orm";
-import { db } from "@/lib/db";
+import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
+import { db as defaultDb } from "@/lib/db";
+import type * as schema from "@/lib/db/schema";
 import {
   decisionDrafts,
   decisionReferences,
@@ -34,12 +36,27 @@ function toDraft(row: typeof decisionDrafts.$inferSelect): DraftRecord {
 }
 
 /**
+ * Any Drizzle handle bound to this schema. `db` from `@/lib/db` is the
+ * postgres-js one the app uses; the contract suite passes the PGlite one,
+ * which is the same Postgres engine compiled to WebAssembly rather than a
+ * different database.
+ */
+export type DecisionsDb = PgDatabase<PgQueryResultHKT, typeof schema>;
+
+/**
  * The production DecisionStore, backed by Postgres. Same interface the in-memory
  * store implements and the service tests pin. The two multi-row writes run in a
  * transaction so a decision never exists without its opening transition, and a
  * status change never lands without its audit row.
  */
 export class DrizzleDecisionStore implements DecisionStore {
+  /**
+   * The handle is injected so the contract suite can run this class against a
+   * real Postgres without one being reachable from the test process. The
+   * default is the app's singleton, so no call site changes.
+   */
+  constructor(private readonly db: DecisionsDb = defaultDb) {}
+
   async createWorkspace(input: {
     id: string;
     name: string;
@@ -47,12 +64,12 @@ export class DrizzleDecisionStore implements DecisionStore {
     ownerId: string;
     createdAt: Date;
   }): Promise<WorkspaceRecord> {
-    const [row] = await db.insert(workspaces).values(input).returning();
+    const [row] = await this.db.insert(workspaces).values(input).returning();
     return row;
   }
 
   async addMember(input: MembershipRecord): Promise<MembershipRecord> {
-    const [row] = await db
+    const [row] = await this.db
       .insert(memberships)
       .values(input)
       .onConflictDoUpdate({
@@ -67,7 +84,7 @@ export class DrizzleDecisionStore implements DecisionStore {
     workspaceId: string,
     userId: string,
   ): Promise<MembershipRecord | null> {
-    const [row] = await db
+    const [row] = await this.db
       .select()
       .from(memberships)
       .where(
@@ -81,7 +98,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async listMembers(workspaceId: string): Promise<MembershipRecord[]> {
-    return db
+    return this.db
       .select()
       .from(memberships)
       .where(eq(memberships.workspaceId, workspaceId))
@@ -89,7 +106,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async removeMember(workspaceId: string, userId: string): Promise<void> {
-    await db
+    await this.db
       .delete(memberships)
       .where(
         and(
@@ -113,7 +130,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }): Promise<DecisionRecord> {
     return withRetry(
       () =>
-        db.transaction(async (tx) => {
+        this.db.transaction(async (tx) => {
           const [{ current }] = await tx
             .select({ current: max(decisions.number) })
             .from(decisions)
@@ -135,7 +152,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async upsertDraft(draft: DraftRecord): Promise<DraftRecord> {
-    const [row] = await db
+    const [row] = await this.db
       .insert(decisionDrafts)
       .values(draft)
       .onConflictDoUpdate({
@@ -153,7 +170,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async getDraft(id: string): Promise<DraftRecord | null> {
-    const [row] = await db
+    const [row] = await this.db
       .select()
       .from(decisionDrafts)
       .where(eq(decisionDrafts.id, id))
@@ -162,7 +179,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async listDrafts(workspaceId: string, authorId: string): Promise<DraftRecord[]> {
-    const rows = await db
+    const rows = await this.db
       .select()
       .from(decisionDrafts)
       .where(
@@ -176,11 +193,11 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async deleteDraft(id: string): Promise<void> {
-    await db.delete(decisionDrafts).where(eq(decisionDrafts.id, id));
+    await this.db.delete(decisionDrafts).where(eq(decisionDrafts.id, id));
   }
 
   async deleteDraftsBefore(authorId: string, before: Date): Promise<number> {
-    const removed = await db
+    const removed = await this.db
       .delete(decisionDrafts)
       .where(
         and(
@@ -193,7 +210,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async peekNextNumber(workspaceId: string): Promise<number> {
-    const [row] = await db
+    const [row] = await this.db
       .select({ current: max(decisions.number) })
       .from(decisions)
       .where(eq(decisions.workspaceId, workspaceId));
@@ -201,7 +218,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async getWorkspace(id: string): Promise<WorkspaceRecord | null> {
-    const [row] = await db
+    const [row] = await this.db
       .select()
       .from(workspaces)
       .where(eq(workspaces.id, id))
@@ -210,7 +227,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async listWorkspacesForUser(userId: string): Promise<WorkspaceRecord[]> {
-    return db
+    return this.db
       .select({
         id: workspaces.id,
         name: workspaces.name,
@@ -225,7 +242,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async getDecision(id: string): Promise<DecisionRecord | null> {
-    const [row] = await db
+    const [row] = await this.db
       .select()
       .from(decisions)
       .where(eq(decisions.id, id))
@@ -234,7 +251,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async listDecisions(workspaceId: string): Promise<DecisionRecord[]> {
-    const rows = await db
+    const rows = await this.db
       .select()
       .from(decisions)
       .where(eq(decisions.workspaceId, workspaceId))
@@ -243,7 +260,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async countDecisions(workspaceId: string): Promise<number> {
-    const [row] = await db
+    const [row] = await this.db
       .select({ c: count() })
       .from(decisions)
       .where(eq(decisions.workspaceId, workspaceId));
@@ -251,7 +268,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async countProposed(workspaceId: string): Promise<number> {
-    const [row] = await db
+    const [row] = await this.db
       .select({ c: count() })
       .from(decisions)
       .where(
@@ -267,11 +284,11 @@ export class DrizzleDecisionStore implements DecisionStore {
     id: string,
     patch: { name: string; key: string },
   ): Promise<void> {
-    await db.update(workspaces).set(patch).where(eq(workspaces.id, id));
+    await this.db.update(workspaces).set(patch).where(eq(workspaces.id, id));
   }
 
   async deleteWorkspace(id: string): Promise<void> {
-    await db.delete(workspaces).where(eq(workspaces.id, id));
+    await this.db.delete(workspaces).where(eq(workspaces.id, id));
   }
 
   async applyStatusChange(input: {
@@ -281,7 +298,7 @@ export class DrizzleDecisionStore implements DecisionStore {
     updatedAt: Date;
     transition: TransitionRecord;
   }): Promise<void> {
-    await db.transaction(async (tx) => {
+    await this.db.transaction(async (tx) => {
       await tx
         .update(decisions)
         .set({
@@ -297,7 +314,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async listTransitions(decisionId: string): Promise<TransitionRecord[]> {
-    return db
+    return this.db
       .select()
       .from(decisionTransitions)
       .where(eq(decisionTransitions.decisionId, decisionId))
@@ -305,11 +322,11 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async addReference(reference: ReferenceRecord): Promise<void> {
-    await db.insert(decisionReferences).values(reference);
+    await this.db.insert(decisionReferences).values(reference);
   }
 
   async getReference(id: string): Promise<ReferenceRecord | null> {
-    const [row] = await db
+    const [row] = await this.db
       .select()
       .from(decisionReferences)
       .where(eq(decisionReferences.id, id))
@@ -318,7 +335,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async listReferences(decisionId: string): Promise<ReferenceRecord[]> {
-    return db
+    return this.db
       .select()
       .from(decisionReferences)
       .where(eq(decisionReferences.decisionId, decisionId))
@@ -326,7 +343,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async deleteReference(id: string): Promise<void> {
-    await db.delete(decisionReferences).where(eq(decisionReferences.id, id));
+    await this.db.delete(decisionReferences).where(eq(decisionReferences.id, id));
   }
 
   async rebaselineReference(
@@ -339,7 +356,7 @@ export class DrizzleDecisionStore implements DecisionStore {
       checkedAt: Date;
     },
   ): Promise<void> {
-    await db
+    await this.db
       .update(decisionReferences)
       .set({
         baselineSha: state.baselineSha,
@@ -362,7 +379,7 @@ export class DrizzleDecisionStore implements DecisionStore {
       endLine?: number;
     },
   ): Promise<void> {
-    await db
+    await this.db
       .update(decisionReferences)
       .set({
         currentSha: state.currentSha,
@@ -375,11 +392,11 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async addWorkspaceRepo(repo: RepoRecord): Promise<void> {
-    await db.insert(workspaceRepos).values(repo);
+    await this.db.insert(workspaceRepos).values(repo);
   }
 
   async listWorkspaceRepos(workspaceId: string): Promise<RepoRecord[]> {
-    return db
+    return this.db
       .select()
       .from(workspaceRepos)
       .where(eq(workspaceRepos.workspaceId, workspaceId))
@@ -387,7 +404,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async getWorkspaceRepo(id: string): Promise<RepoRecord | null> {
-    const [row] = await db
+    const [row] = await this.db
       .select()
       .from(workspaceRepos)
       .where(eq(workspaceRepos.id, id))
@@ -396,7 +413,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async deleteWorkspaceRepo(id: string): Promise<void> {
-    await db.delete(workspaceRepos).where(eq(workspaceRepos.id, id));
+    await this.db.delete(workspaceRepos).where(eq(workspaceRepos.id, id));
   }
 }
 

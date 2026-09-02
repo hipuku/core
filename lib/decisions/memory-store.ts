@@ -56,8 +56,12 @@ export class MemoryDecisionStore implements DecisionStore {
   }
 
   async listMembers(workspaceId: string): Promise<MembershipRecord[]> {
+    // Sorted, because the SQL side sorts. Map iteration is insertion order,
+    // which agrees with createdAt for as long as rows are added in time order
+    // and silently stops agreeing when they are not.
     return [...this.members.values()]
       .filter((m) => m.workspaceId === workspaceId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
       .map((m) => ({ ...m }));
   }
 
@@ -130,6 +134,7 @@ export class MemoryDecisionStore implements DecisionStore {
     );
     return [...this.workspaces.values()]
       .filter((w) => workspaceIds.has(w.id))
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
       .map((w) => ({ ...w }));
   }
 
