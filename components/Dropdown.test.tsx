@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { useState } from "react";
 import { Dropdown, type DropdownOption } from "./Dropdown";
+import { axe } from "vitest-axe";
 
 /**
  * The dropdown replaced a native <select> for styling, which means it owes the
@@ -145,5 +146,18 @@ describe("Dropdown", () => {
       'input[type="hidden"][name="role"]',
     );
     expect(hidden?.value).toBe("owner");
+  });
+});
+
+describe("accessibility", () => {
+  it("has no violations closed", async () => {
+    const { container } = render(<Harness />);
+    expect((await axe(container)).violations).toEqual([]);
+  });
+
+  it("has no violations with the listbox open", async () => {
+    const { container } = render(<Harness />);
+    await userEvent.click(screen.getByRole("combobox"));
+    expect((await axe(container)).violations).toEqual([]);
   });
 });

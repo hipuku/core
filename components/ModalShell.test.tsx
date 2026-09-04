@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ModalShell } from "./ModalShell";
+import { axe } from "vitest-axe";
 
 /**
  * The shell fronts every destructive dialog in the app, so the parts worth
@@ -120,5 +121,18 @@ describe("ModalShell", () => {
     render(<Harness onClose={onClose} />);
     await user.click(screen.getByRole("button", { name: "confirm" }));
     expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * core has 30 components and shipped six component tests, none of which
+ * asserted anything about accessibility. The two that own focus come first:
+ * axe cannot see a missing focus trap, so these sit alongside the keyboard
+ * tests rather than standing in for them.
+ */
+describe("accessibility", () => {
+  it("has no violations when open", async () => {
+    const { container } = render(<Harness />);
+    expect((await axe(container)).violations).toEqual([]);
   });
 });

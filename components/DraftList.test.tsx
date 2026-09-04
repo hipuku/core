@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { DraftList, type DraftSummary } from "./DraftList";
+import { axe } from "vitest-axe";
 
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: ComponentProps<"a">) => (
@@ -86,5 +87,14 @@ describe("DraftList", () => {
       />,
     );
     expect(screen.getByText("edited 3 minutes ago")).toBeInTheDocument();
+  });
+});
+
+describe("accessibility", () => {
+  it("has no violations with drafts", async () => {
+    const { container } = render(
+      <DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[draft()]} />,
+    );
+    expect((await axe(container)).violations).toEqual([]);
   });
 });

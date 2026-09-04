@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DecisionEditor } from "./DecisionEditor";
+import { axe } from "vitest-axe";
 
 /**
  * The compose editor, exercised through the DOM.
@@ -218,5 +219,28 @@ describe("DecisionEditor: the document it is writing", () => {
     await waitFor(() => expect(action).toHaveBeenCalled());
     const formData = action.mock.calls[0]![0] as FormData;
     expect(formData.get("decision")).toBe("the call");
+  });
+});
+
+/**
+ * The editor is where most time in this app is spent: a title, three
+ * markdown fields, the citation inserter and the draft controls. It is also
+ * the densest set of form controls in the repo, so it is the most likely place
+ * for a label to go missing.
+ */
+describe("accessibility", () => {
+  it("has no violations", async () => {
+    const { container } = render(
+      <DecisionEditor
+        action={vi.fn().mockResolvedValue(undefined)}
+        onSaveDraft={vi.fn().mockResolvedValue({ ok: "Saved as a draft." })}
+        cancelHref="/app/ws-1"
+        submitLabel="Propose decision"
+        withTitle
+        defaults={EMPTY}
+        draftKey="ws-1:axe"
+      />,
+    );
+    expect((await axe(container)).violations).toEqual([]);
   });
 });
