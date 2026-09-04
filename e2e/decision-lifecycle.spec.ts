@@ -18,12 +18,22 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.getByLabel("Email").fill(EMAIL);
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
-  // `/app` with no trailing segment: it resolves the workspace server-side.
+  // `/app` is the workspace list, not the decision log. The log lives at
+  // `/app/{workspaceId}`, one click in. Assuming otherwise is what the first
+  // run of this suite got wrong.
   await page.waitForURL(/\/app(\/|$)/, { timeout: 30_000 });
+  await expect(page.getByRole("heading", { name: "Workspaces" })).toBeVisible();
+}
+
+/** Sign in, then open the seeded workspace's decision log. */
+async function openLog(page: import("@playwright/test").Page) {
+  await signIn(page);
+  await page.getByRole("link", { name: /haus/ }).first().click();
+  await page.waitForURL(/\/app\/[^/]+$/, { timeout: 30_000 });
 }
 
 test("signs in and reaches the decision log", async ({ page }) => {
-  await signIn(page);
+  await openLog(page);
 
   // The seed builds haus's real decisions, so these are the titles that exist.
   await expect(page.getByRole("link", { name: /Split the brand out of the role layer/ })).toBeVisible();
@@ -31,7 +41,7 @@ test("signs in and reaches the decision log", async ({ page }) => {
 });
 
 test("opens a decision and shows its status and history", async ({ page }) => {
-  await signIn(page);
+  await openLog(page);
   await page.getByRole("link", { name: /Split the brand out of the role layer/ }).click();
 
   await expect(page.getByRole("heading", { name: /Split the brand out of the role layer/ })).toBeVisible();
@@ -44,7 +54,7 @@ test("opens a decision and shows its status and history", async ({ page }) => {
 });
 
 test("is reachable and readable by keyboard alone", async ({ page }) => {
-  await signIn(page);
+  await openLog(page);
 
   // Same assertion as drift's: whatever takes focus has to be rendered. The
   // defect this guards against shipped on hipuku-web and no unit test saw it.
