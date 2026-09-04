@@ -68,3 +68,53 @@ jobs:
           BETTER_AUTH_SECRET: ci-build-secret-not-used-for-anything-real
           BETTER_AUTH_URL: http://localhost:3000
         run: npm run build
+
+  e2e:
+    name: End to end
+    runs-on: ubuntu-latest
+    needs: check
+
+    # A disposable Postgres, not a shared one: the suite pushes a schema and
+    # writes fixture users over whatever is there.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: core_e2e
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/core_e2e
+      BETTER_AUTH_SECRET: e2e-secret-not-used-for-anything-real
+      BETTER_AUTH_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install chromium --with-deps
+
+      # The schema, the seed and the build all happen inside the suite: global
+      # setup pushes and seeds, the web server builds and starts.
+      - name: End to end
+        run: npm run e2e
+
+      - name: Keep the trace when it fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

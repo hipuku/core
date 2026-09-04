@@ -48,3 +48,6 @@ next-env.d.ts
 # a file people are tempted to paste secrets into. Kept out of a repo that is one
 # setting away from public.
 /DEPLOYMENT.md
+e2e/.pg.pid
+test-results/
+playwright-report/

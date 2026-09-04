@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { scorePassword } from "@/lib/password-strength";
 import styles from "./PasswordField.module.css";
 
@@ -18,6 +18,7 @@ export function PasswordField({
   minLength?: number;
 }) {
   const [reveal, setReveal] = useState(false);
+  const id = useId();
   const strength = useMemo(
     () => (showMeter ? scorePassword(value) : null),
     [showMeter, value],
@@ -25,10 +26,18 @@ export function PasswordField({
 
   return (
     <div className={styles.wrap}>
-      <label className="field">
-        <span>Password</span>
+      {/* Explicit association, and the toggle outside the label.
+          Wrapping both controls made the label's text content "Password Show",
+          which is the input's accessible name: a screen reader announced the
+          field as "Password Show, edit text". It also meant a click on the
+          toggle was a click on the label, so the browser moved focus into the
+          input on every reveal. Found by an end-to-end test that could not
+          address the field by its name. */}
+      <div className="field">
+        <label htmlFor={id}>Password</label>
         <div className={styles.inputRow}>
           <input
+            id={id}
             className="input"
             type={reveal ? "text" : "password"}
             value={value}
@@ -42,11 +51,12 @@ export function PasswordField({
             className={styles.toggle}
             onClick={() => setReveal((r) => !r)}
             aria-label={reveal ? "Hide password" : "Show password"}
+            aria-controls={id}
           >
             {reveal ? "Hide" : "Show"}
           </button>
         </div>
-      </label>
+      </div>
 
       {showMeter && strength && (
         <div className={styles.meter} data-score={value ? strength.score : -1}>
