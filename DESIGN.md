@@ -61,14 +61,30 @@ Drizzle implementation can wrap each in one transaction: a decision and its
 opening transition, and a status change and its audit row.
 
 **What the suite proves, and what it does not.** Every domain test constructs
-`memory-store`. `drizzle-store` runs no test at all, so what the suite
-establishes about permissions and the lifecycle is established about the double.
-`store-parity.test.ts` holds both to the port's 32 methods, which catches a
+`memory-store`, so what it establishes about permissions and the lifecycle it
+establishes about a double. Two suites close that, and they close different
+halves.
+
+`store-parity.test.ts` holds both stores to the port's 32 methods. It catches a
 method added to one side and forgotten on the other, and catches nothing about
 behaviour: an ordering difference, a null handled differently, a transaction
-boundary in the wrong place would all pass. The answer is one suite run against
-both implementations, which needs a Postgres in CI. Recorded in the trade-offs
-below rather than implied by silence here.
+boundary in the wrong place would all pass. It is still worth having because
+that failure is otherwise silent, since TypeScript checks each class against the
+interface and a method dropped from the interface and both classes typechecks
+cleanly while the service calls it.
+
+`store-contract.test.ts` is the behavioural half and it is the one that matters:
+**43 cases, each run twice against the same assertions, once per store.** A
+difference between the double and the real thing is a failure rather than a
+surprise in production.
+
+It needs a Postgres and does not need one installed. PGlite is Postgres compiled
+to WebAssembly and run in this process, so the planner, the types and the
+constraint and transaction semantics are Postgres's rather than an emulator's.
+No Docker, no service container, no `DATABASE_URL`. The DDL is generated from
+the Drizzle schema rather than a checked-in dump, so a column added to
+`lib/db/schema` is present on the next run and cannot drift out of step with the
+tables the tests write to.
 
 ### Restore is a forward commit
 
@@ -353,12 +369,23 @@ storage.
 
 # Known trade-offs / next
 
-**The Postgres store is tested by nothing.** All 172 domain tests run against
-`memory-store`, so the permission model, which is the product, is proved against
-a double. `store-parity.test.ts` checks that both stores implement the port's 32
-methods and can check no more than that. The fix is one contract suite
-parameterised over both implementations, with a Postgres service in CI. It is the
-largest piece of work outstanding here, and it is tracked as issue #1.
+**~~The Postgres store is tested by nothing.~~ Done**, and this entry is kept
+rather than deleted because it was the largest piece of work outstanding here
+and a trade-offs list that only ever grows is not being read.
+
+`store-contract.test.ts` runs 43 cases twice, once per store, against PGlite.
+Issue #1, closed in `4dfa1a2`. The section above says what it does and does not
+prove; the short version is that `drizzle-store` is no longer exercised by
+nothing.
+
+**The token layer covers colour, radius and shadow, and nothing else.** There is
+no type scale and no spacing scale, so every size, weight and gap in the app is
+chosen per declaration: 172 distinct raw declarations across 355 sites, eleven
+font sizes between 0.72rem and 1.7rem, and seven weights including 550 and 650,
+which most faces do not have. `scripts/check-token-debt.mjs` holds that number
+in CI, failing in both directions, and the fix is not to invent scales here: it
+is to adopt haus's, which is what this app's migration is for. The number
+reaching zero is what "migrated" will mean.
 
 **`app/app/actions.ts` is 741 lines and has no tests of its own.** It is the
 security boundary, holding `requireUser` and the demo refusals. The pure helpers

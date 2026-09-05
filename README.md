@@ -96,9 +96,35 @@ a component. `ui` runs in jsdom and covers what is only observable in a browser,
 which is draft autosave and recovery, the unsaved-navigation guard, and the
 compose editor's markdown keystrokes reaching the caret.
 
-The domain suite runs against the in-memory store. The Postgres store implements
-the same port and is checked against it structurally: see [DESIGN.md](./DESIGN.md)
-for what that does and does not prove.
+The domain suite runs against the in-memory store, so what it proves about the
+permission model, which is the product, it proves about a double. Two suites
+close that gap and they close different halves of it.
+
+`store-parity.test.ts` is **structural**. It holds `MemoryDecisionStore` and
+`DrizzleDecisionStore` to the same method set, so a port method added to one and
+forgotten on the other fails here rather than on a page. It is worth having
+because that failure is otherwise silent: TypeScript checks each class against
+the interface, so a method dropped from the interface and from both classes
+typechecks cleanly while the service still calls it. It catches nothing about
+behaviour.
+
+`store-contract.test.ts` is **behavioural**, and it is the one that matters.
+**43 cases, each run twice against the same assertions, once per store**, so a
+difference between the double and the real thing is a failure rather than a
+surprise in production: an ordering that only holds because a `Map` preserves
+insertion order, a null the SQL side stores differently, a count that includes a
+row the other excludes.
+
+It runs against **a real Postgres, with nothing installed**. PGlite is Postgres
+compiled to WebAssembly and run in this process, so the planner, the types and
+the constraint and transaction semantics are Postgres's rather than an
+emulator's. No Docker, no service container, no `DATABASE_URL`: `npm test` runs
+it on a laptop and in CI identically. The DDL is generated from the Drizzle
+schema rather than from a checked-in dump, so a column added to `lib/db/schema`
+is present on the next run and cannot drift out of step with the tables the
+tests write to.
+
+See [DESIGN.md](./DESIGN.md) for what the pair still does not prove.
 
 CI runs lint, typecheck and test on every push and pull request, then a
 production build once they agree. Each check reports independently, so one run
