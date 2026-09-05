@@ -324,7 +324,7 @@
 /* ---- narrow screens ------------------------------------------------------
    The bar wraps to two rows on a phone, which would let the document scroll
    underneath a taller sticky element, so it stops being sticky there. */
-@media (max-width: 720px) {
+@media (width <= 720px) {
   .bar {
     position: static;
     border-bottom: 1px solid var(--border);

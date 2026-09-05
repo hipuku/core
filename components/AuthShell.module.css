@@ -30,7 +30,7 @@
   max-width: 21rem;
 }
 
-@media (max-width: 860px) {
+@media (width <= 860px) {
   .split {
     grid-template-columns: 1fr;
   }

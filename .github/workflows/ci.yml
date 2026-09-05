@@ -42,6 +42,20 @@ jobs:
       - name: Lint prose
         run: npm run lint:prose
 
+      # The hardcoded-value gate. The strict-value rule is a warning here rather
+      # than an error, because core's token layer covers colour, radius and
+      # shadow and nothing else: 355 declarations choose a size, a weight or a
+      # gap by hand. Failing on all of them today would have meant switching the
+      # rule off.
+      - name: Lint CSS
+        run: npm run lint:css
+
+      # So this is what fails. It asserts the count exactly, in both directions,
+      # and step 8 drives it to zero by migrating onto haus, which has the
+      # scales core is missing.
+      - name: Token debt
+        run: npm run lint:tokens
+
       - name: Typecheck
         if: always()
         run: npm run typecheck

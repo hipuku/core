@@ -155,13 +155,6 @@
   gap: 0.6rem;
   align-items: center;
 }
-.headMain {
-  flex: 1;
-  min-width: 0;
-}
-.headKey {
-  margin-bottom: 0.5rem;
-}
 
 /* ============================================================================
    The decision page
@@ -484,7 +477,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
   .sheet {
     padding: 1.5rem 1.25rem;
   }
