@@ -19,7 +19,7 @@
 const OFF_SCALE = [
 ]
 
-export default {
+const config = {
   extends: ['stylelint-config-standard'],
   plugins: ['stylelint-declaration-strict-value'],
   rules: {
@@ -108,3 +108,5 @@ export default {
 
   ignoreFiles: ['**/.next/**', '**/node_modules/**', '**/coverage/**', '**/playwright-report/**'],
 }
+
+export default config

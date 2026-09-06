@@ -86,8 +86,8 @@ console.error(
       'Record it: node scripts/check-token-debt.mjs --write',
 )
 
-const changed = Object.entries({ ...recorded.byFile, ...byFile })
-  .map(([f, _]) => [f, (byFile[f] ?? 0) - (recorded.byFile[f] ?? 0)])
+const changed = Object.keys({ ...recorded.byFile, ...byFile })
+  .map((f) => [f, (byFile[f] ?? 0) - (recorded.byFile[f] ?? 0)])
   .filter(([, d]) => d !== 0)
   .sort((a, b) => b[1] - a[1])
 console.error('\n' + changed.map(([f, d]) => `  ${d > 0 ? '+' : ''}${d}  ${f}`).join('\n'))
