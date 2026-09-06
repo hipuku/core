@@ -4,7 +4,7 @@
   z-index: 50;
   display: grid;
   place-items: center;
-  padding: 1.5rem;
+  padding: var(--haus-space-6);
   background: oklch(30% 0.02 60 / 0.35);
   backdrop-filter: blur(2px);
 }
@@ -27,12 +27,12 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--haus-space-4);
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.55rem;
-  margin-top: 0.25rem;
+  margin-top: var(--haus-space-1);
 }

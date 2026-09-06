@@ -4,7 +4,7 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--haus-space-1);
   font-family: var(--font-mono);
   font-size: 0.8em;
   vertical-align: baseline;
@@ -27,7 +27,7 @@ a.chip:hover {
 .row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
   min-width: 0;
 }
 

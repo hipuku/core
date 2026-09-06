@@ -6,8 +6,8 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--haus-space-2);
+  margin-bottom: var(--haus-space-2);
 }
 
 .card {
@@ -31,7 +31,7 @@
 .cardTitle {
   flex: 1;
   min-width: 0;
-  font-weight: 500;
+  font-weight: var(--haus-weight-medium);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -41,7 +41,7 @@
 .derived {
   flex: 1;
   min-width: 0;
-  font-weight: 500;
+  font-weight: var(--haus-weight-medium);
   color: var(--text-dim);
   overflow: hidden;
   text-overflow: ellipsis;

@@ -3,47 +3,47 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: var(--haus-space-4);
+  margin-bottom: var(--haus-space-8);
 }
 .headMain {
   flex: 1;
   min-width: 0;
 }
 .headKey {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--haus-space-2);
 }
 .title {
   font-size: 1.7rem;
-  font-weight: 700;
+  font-weight: var(--haus-weight-bold);
   letter-spacing: -0.025em;
   line-height: 1.12;
 }
 .titleMuted {
   color: var(--text-faint);
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
 }
 .sub {
   color: var(--text-dim);
   font-size: 1.02rem;
-  margin-top: 0.5rem;
+  margin-top: var(--haus-space-2);
 }
 .headActions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
 }
 .repoChips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
 }
 /* ---- lists ------------------------------------------------------------- */
 .list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
 }
 .card {
   display: flex;
@@ -65,10 +65,10 @@
 }
 .cardTitle {
   flex: 1;
-  font-weight: 500;
+  font-weight: var(--haus-weight-medium);
 }
 .empty {
-  padding: 2.5rem;
+  padding: var(--haus-space-10);
   text-align: center;
   color: var(--text-faint);
   border-radius: var(--r-lg);
@@ -81,7 +81,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.25rem;
+  gap: var(--haus-space-5);
   padding: 1.1rem 1.35rem;
   background: var(--surface);
   border-radius: var(--r-lg);
@@ -95,7 +95,7 @@
 .wsName {
   font-size: 1.15rem;
   font-weight: 650;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--haus-tracking-tight);
 }
 .wsMeta {
   display: flex;
@@ -117,7 +117,7 @@
   background: color-mix(in oklch, var(--st-proposed) 15%, var(--surface));
   color: color-mix(in oklch, var(--st-proposed) 72%, black);
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
 }
 .wsRepo {
   padding: 0.2rem 0.65rem;
@@ -136,7 +136,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: var(--haus-space-4);
 }
 .sectionTitle {
   font-size: 0.9rem;
@@ -183,7 +183,7 @@
 }
 .propLabel {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -213,11 +213,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--haus-space-4);
   flex-wrap: wrap;
   padding: 0.9rem 1.1rem;
   border-radius: var(--r);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--haus-space-6);
   background: var(--surface-2);
   border-left: 3px solid var(--border-strong);
 }
@@ -228,7 +228,7 @@
   min-width: 0;
 }
 .noticeTitle {
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
   font-size: 0.92rem;
 }
 .noticeSub {
@@ -257,7 +257,7 @@
 .doc {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--haus-space-8);
 }
 .docBlock {
   padding-left: 1.1rem;
@@ -270,7 +270,7 @@
 }
 .docLabel {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -288,19 +288,19 @@
    rule rather than in a card of their own. One less surface on the page. */
 .docFooter {
   margin-top: 2.25rem;
-  padding-top: 1.5rem;
+  padding-top: var(--haus-space-6);
   border-top: 1px solid var(--border);
 }
 .docFooterHead {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  gap: var(--haus-space-4);
+  margin-bottom: var(--haus-space-3);
 }
 .docFooterTitle {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -338,7 +338,7 @@
 }
 .activityGroup > h2 {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -372,7 +372,7 @@
 .tlHead {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
   flex-wrap: wrap;
 }
 .tlMsg {
@@ -388,7 +388,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  margin-top: 0.5rem;
+  margin-top: var(--haus-space-2);
   font-family: var(--font-mono);
   font-size: 0.78rem;
   background: var(--surface-3);
@@ -410,7 +410,7 @@
 .refItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
   padding: 0.5rem 0.7rem;
   border-radius: var(--r-sm);
   background: var(--surface-2);
@@ -429,7 +429,7 @@
 }
 .refForm {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
   flex-wrap: wrap;
   align-items: center;
 }
@@ -443,7 +443,7 @@
 .memberRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--haus-space-3);
   padding: 0.7rem 0.95rem;
   background: var(--surface);
   border-radius: var(--r);
@@ -452,13 +452,13 @@
 .memberName {
   flex: 1;
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: var(--haus-weight-medium);
 }
 .memberEmail {
   color: var(--text-faint);
   font-size: 0.82rem;
   margin-left: 0.4rem;
-  font-weight: 400;
+  font-weight: var(--haus-weight-regular);
 }
 
 /* ---- compose ----------------------------------------------------------- */

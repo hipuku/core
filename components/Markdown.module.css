@@ -1,5 +1,5 @@
 .prose {
-  font-size: 1rem;
+  font-size: var(--haus-text-16);
   line-height: 1.7;
   color: var(--text);
 }
@@ -15,7 +15,7 @@
 .prose h3,
 .prose h4 {
   font-weight: 650;
-  line-height: 1.25;
+  line-height: var(--haus-leading-snug);
   margin: 1.5rem 0 0.6rem;
 }
 .prose h1 { font-size: 1.4rem; }
@@ -92,7 +92,7 @@
 }
 .prose th {
   background: var(--surface-2);
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
 }
 
 .prose hr {
@@ -105,7 +105,7 @@
   display: flex;
   justify-content: center;
   margin: 1rem 0;
-  padding: 1rem;
+  padding: var(--haus-space-4);
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--surface);

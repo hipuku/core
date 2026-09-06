@@ -5,7 +5,7 @@
   background: var(--surface);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--haus-space-6);
   transition: box-shadow 0.14s ease;
 }
 /* Open, it holds more of the page's attention, so it lifts slightly. */
@@ -16,7 +16,7 @@
 .head {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.75rem;
+  gap: var(--haus-space-7);
   padding: 1.1rem 1.25rem;
   min-width: 0;
 }
@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--haus-space-4);
   width: 100%;
   font: inherit;
   text-align: left;
@@ -74,10 +74,10 @@
 .affordance {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--haus-space-1);
   flex: none;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: var(--haus-weight-medium);
 }
 .chevron {
   transition: transform 0.16s ease;
@@ -100,7 +100,7 @@
 
 @media (width <= 720px) {
   .head {
-    padding: 1rem;
+    padding: var(--haus-space-4);
     gap: 1.1rem;
   }
   .handle {

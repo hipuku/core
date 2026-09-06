@@ -6,7 +6,7 @@
 
 .brandPane {
   position: relative;
-  padding: 2rem;
+  padding: var(--haus-space-8);
   border-right: 1px solid var(--border);
   background: var(--surface-2);
   overflow: hidden;
@@ -15,7 +15,7 @@
 .brand {
   position: relative;
   z-index: 2;
-  font-weight: 700;
+  font-weight: var(--haus-weight-bold);
   font-size: 1.9rem;
   letter-spacing: -0.02em;
 }
@@ -23,7 +23,7 @@
 .formPane {
   display: grid;
   place-items: center;
-  padding: 2rem;
+  padding: var(--haus-space-8);
 }
 .formInner {
   width: 100%;

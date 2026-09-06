@@ -31,7 +31,7 @@
 }
 .propLabel {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -62,14 +62,14 @@
 .bar {
   position: sticky;
   top: 60px;
-  z-index: 10;
+  z-index: var(--haus-z-10);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem 1rem;
   flex-wrap: wrap;
   padding: 0.6rem 0 0.7rem;
-  margin-bottom: 1rem;
+  margin-bottom: var(--haus-space-4);
   /* The bar overlaps the document as it scrolls under, so it needs the desk
      colour behind it, and a hairline to separate the two once they meet. */
   background: var(--bg);
@@ -94,7 +94,7 @@
 .segBtn {
   font: inherit;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: var(--haus-weight-medium);
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -136,7 +136,7 @@
 .confirm {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
 }
 .confirmText {
   font-size: 0.85rem;
@@ -153,7 +153,7 @@
   flex-wrap: wrap;
   font-size: 0.88rem;
   padding: 0.7rem 0.9rem;
-  margin-bottom: 1rem;
+  margin-bottom: var(--haus-space-4);
   border-radius: var(--r);
   background: color-mix(in oklch, var(--st-deprecated) 12%, var(--surface));
   border: 1px solid color-mix(in oklch, var(--st-deprecated) 30%, transparent);
@@ -180,12 +180,12 @@
 .title {
   font: inherit;
   font-size: 1.9rem;
-  font-weight: 700;
+  font-weight: var(--haus-weight-bold);
   letter-spacing: -0.028em;
-  line-height: 1.15;
+  line-height: var(--haus-leading-tight);
   width: 100%;
   padding: 0;
-  margin-bottom: 2rem;
+  margin-bottom: var(--haus-space-8);
   border: none;
   background: none;
   color: var(--text);
@@ -217,7 +217,7 @@
 .blockLabel {
   display: block;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: var(--haus-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -241,7 +241,7 @@
    Preview, the strongest signal that these are one surface rather than two. */
 .area {
   font: inherit;
-  font-size: 1rem;
+  font-size: var(--haus-text-16);
   line-height: 1.7;
   display: block;
   width: 100%;
@@ -274,10 +274,10 @@
    Deliberately the same metrics as the write pane above. */
 .pvTitle {
   font-size: 1.9rem;
-  font-weight: 700;
+  font-weight: var(--haus-weight-bold);
   letter-spacing: -0.028em;
-  line-height: 1.15;
-  margin-bottom: 2rem;
+  line-height: var(--haus-leading-tight);
+  margin-bottom: var(--haus-space-8);
 }
 .pvUntitled {
   color: var(--text-faint);
@@ -297,7 +297,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--haus-space-4);
   flex-wrap: wrap;
   padding: 0.9rem 0.25rem 0;
 }
@@ -316,7 +316,7 @@
 }
 .note {
   font-size: 0.82rem;
-  line-height: 1.6;
+  line-height: var(--haus-leading-loose);
   color: var(--text-dim);
   margin-left: auto;
 }
@@ -334,7 +334,7 @@
   }
   .title,
   .pvTitle {
-    font-size: 1.5rem;
+    font-size: var(--haus-text-24);
   }
   .block {
     padding-left: 0.8rem;
@@ -348,7 +348,7 @@
 /* ---- unsaved-work modal -------------------------------------------------- */
 .modalText {
   font-size: 0.92rem;
-  line-height: 1.6;
+  line-height: var(--haus-leading-loose);
   color: var(--text-dim);
   margin-bottom: 1.4rem;
 }

@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--haus-space-2);
   padding: 0.55rem 0.7rem;
   border-radius: var(--r-sm);
   border: 1px solid transparent;
