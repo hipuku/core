@@ -28,7 +28,7 @@
 }
 .search {
   font: inherit;
-  font-size: 0.9rem;
+  font-size: var(--haus-text-14);
   flex: 1;
   min-width: 0;
   padding: 0.5rem 0;
@@ -61,7 +61,7 @@
 }
 
 .status {
-  font-size: 0.82rem;
+  font-size: var(--haus-text-13);
   color: var(--text-faint);
   padding: 0 0.15rem;
 }
@@ -124,7 +124,7 @@
 }
 .rangeInput {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--haus-text-13);
   width: 9rem;
   padding: 0.45rem 0.6rem;
   border-radius: var(--r-sm);

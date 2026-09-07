@@ -48,7 +48,7 @@
   white-space: nowrap;
 }
 .when {
-  font-size: 0.8rem;
+  font-size: var(--haus-text-13);
   color: var(--text-faint);
   white-space: nowrap;
 }

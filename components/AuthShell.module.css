@@ -16,7 +16,7 @@
   position: relative;
   z-index: 2;
   font-weight: var(--haus-weight-bold);
-  font-size: 1.9rem;
+  font-size: var(--haus-text-30);
   letter-spacing: -0.02em;
 }
 

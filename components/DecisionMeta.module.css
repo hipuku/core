@@ -60,7 +60,7 @@
   align-items: baseline;
   gap: 0.4rem;
   flex-wrap: wrap;
-  font-size: 0.85rem;
+  font-size: var(--haus-text-14);
   min-width: 0;
 }
 .when {
@@ -76,7 +76,7 @@
   align-items: center;
   gap: var(--haus-space-1);
   flex: none;
-  font-size: 0.82rem;
+  font-size: var(--haus-text-13);
   font-weight: var(--haus-weight-medium);
 }
 .chevron {

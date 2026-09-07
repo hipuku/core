@@ -7,13 +7,13 @@
 .empty {
   color: var(--text-faint);
   font-style: italic;
-  font-size: 0.9rem;
+  font-size: var(--haus-text-14);
 }
 
 /* A plain link reference: a ticket or an RFC rather than a file. */
 .link {
   display: inline-block;
-  font-size: 0.85rem;
+  font-size: var(--haus-text-14);
   padding: 0.35rem 0;
   color: var(--text);
 }

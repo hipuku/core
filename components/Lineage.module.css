@@ -11,7 +11,7 @@
 
 .label {
   flex: none;
-  font-size: 0.72rem;
+  font-size: var(--haus-text-12);
   font-weight: var(--haus-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -64,7 +64,7 @@ a.node:hover .title {
 }
 
 .title {
-  font-size: 0.82rem;
+  font-size: var(--haus-text-13);
   color: var(--text-faint);
   overflow: hidden;
   text-overflow: ellipsis;

@@ -39,7 +39,7 @@ a.chip:hover {
   min-width: 0;
   font: inherit;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--haus-text-13);
   text-align: left;
   padding: 0.35rem 0;
   border: none;

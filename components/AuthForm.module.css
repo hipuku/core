@@ -8,18 +8,18 @@
   margin-bottom: var(--haus-space-1);
 }
 .title {
-  font-size: 1.4rem;
+  font-size: var(--haus-text-24);
   font-weight: var(--haus-weight-semibold);
   letter-spacing: -0.02em;
 }
 .subtitle {
   color: var(--text-dim);
-  font-size: 0.9rem;
+  font-size: var(--haus-text-14);
   margin-top: 0.3rem;
 }
 
 .error {
-  font-size: 0.85rem;
+  font-size: var(--haus-text-14);
   color: var(--danger);
   padding: 0.55rem 0.7rem;
   border-radius: var(--r-sm);
@@ -27,7 +27,7 @@
 }
 
 .alt {
-  font-size: 0.85rem;
+  font-size: var(--haus-text-14);
   color: var(--text-dim);
   text-align: center;
   margin-top: var(--haus-space-1);

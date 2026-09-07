@@ -18,9 +18,9 @@
   line-height: var(--haus-leading-snug);
   margin: 1.5rem 0 0.6rem;
 }
-.prose h1 { font-size: 1.4rem; }
-.prose h2 { font-size: 1.2rem; }
-.prose h3 { font-size: 1.05rem; }
+.prose h1 { font-size: var(--haus-text-24); }
+.prose h2 { font-size: var(--haus-text-20); }
+.prose h3 { font-size: var(--haus-text-16); }
 
 .prose p {
   margin: 0.7rem 0;
@@ -62,7 +62,7 @@
 
 .pre {
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: var(--haus-text-13);
   line-height: 1.55;
   overflow-x: auto;
   margin: 0.9rem 0;
@@ -82,7 +82,7 @@
   width: 100%;
   border-collapse: collapse;
   margin: 0.9rem 0;
-  font-size: 0.9rem;
+  font-size: var(--haus-text-14);
 }
 .prose th,
 .prose td {

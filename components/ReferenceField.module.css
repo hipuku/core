@@ -22,7 +22,7 @@
   border-left: 3px solid color-mix(in oklch, var(--st-deprecated) 45%, transparent);
 }
 .untrackedLead {
-  font-size: 0.82rem;
+  font-size: var(--haus-text-13);
   color: var(--text-dim);
   margin-bottom: 0.35rem;
 }

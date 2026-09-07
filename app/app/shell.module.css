@@ -19,7 +19,7 @@
   display: inline-flex;
   align-items: center;
   font-weight: var(--haus-weight-bold);
-  font-size: 1.7rem;
+  font-size: var(--haus-text-30);
   letter-spacing: -0.03em;
 }
 
@@ -43,7 +43,7 @@
   color: var(--text);
 }
 .ctxName {
-  font-size: 1.05rem;
+  font-size: var(--haus-text-16);
   font-weight: var(--haus-weight-medium);
   color: var(--text);
   letter-spacing: var(--haus-tracking-tight);
@@ -83,7 +83,7 @@
   background: var(--accent-tint);
   border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
   color: var(--text);
-  font-size: 0.8rem;
+  font-size: var(--haus-text-13);
   font-weight: var(--haus-weight-semibold);
 }
 
@@ -110,7 +110,7 @@
   font-weight: 550;
 }
 .menuEmail {
-  font-size: 0.78rem;
+  font-size: var(--haus-text-12);
   color: var(--text-faint);
   margin-top: 0.1rem;
 }
@@ -119,7 +119,7 @@
   width: 100%;
   text-align: left;
   font: inherit;
-  font-size: 0.85rem;
+  font-size: var(--haus-text-14);
   padding: 0.5rem 0.6rem;
   background: none;
   border: none;
