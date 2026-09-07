@@ -3,11 +3,11 @@
 .check {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--haus-space-2);
   font: inherit;
   font-size: var(--haus-text-13);
   margin-top: 0.6rem;
-  padding: 0.3rem 0.5rem;
+  padding: var(--haus-space-1) var(--haus-space-2);
   border: none;
   border-radius: var(--r-sm);
   background: none;

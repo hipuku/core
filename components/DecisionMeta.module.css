@@ -17,7 +17,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--haus-space-7);
-  padding: 1.1rem 1.25rem;
+  padding: var(--haus-space-4) var(--haus-space-5);
   min-width: 0;
 }
 
@@ -33,7 +33,7 @@
   width: 100%;
   font: inherit;
   text-align: left;
-  padding: 0.7rem 1.25rem;
+  padding: var(--haus-space-3) var(--haus-space-5);
   border: none;
   border-top: 1px solid var(--border);
   border-radius: 0 0 var(--r-lg) var(--r-lg);
@@ -58,7 +58,7 @@
 .summary {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.4rem;
+  gap: var(--haus-space-2);
   flex-wrap: wrap;
   font-size: var(--haus-text-14);
   min-width: 0;
@@ -95,18 +95,18 @@
 /* No rule of its own: the handle above already draws the line, and a second
    one would box the history in rather than let it hang off the handle. */
 .panel {
-  padding: 0.5rem 1.25rem 1.5rem;
+  padding: var(--haus-space-2) var(--haus-space-5) var(--haus-space-6);
 }
 
 @media (width <= 720px) {
   .head {
     padding: var(--haus-space-4);
-    gap: 1.1rem;
+    gap: var(--haus-space-4);
   }
   .handle {
-    padding: 0.7rem 1rem;
+    padding: var(--haus-space-3) var(--haus-space-4);
   }
   .panel {
-    padding: 0.5rem 1rem 1.25rem;
+    padding: var(--haus-space-2) var(--haus-space-4) var(--haus-space-5);
   }
 }

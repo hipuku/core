@@ -15,7 +15,7 @@
   background: var(--surface);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);
-  padding: 1.4rem;
+  padding: var(--haus-space-6);
 }
 
 .panelTitle {
@@ -33,6 +33,6 @@
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.55rem;
+  gap: var(--haus-space-2);
   margin-top: var(--haus-space-1);
 }

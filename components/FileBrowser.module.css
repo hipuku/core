@@ -4,7 +4,7 @@
 .browse {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--haus-space-2);
   margin-top: 0.6rem;
 }
 
@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: var(--haus-space-2);
-  padding: 0 0.7rem;
+  padding: 0 var(--haus-space-3);
   border-radius: var(--r-sm);
   background: var(--surface-2);
   border: 1px solid transparent;
@@ -31,7 +31,7 @@
   font-size: var(--haus-text-14);
   flex: 1;
   min-width: 0;
-  padding: 0.5rem 0;
+  padding: var(--haus-space-2) 0;
   border: none;
   background: none;
   color: var(--text);
@@ -63,7 +63,7 @@
 .status {
   font-size: var(--haus-text-13);
   color: var(--text-faint);
-  padding: 0 0.15rem;
+  padding: 0 var(--haus-space-1);
 }
 .status[data-tone="error"] {
   color: var(--danger);
@@ -92,7 +92,7 @@
   flex: none;
   font: inherit;
   font-size: var(--haus-text-12);
-  padding: 0.15rem 0.55rem;
+  padding: var(--haus-space-1) var(--haus-space-2);
   border: none;
   border-radius: var(--r-sm);
   background: none;
@@ -116,7 +116,7 @@
   align-items: center;
   gap: var(--haus-space-2);
   flex-wrap: wrap;
-  padding: 0.15rem;
+  padding: var(--haus-space-1);
 }
 .narrowPath {
   flex: 1;
@@ -126,7 +126,7 @@
   font-family: var(--font-mono);
   font-size: var(--haus-text-13);
   width: 9rem;
-  padding: 0.45rem 0.6rem;
+  padding: var(--haus-space-2) var(--haus-space-2);
   border-radius: var(--r-sm);
   border: 1px solid transparent;
   background: var(--surface);

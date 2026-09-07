@@ -34,14 +34,14 @@ a.chip:hover {
 .name {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--haus-space-2);
   flex: 1;
   min-width: 0;
   font: inherit;
   font-family: var(--font-mono);
   font-size: var(--haus-text-13);
   text-align: left;
-  padding: 0.35rem 0;
+  padding: var(--haus-space-1) 0;
   border: none;
   background: none;
   color: var(--text);
@@ -87,6 +87,6 @@ a.name:hover .path {
 .slot {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--haus-space-1);
   flex: none;
 }

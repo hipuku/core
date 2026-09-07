@@ -8,6 +8,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.4rem;
+  gap: var(--haus-space-2);
   margin-top: var(--haus-space-5);
 }

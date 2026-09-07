@@ -6,7 +6,7 @@
   gap: var(--haus-space-3);
   flex-wrap: wrap;
   margin-bottom: var(--haus-space-6);
-  padding: 0 0.15rem;
+  padding: 0 var(--haus-space-1);
 }
 
 .label {
@@ -21,7 +21,7 @@
 .chain {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--haus-space-1);
   flex-wrap: wrap;
   list-style: none;
   min-width: 0;
@@ -43,9 +43,9 @@
 .node {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.4rem;
+  gap: var(--haus-space-2);
   min-width: 0;
-  padding: 0.2rem 0.35rem;
+  padding: var(--haus-space-1) var(--haus-space-1);
   border-radius: var(--r-sm);
   transition: background 0.12s ease;
 }

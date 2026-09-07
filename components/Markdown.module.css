@@ -29,7 +29,7 @@
 .prose ul,
 .prose ol {
   margin: 0.7rem 0;
-  padding-left: 1.4rem;
+  padding-left: var(--haus-space-6);
 }
 .prose li {
   margin: 0.25rem 0;
@@ -46,7 +46,7 @@
 
 .prose blockquote {
   margin: 0.9rem 0;
-  padding: 0.2rem 0 0.2rem 1rem;
+  padding: var(--haus-space-1) 0 var(--haus-space-1) var(--haus-space-4);
   border-left: 3px solid var(--border-strong);
   color: var(--text-dim);
 }
@@ -66,7 +66,7 @@
   line-height: 1.55;
   overflow-x: auto;
   margin: 0.9rem 0;
-  padding: 0.85rem 1rem;
+  padding: var(--haus-space-3) var(--haus-space-4);
   border-radius: var(--r);
   background: var(--surface-2);
   border: 1px solid var(--border);
@@ -87,7 +87,7 @@
 .prose th,
 .prose td {
   border: 1px solid var(--border);
-  padding: 0.45rem 0.6rem;
+  padding: var(--haus-space-2) var(--haus-space-2);
   text-align: left;
 }
 .prose th {

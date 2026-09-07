@@ -13,8 +13,8 @@
 .card {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.85rem 1rem;
+  gap: var(--haus-space-3);
+  padding: var(--haus-space-3) var(--haus-space-4);
   background: var(--surface);
   border-radius: var(--r);
   box-shadow: var(--shadow-sm);

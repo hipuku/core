@@ -14,7 +14,7 @@
 .link {
   display: inline-block;
   font-size: var(--haus-text-14);
-  padding: 0.35rem 0;
+  padding: var(--haus-space-1) 0;
   color: var(--text);
 }
 .link:hover {

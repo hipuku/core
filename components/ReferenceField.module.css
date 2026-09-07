@@ -16,7 +16,7 @@
    wrong, there is just a distinction the interface can help act on. */
 .untracked {
   margin: 0.6rem 0;
-  padding: 0.7rem 0.85rem;
+  padding: var(--haus-space-3) var(--haus-space-3);
   border-radius: var(--r);
   background: color-mix(in oklch, var(--st-deprecated) 10%, var(--surface));
   border-left: 3px solid color-mix(in oklch, var(--st-deprecated) 45%, transparent);
@@ -38,7 +38,7 @@
   font: inherit;
   font-size: var(--haus-text-12);
   font-weight: var(--haus-weight-medium);
-  padding: 0.2rem 0.5rem;
+  padding: var(--haus-space-1) var(--haus-space-2);
   border: none;
   border-radius: var(--r-sm);
   background: var(--surface-2);

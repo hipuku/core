@@ -21,7 +21,7 @@
 .error {
   font-size: var(--haus-text-14);
   color: var(--danger);
-  padding: 0.55rem 0.7rem;
+  padding: var(--haus-space-2) var(--haus-space-3);
   border-radius: var(--r-sm);
   background: color-mix(in oklch, var(--danger) 12%, var(--surface));
 }

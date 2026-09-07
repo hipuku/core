@@ -20,14 +20,14 @@
 .props {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: var(--haus-space-3);
   flex-wrap: wrap;
-  padding: 0 0.25rem 0.9rem;
+  padding: 0 var(--haus-space-1) var(--haus-space-4);
 }
 .propGroup {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--haus-space-2);
 }
 .propLabel {
   font-size: var(--haus-text-12);
@@ -66,9 +66,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem 1rem;
+  gap: var(--haus-space-3) var(--haus-space-4);
   flex-wrap: wrap;
-  padding: 0.6rem 0 0.7rem;
+  padding: var(--haus-space-2) 0 var(--haus-space-3);
   margin-bottom: var(--haus-space-4);
   /* The bar overlaps the document as it scrolls under, so it needs the desk
      colour behind it, and a hairline to separate the two once they meet. */
@@ -79,14 +79,14 @@
 .barRight {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--haus-space-2);
   flex-wrap: wrap;
 }
 
 /* Write / Preview */
 .seg {
   display: inline-flex;
-  padding: 0.2rem;
+  padding: var(--haus-space-1);
   border-radius: var(--r);
   background: var(--surface-3);
   flex: none;
@@ -97,8 +97,8 @@
   font-weight: var(--haus-weight-medium);
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.7rem;
+  gap: var(--haus-space-1);
+  padding: var(--haus-space-1) var(--haus-space-3);
   border: none;
   border-radius: var(--r-sm);
   background: none;
@@ -122,8 +122,8 @@
 .tools {
   display: flex;
   align-items: center;
-  gap: 0.1rem;
-  padding-left: 0.6rem;
+  gap: var(--haus-space-1);
+  padding-left: var(--haus-space-2);
   border-left: 1px solid var(--border);
 }
 /* The shared icon affordance, one notch larger, since a toolbar is scanned at
@@ -149,10 +149,10 @@
 .recovered {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--haus-space-2);
   flex-wrap: wrap;
   font-size: var(--haus-text-14);
-  padding: 0.7rem 0.9rem;
+  padding: var(--haus-space-3) var(--haus-space-4);
   margin-bottom: var(--haus-space-4);
   border-radius: var(--r);
   background: color-mix(in oklch, var(--st-deprecated) 12%, var(--surface));
@@ -164,13 +164,13 @@
 }
 .recoveredActions {
   display: inline-flex;
-  gap: 0.4rem;
+  gap: var(--haus-space-2);
   margin-left: auto;
 }
 
 /* ---- the document sheet -------------------------------------------------- */
 .sheet {
-  padding: 2.75rem 3rem 3rem;
+  padding: var(--haus-space-10) var(--haus-space-12) var(--haus-space-12);
   background: var(--surface);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
@@ -203,7 +203,7 @@
    form. On focus the rule takes the accent: the only chrome the editor has. */
 .block {
   border: none;
-  padding: 0 0 0 1.1rem;
+  padding: 0 0 0 var(--haus-space-4);
   margin: 0 0 2rem;
   border-left: 2px solid var(--border);
   transition: border-color 0.14s ease;
@@ -299,7 +299,7 @@
   justify-content: space-between;
   gap: var(--haus-space-4);
   flex-wrap: wrap;
-  padding: 0.9rem 0.25rem 0;
+  padding: var(--haus-space-4) var(--haus-space-1) 0;
 }
 .syntax {
   font-size: var(--haus-text-13);
@@ -308,7 +308,7 @@
 .syntax kbd {
   font-family: var(--font-mono);
   font-size: var(--haus-text-12);
-  padding: 0.1rem 0.3rem;
+  padding: var(--haus-space-1) var(--haus-space-1);
   margin: 0 0.1rem;
   border-radius: 4px;
   background: var(--surface-3);
@@ -330,14 +330,14 @@
     border-bottom: 1px solid var(--border);
   }
   .sheet {
-    padding: 1.5rem 1.25rem 1.75rem;
+    padding: var(--haus-space-6) var(--haus-space-5) var(--haus-space-7);
   }
   .title,
   .pvTitle {
     font-size: var(--haus-text-24);
   }
   .block {
-    padding-left: 0.8rem;
+    padding-left: var(--haus-space-3);
   }
   .recoveredActions,
   .note {
@@ -360,6 +360,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.4rem;
+  gap: var(--haus-space-2);
   flex-wrap: wrap;
 }
