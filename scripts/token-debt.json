@@ -1,22 +1,19 @@
 {
-  "total": 84,
+  "total": 49,
   "byFile": {
-    "app/app/app.module.css": 17,
-    "app/app/shell.module.css": 7,
-    "components/AuthForm.module.css": 2,
+    "app/app/app.module.css": 9,
+    "app/app/shell.module.css": 5,
+    "components/AuthForm.module.css": 1,
     "components/AuthShell.module.css": 3,
     "components/ChipPit.module.css": 2,
-    "components/DecisionEditor.module.css": 14,
-    "components/DemoCredentials.module.css": 3,
+    "components/DecisionEditor.module.css": 10,
+    "components/DemoCredentials.module.css": 1,
     "components/Dropdown.module.css": 2,
-    "components/FileBrowser.module.css": 2,
+    "components/FileBrowser.module.css": 1,
     "components/FileToken.module.css": 2,
-    "components/Lineage.module.css": 3,
-    "components/LiveReferenceField.module.css": 1,
-    "components/Markdown.module.css": 15,
-    "components/Modal.module.css": 3,
-    "components/PasswordField.module.css": 5,
-    "components/ReferenceField.module.css": 2,
-    "components/SupersedeModal.module.css": 1
+    "components/Lineage.module.css": 2,
+    "components/Markdown.module.css": 5,
+    "components/Modal.module.css": 2,
+    "components/PasswordField.module.css": 4
   }
 }

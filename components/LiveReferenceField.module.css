@@ -6,7 +6,7 @@
   gap: var(--haus-space-2);
   font: inherit;
   font-size: var(--haus-text-13);
-  margin-top: 0.6rem;
+  margin-top: var(--haus-space-2);
   padding: var(--haus-space-1) var(--haus-space-2);
   border: none;
   border-radius: var(--r-sm);

@@ -15,7 +15,7 @@
 .subtitle {
   color: var(--text-dim);
   font-size: var(--haus-text-14);
-  margin-top: 0.3rem;
+  margin-top: var(--haus-space-1);
 }
 
 .error {

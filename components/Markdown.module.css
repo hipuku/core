@@ -16,26 +16,26 @@
 .prose h4 {
   font-weight: 650;
   line-height: var(--haus-leading-snug);
-  margin: 1.5rem 0 0.6rem;
+  margin: var(--haus-space-6) 0 var(--haus-space-2);
 }
 .prose h1 { font-size: var(--haus-text-24); }
 .prose h2 { font-size: var(--haus-text-20); }
 .prose h3 { font-size: var(--haus-text-16); }
 
 .prose p {
-  margin: 0.7rem 0;
+  margin: var(--haus-space-3) 0;
 }
 
 .prose ul,
 .prose ol {
-  margin: 0.7rem 0;
+  margin: var(--haus-space-3) 0;
   padding-left: var(--haus-space-6);
 }
 .prose li {
-  margin: 0.25rem 0;
+  margin: var(--haus-space-1) 0;
 }
 .prose li > input[type="checkbox"] {
-  margin-right: 0.4rem;
+  margin-right: var(--haus-space-2);
 }
 
 .prose a {
@@ -45,7 +45,7 @@
 }
 
 .prose blockquote {
-  margin: 0.9rem 0;
+  margin: var(--haus-space-4) 0;
   padding: var(--haus-space-1) 0 var(--haus-space-1) var(--haus-space-4);
   border-left: 3px solid var(--border-strong);
   color: var(--text-dim);
@@ -65,7 +65,7 @@
   font-size: var(--haus-text-13);
   line-height: 1.55;
   overflow-x: auto;
-  margin: 0.9rem 0;
+  margin: var(--haus-space-4) 0;
   padding: var(--haus-space-3) var(--haus-space-4);
   border-radius: var(--r);
   background: var(--surface-2);
@@ -81,7 +81,7 @@
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  margin: 0.9rem 0;
+  margin: var(--haus-space-4) 0;
   font-size: var(--haus-text-14);
 }
 .prose th,
@@ -98,13 +98,13 @@
 .prose hr {
   border: none;
   border-top: 1px solid var(--border);
-  margin: 1.4rem 0;
+  margin: var(--haus-space-6) 0;
 }
 
 .mermaid {
   display: flex;
   justify-content: center;
-  margin: 1rem 0;
+  margin: var(--haus-space-4) 0;
   padding: var(--haus-space-4);
   border: 1px solid var(--border);
   border-radius: var(--r);

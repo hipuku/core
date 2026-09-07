@@ -21,7 +21,7 @@
 .panelTitle {
   font-size: var(--haus-text-16);
   font-weight: 650;
-  margin-bottom: 1.1rem;
+  margin-bottom: var(--haus-space-4);
 }
 
 .form {

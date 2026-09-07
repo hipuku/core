@@ -204,7 +204,7 @@
 .block {
   border: none;
   padding: 0 0 0 var(--haus-space-4);
-  margin: 0 0 2rem;
+  margin: 0 0 var(--haus-space-8);
   border-left: 2px solid var(--border);
   transition: border-color 0.14s ease;
 }
@@ -221,7 +221,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin-bottom: 0.45rem;
+  margin-bottom: var(--haus-space-2);
   padding: 0;
 }
 .block:focus-within > .blockLabel {
@@ -309,7 +309,7 @@
   font-family: var(--font-mono);
   font-size: var(--haus-text-12);
   padding: var(--haus-space-1) var(--haus-space-1);
-  margin: 0 0.1rem;
+  margin: 0 var(--haus-space-1);
   border-radius: 4px;
   background: var(--surface-3);
   color: var(--text-dim);
@@ -350,7 +350,7 @@
   font-size: var(--haus-text-14);
   line-height: var(--haus-leading-loose);
   color: var(--text-dim);
-  margin-bottom: 1.4rem;
+  margin-bottom: var(--haus-space-6);
 }
 
 /* One right-aligned cluster, weighted left to right: the destructive option

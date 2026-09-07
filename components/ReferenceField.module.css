@@ -15,7 +15,7 @@
    rather than fixed. Tinted like a notice, not like an error: nothing is
    wrong, there is just a distinction the interface can help act on. */
 .untracked {
-  margin: 0.6rem 0;
+  margin: var(--haus-space-2) 0;
   padding: var(--haus-space-3) var(--haus-space-3);
   border-radius: var(--r);
   background: color-mix(in oklch, var(--st-deprecated) 10%, var(--surface));
@@ -24,7 +24,7 @@
 .untrackedLead {
   font-size: var(--haus-text-13);
   color: var(--text-dim);
-  margin-bottom: 0.35rem;
+  margin-bottom: var(--haus-space-1);
 }
 .untrackedList {
   list-style: none;

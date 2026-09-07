@@ -101,7 +101,7 @@
 
 .menuHead {
   padding: var(--haus-space-2) var(--haus-space-2) var(--haus-space-2);
-  margin-bottom: 0.2rem;
+  margin-bottom: var(--haus-space-1);
   background: var(--surface-2);
   border-radius: var(--r-sm);
 }
@@ -112,7 +112,7 @@
 .menuEmail {
   font-size: var(--haus-text-12);
   color: var(--text-faint);
-  margin-top: 0.1rem;
+  margin-top: var(--haus-space-1);
 }
 
 .menuItem {

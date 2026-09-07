@@ -2,7 +2,7 @@
   font-size: var(--haus-text-14);
   line-height: var(--haus-leading-loose);
   color: var(--text-dim);
-  margin-bottom: 1.1rem;
+  margin-bottom: var(--haus-space-4);
 }
 .actions {
   display: flex;

@@ -130,7 +130,7 @@
 
 /* ---- sections ---------------------------------------------------------- */
 .section {
-  margin-top: 2.75rem;
+  margin-top: var(--haus-space-10);
 }
 .sectionHead {
   display: flex;
@@ -198,7 +198,7 @@
 /* A secondary fact inside a property: "3 days ago" beside a date. */
 .propAside {
   color: var(--text-faint);
-  margin-left: 0.4rem;
+  margin-left: var(--haus-space-2);
 }
 
 /* ---- notice -------------------------------------------------------------
@@ -274,7 +274,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin-bottom: 0.45rem;
+  margin-bottom: var(--haus-space-2);
 }
 .docBlockLead .docLabel {
   color: var(--accent);
@@ -287,7 +287,7 @@
 /* References belong to the document, so they sit on the same paper, below a
    rule rather than in a card of their own. One less surface on the page. */
 .docFooter {
-  margin-top: 2.25rem;
+  margin-top: var(--haus-space-8);
   padding-top: var(--haus-space-6);
   border-top: 1px solid var(--border);
 }
@@ -342,7 +342,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin-bottom: 0.9rem;
+  margin-bottom: var(--haus-space-4);
 }
 
 /* ---- activity: timeline ------------------------------------------------ */
@@ -381,7 +381,7 @@
 .tlMeta {
   font-size: var(--haus-text-12);
   color: var(--text-faint);
-  margin-top: 0.15rem;
+  margin-top: var(--haus-space-1);
 }
 .changes {
   list-style: none;
@@ -405,7 +405,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--haus-space-2);
-  margin-bottom: 0.85rem;
+  margin-bottom: var(--haus-space-3);
 }
 .refItem {
   display: flex;
@@ -457,7 +457,7 @@
 .memberEmail {
   color: var(--text-faint);
   font-size: var(--haus-text-13);
-  margin-left: 0.4rem;
+  margin-left: var(--haus-space-2);
   font-weight: var(--haus-weight-regular);
 }
 

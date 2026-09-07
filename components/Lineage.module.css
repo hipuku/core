@@ -31,7 +31,7 @@
    nothing in front of it without a special case. */
 .step + .step::before {
   content: "→";
-  margin-right: 0.35rem;
+  margin-right: var(--haus-space-1);
   color: var(--text-faint);
 }
 .step {
