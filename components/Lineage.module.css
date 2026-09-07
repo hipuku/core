@@ -13,7 +13,7 @@
   flex: none;
   font-size: var(--haus-text-12);
   font-weight: var(--haus-weight-semibold);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--haus-tracking-wider);
   text-transform: uppercase;
   color: var(--text-faint);
 }

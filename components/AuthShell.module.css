@@ -17,7 +17,7 @@
   z-index: 2;
   font-weight: var(--haus-weight-bold);
   font-size: var(--haus-text-30);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--haus-tracking-tighter);
 }
 
 .formPane {

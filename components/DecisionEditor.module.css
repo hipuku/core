@@ -32,7 +32,7 @@
 .propLabel {
   font-size: var(--haus-text-12);
   font-weight: var(--haus-weight-semibold);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--haus-tracking-wider);
   text-transform: uppercase;
   color: var(--text-faint);
 }
@@ -181,7 +181,7 @@
   font: inherit;
   font-size: var(--haus-text-30);
   font-weight: var(--haus-weight-bold);
-  letter-spacing: -0.028em;
+  letter-spacing: var(--haus-tracking-tightest);
   line-height: var(--haus-leading-tight);
   width: 100%;
   padding: 0;
@@ -218,7 +218,7 @@
   display: block;
   font-size: var(--haus-text-12);
   font-weight: var(--haus-weight-semibold);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--haus-tracking-wider);
   text-transform: uppercase;
   color: var(--text-faint);
   margin-bottom: var(--haus-space-2);
@@ -275,7 +275,7 @@
 .pvTitle {
   font-size: var(--haus-text-30);
   font-weight: var(--haus-weight-bold);
-  letter-spacing: -0.028em;
+  letter-spacing: var(--haus-tracking-tightest);
   line-height: var(--haus-leading-tight);
   margin-bottom: var(--haus-space-8);
 }

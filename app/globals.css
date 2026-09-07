@@ -93,7 +93,7 @@ body {
   font-family: var(--font-sans);
   font-size: 15.5px;
   line-height: var(--haus-leading-relaxed);
-  letter-spacing: -0.005em;
+  letter-spacing: var(--haus-tracking-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -109,7 +109,7 @@ a {
 }
 
 h1, h2, h3, h4 {
-  letter-spacing: -0.02em;
+  letter-spacing: var(--haus-tracking-tighter);
 }
 
 /* ---- shared primitives ------------------------------------------------- */
@@ -121,7 +121,7 @@ h1, h2, h3, h4 {
 .eyebrow {
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--haus-tracking-wider);
   text-transform: uppercase;
   color: var(--text-faint);
 }
@@ -336,7 +336,7 @@ h1, h2, h3, h4 {
   align-items: center;
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--haus-tracking-wide);
   text-transform: uppercase;
   padding: 0.22rem 0.5rem;
   border-radius: var(--r-full);
@@ -351,7 +351,7 @@ h1, h2, h3, h4 {
   align-items: center;
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--haus-tracking-wide);
   padding: 0.22rem 0.5rem;
   border-radius: var(--r-full);
   color: var(--text-dim);
@@ -371,7 +371,7 @@ h1, h2, h3, h4 {
   border-color: transparent;
   background: var(--surface-3);
   color: var(--text-dim);
-  letter-spacing: 0.06em;
+  letter-spacing: var(--haus-tracking-wider);
 }
 .pill--proposed { --pc: var(--st-proposed); }
 .pill--accepted { --pc: var(--st-accepted); }

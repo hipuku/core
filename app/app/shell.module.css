@@ -20,7 +20,7 @@
   align-items: center;
   font-weight: var(--haus-weight-bold);
   font-size: var(--haus-text-30);
-  letter-spacing: -0.03em;
+  letter-spacing: var(--haus-tracking-tightest);
 }
 
 /* workspace context: back button + name */
