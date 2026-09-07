@@ -17,6 +17,15 @@
  * while these stay visible in one place, with a reason per group.
  */
 const OFF_SCALE = [
+  /* Viewport height. `min-height: 100dvh` is a full-viewport shell, and there
+     is no token for the viewport: dvh is the value, not a step on a scale. */
+  '100dvh',
+  /* Em-relative text sizes. Inline code and a couple of small labels set their
+     size against the surrounding text, and haus's type scale is absolute (rem),
+     so no token means "0.85 of my parent". FileToken 0.8em, Markdown 0.85em,
+     FileBrowser 0.9em. A new absolute size still fails; only these relative ones
+     are exempt. */
+  '0.8em', '0.85em', '0.9em',
 ]
 
 const config = {
