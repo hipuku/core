@@ -1,6 +1,6 @@
 .prose {
   font-size: var(--haus-text-16);
-  line-height: 1.7;
+  line-height: var(--haus-leading-loose);
   color: var(--text);
 }
 .prose > :first-child {
@@ -63,7 +63,7 @@
 .pre {
   font-family: var(--font-mono);
   font-size: var(--haus-text-13);
-  line-height: 1.55;
+  line-height: var(--haus-leading-relaxed);
   overflow-x: auto;
   margin: var(--haus-space-4) 0;
   padding: var(--haus-space-3) var(--haus-space-4);

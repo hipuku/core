@@ -92,7 +92,7 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 15.5px;
-  line-height: 1.55;
+  line-height: var(--haus-leading-relaxed);
   letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -298,7 +298,7 @@ h1, h2, h3, h4 {
 }
 .textarea {
   resize: vertical;
-  line-height: 1.6;
+  line-height: var(--haus-leading-loose);
 }
 .input::placeholder,
 .textarea::placeholder {

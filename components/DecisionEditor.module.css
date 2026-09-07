@@ -230,7 +230,7 @@
 
 .blockHint {
   font-size: var(--haus-text-13);
-  line-height: 1.55;
+  line-height: var(--haus-leading-relaxed);
   color: var(--text-faint);
   margin: -0.15rem 0 0.6rem;
   max-width: 44rem;
@@ -242,7 +242,7 @@
 .area {
   font: inherit;
   font-size: var(--haus-text-16);
-  line-height: 1.7;
+  line-height: var(--haus-leading-loose);
   display: block;
   width: 100%;
   min-height: 3.4rem;

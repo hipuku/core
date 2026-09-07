@@ -17,7 +17,7 @@
   font-size: var(--haus-text-30);
   font-weight: var(--haus-weight-bold);
   letter-spacing: -0.025em;
-  line-height: 1.12;
+  line-height: var(--haus-leading-tight);
 }
 .titleMuted {
   color: var(--text-faint);

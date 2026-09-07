@@ -1,19 +1,18 @@
 {
-  "total": 49,
+  "total": 42,
   "byFile": {
-    "app/app/app.module.css": 9,
+    "app/app/app.module.css": 8,
     "app/app/shell.module.css": 5,
     "components/AuthForm.module.css": 1,
     "components/AuthShell.module.css": 3,
     "components/ChipPit.module.css": 2,
-    "components/DecisionEditor.module.css": 10,
-    "components/DemoCredentials.module.css": 1,
+    "components/DecisionEditor.module.css": 8,
     "components/Dropdown.module.css": 2,
     "components/FileBrowser.module.css": 1,
     "components/FileToken.module.css": 2,
     "components/Lineage.module.css": 2,
-    "components/Markdown.module.css": 5,
+    "components/Markdown.module.css": 3,
     "components/Modal.module.css": 2,
-    "components/PasswordField.module.css": 4
+    "components/PasswordField.module.css": 3
   }
 }
