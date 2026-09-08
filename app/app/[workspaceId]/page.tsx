@@ -8,7 +8,7 @@ import { repoChipColor } from "@/lib/brand";
 import { decisionLabel, decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "../app.module.css";
-import { EmptyState } from "haus-components";
+import { EmptyState, Card } from "haus-components";
 
 export default async function WorkspacePage({
   params,
@@ -90,7 +90,8 @@ export default async function WorkspacePage({
         <ul className={styles.list}>
           {decisions.map((decision) => (
             <li key={decision.id}>
-              <Link href={`/app/${workspaceId}/${decision.id}`} className={styles.card}>
+              <Link href={`/app/${workspaceId}/${decision.id}`} className={styles.cardLink}>
+                <Card variant="elevated" padding={false} className={styles.card}>
                 <span className={styles.cardNum}>
                   <span className="key-chip">
                     {decisionLabel(workspace.key, decision.number)}
@@ -98,6 +99,7 @@ export default async function WorkspacePage({
                 </span>
                 <span className={styles.cardTitle}>{decision.title}</span>
                 <StatusBadge status={decision.status} />
+              </Card>
               </Link>
             </li>
           ))}

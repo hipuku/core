@@ -3,6 +3,7 @@ import { draftLabel } from "@/lib/decisions/draft-label";
 import { timeAgo } from "@/lib/time-ago";
 import styles from "./DraftList.module.css";
 import { StatusBadge } from "@/components/StatusBadge";
+import { Card } from "haus-components";
 
 export interface DraftSummary {
   id: string;
@@ -46,27 +47,29 @@ export function DraftList({
         <li key={draft.id}>
           <Link
             href={`/app/${workspaceId}/new?draft=${draft.id}`}
-            className={styles.card}
+            className={styles.cardLink}
           >
-            <span className={styles.cardNum}>
-              <span
-                className="key-chip key-chip--pending"
-                title="Your draft, numbered when you propose it"
-              >
-                {workspaceKey}-&bull;&bull;&bull;
+            <Card variant="elevated" padding={false} className={styles.card}>
+              <span className={styles.cardNum}>
+                <span
+                  className="key-chip key-chip--pending"
+                  title="Your draft, numbered when you propose it"
+                >
+                  {workspaceKey}-&bull;&bull;&bull;
+                </span>
               </span>
-            </span>
-            <span className={label.derived ? styles.derived : styles.cardTitle}>
-              {label.text}
-            </span>
-            <span className={styles.when}>
-              edited {timeAgo(new Date(draft.updatedAt).getTime())}
-            </span>
-            {/* The tag sits where every other row carries its status, so the
-                column scans top to bottom without a gap. */}
-            <span title="Only you can see this">
-              <StatusBadge status="draft" />
-            </span>
+              <span className={label.derived ? styles.derived : styles.cardTitle}>
+                {label.text}
+              </span>
+              <span className={styles.when}>
+                edited {timeAgo(new Date(draft.updatedAt).getTime())}
+              </span>
+              {/* The tag sits where every other row carries its status, so the
+                  column scans top to bottom without a gap. */}
+              <span title="Only you can see this">
+                <StatusBadge status="draft" />
+              </span>
+            </Card>
           </Link>
         </li>
         );

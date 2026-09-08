@@ -45,15 +45,25 @@
   flex-direction: column;
   gap: var(--haus-space-2);
 }
+/* Layout only. haus Card owns the surface: the background, the corner and the
+   elevation. What is left here is the arrangement, which is the half a design
+   system should have no opinion about. */
 .card {
   display: flex;
   align-items: center;
   gap: var(--haus-space-3);
   padding: var(--haus-space-3) var(--haus-space-4);
-  background: var(--surface);
-  border-radius: var(--r);
-  box-shadow: var(--shadow-sm);
   transition: box-shadow 0.14s ease, transform 0.14s ease;
+}
+
+/* The anchor around the card. A card cannot be the anchor: haus Card's `as` is
+   a union of intrinsic element names by design, so the link wraps it instead.
+   An anchor may contain flow content, so this is valid and the whole card stays
+   clickable. */
+.cardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 .card:hover {
   box-shadow: var(--shadow);
@@ -75,10 +85,13 @@
   justify-content: space-between;
   gap: var(--haus-space-5);
   padding: var(--haus-space-4) var(--haus-space-5);
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
   transition: box-shadow 0.14s ease, transform 0.14s ease;
+}
+
+.wsLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 .wsCard:hover {
   box-shadow: var(--shadow);

@@ -1,10 +1,8 @@
 /* One card holding the decision's current state and, on request, the history
    behind it. It grows downwards rather than pushing a second surface onto the
    page: the history is this record at greater depth rather than a neighbour of it. */
+/* Layout only; haus Card owns the surface. */
 .card {
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
   margin-bottom: var(--haus-space-6);
   transition: box-shadow 0.14s ease;
 }

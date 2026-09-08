@@ -10,15 +10,19 @@
   margin-bottom: var(--haus-space-2);
 }
 
+/* Layout only; haus Card owns the surface. */
 .card {
   display: flex;
   align-items: center;
   gap: var(--haus-space-3);
   padding: var(--haus-space-3) var(--haus-space-4);
-  background: var(--surface);
-  border-radius: var(--r);
-  box-shadow: var(--shadow-sm);
   transition: box-shadow 0.14s ease, transform 0.14s ease;
+}
+
+.cardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 .card:hover {
   box-shadow: var(--shadow);

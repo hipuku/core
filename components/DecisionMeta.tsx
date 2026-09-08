@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
 import { timeAgo } from "@/lib/time-ago";
 import styles from "./DecisionMeta.module.css";
+import { Card } from "haus-components";
 
 /**
  * The decision's dossier: what is true of it now, and how it got that way.
@@ -41,7 +42,11 @@ export function DecisionMeta({
   const panelId = useId();
 
   return (
-    <div className={`${styles.card} ${open ? styles.cardOpen : ""}`}>
+    <Card
+      variant="elevated"
+      padding={false}
+      className={`${styles.card} ${open ? styles.cardOpen : ""}`}
+    >
       <div className={styles.head}>{children}</div>
 
       {count > 0 && (
@@ -81,6 +86,6 @@ export function DecisionMeta({
           )}
         </>
       )}
-    </div>
+    </Card>
   );
 }

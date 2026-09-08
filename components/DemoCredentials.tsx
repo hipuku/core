@@ -3,7 +3,7 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import styles from "./DemoCredentials.module.css";
-import { IconButton } from "haus-components";
+import { IconButton, Callout } from "haus-components";
 
 /**
  * The way in, on the page where someone needs it.
@@ -24,14 +24,17 @@ export function DemoCredentials({
   password: string;
 }) {
   return (
-    <div className={styles.card}>
+    // A Callout, not a Card. A tinted panel with a rule down one side and an
+    // advisory message is what Callout is; it was drawn as a card because core
+    // had no callout of its own to reach for.
+    <Callout tone="info" className={styles.card}>
       <p className={styles.lead}>
         <strong>Read-only demo.</strong> Sign in with these to look around. You
         can write and save drafts; the decision log itself stays as it is.
       </p>
       <Field label="Email" value={email} />
       <Field label="Password" value={password} />
-    </div>
+    </Callout>
   );
 }
 
