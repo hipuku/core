@@ -4,6 +4,16 @@ import { useFormStatus } from "react-dom";
 import { Button, type ButtonProps } from "haus-components";
 
 /**
+ * The half of haus `ButtonProps` that renders a real button.
+ *
+ * `ButtonProps` became a union with `asChild` (haus#57). A submit button is
+ * never a cloned child, so the wrapper takes the non-`asChild` half rather than
+ * the whole union: with the union, passing the props straight through fails
+ * because the compiler cannot rule out the `asChild` branch. haus#66.
+ */
+type ButtonOwnProps = Extract<ButtonProps, { asChild?: false }>;
+
+/**
  * A submit button that knows its form is busy. Composes haus `Button`. C3.
  *
  * Every mutation here is a server action: a round trip, then a revalidation.
@@ -28,7 +38,7 @@ export function SubmitButton({
   pendingLabel,
   disabled,
   ...rest
-}: ButtonProps & { pendingLabel?: string }) {
+}: ButtonOwnProps & { pendingLabel?: string }) {
   const { pending } = useFormStatus();
 
   return (
