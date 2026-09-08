@@ -18,8 +18,8 @@
   margin: var(--haus-space-2) 0;
   padding: var(--haus-space-3) var(--haus-space-3);
   border-radius: var(--r);
-  background: color-mix(in oklch, var(--st-deprecated) 10%, var(--surface));
-  border-left: 3px solid color-mix(in oklch, var(--st-deprecated) 45%, transparent);
+  background: var(--haus-color-warning-subtle);
+  border-left: 3px solid var(--haus-color-warning-border);
 }
 .untrackedLead {
   font-size: var(--haus-text-13);

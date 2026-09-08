@@ -5,6 +5,7 @@ import { NewWorkspaceModal } from "@/components/NewWorkspaceModal";
 import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "./app.module.css";
+import { EmptyState } from "haus-components";
 
 export default async function WorkspacesPage() {
   const user = await requireUser();
@@ -23,9 +24,10 @@ export default async function WorkspacesPage() {
       </div>
 
       {summaries.length === 0 ? (
-        <p className={styles.empty}>
-          No workspaces yet. Create one to start recording decisions.
-        </p>
+        <EmptyState
+          title="No workspaces yet"
+          description="Create one to start recording decisions."
+        />
       ) : (
         <ul className={styles.list}>
           {summaries.map(

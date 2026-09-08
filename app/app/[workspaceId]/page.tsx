@@ -8,6 +8,7 @@ import { repoChipColor } from "@/lib/brand";
 import { decisionLabel, decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "../app.module.css";
+import { EmptyState } from "haus-components";
 
 export default async function WorkspacePage({
   params,
@@ -76,14 +77,15 @@ export default async function WorkspacePage({
       />
 
       {decisions.length === 0 && drafts.length === 0 ? (
-        <p className={styles.empty}>
-          No decisions yet. Propose the first one to start the log.
-        </p>
+        <EmptyState
+          title="No decisions yet"
+          description="Propose the first one to start the log."
+        />
       ) : decisions.length === 0 ? (
-        <p className={styles.empty}>
-          Nothing proposed yet. Your draft above is not visible to anyone else
-          until you propose it.
-        </p>
+        <EmptyState
+          title="Nothing proposed yet"
+          description="Your draft above is not visible to anyone else until you propose it."
+        />
       ) : (
         <ul className={styles.list}>
           {decisions.map((decision) => (

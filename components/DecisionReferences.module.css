@@ -4,12 +4,6 @@
   flex-direction: column;
 }
 
-.empty {
-  color: var(--text-faint);
-  font-style: italic;
-  font-size: var(--haus-text-14);
-}
-
 /* A plain link reference: a ticket or an RFC rather than a file. */
 .link {
   display: inline-block;

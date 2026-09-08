@@ -155,9 +155,9 @@
   padding: var(--haus-space-3) var(--haus-space-4);
   margin-bottom: var(--haus-space-4);
   border-radius: var(--r);
-  background: color-mix(in oklch, var(--st-deprecated) 12%, var(--surface));
-  border: 1px solid color-mix(in oklch, var(--st-deprecated) 30%, transparent);
-  color: color-mix(in oklch, var(--st-deprecated) 80%, black);
+  background: var(--haus-color-warning-subtle);
+  border: var(--haus-border-width-default) solid var(--haus-color-warning-border);
+  color: var(--haus-color-warning-on-subtle);
 }
 .recoveredIcon {
   flex: none;

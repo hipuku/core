@@ -1,4 +1,4 @@
-import { Badge, type BadgeTone } from "haus-components";
+import { Badge, type BadgeTone, EmptyState } from "haus-components";
 import { FileRow } from "@/components/FileToken";
 import { referenceDrift, type DriftStatus } from "@/lib/decisions/drift";
 import styles from "./DecisionReferences.module.css";
@@ -39,7 +39,9 @@ export interface ReferenceView {
  */
 export function DecisionReferences({ references }: { references: ReferenceView[] }) {
   if (references.length === 0) {
-    return <p className={styles.empty}>No code or links cited.</p>;
+    // headingLevel 4: this is a region inside the decision page, not the page's
+    // own empty state, so it sits under the section heading above it.
+    return <EmptyState title="No code or links cited" headingLevel={4} />;
   }
 
   return (

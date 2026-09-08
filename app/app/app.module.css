@@ -67,14 +67,6 @@
   flex: 1;
   font-weight: var(--haus-weight-medium);
 }
-.empty {
-  padding: var(--haus-space-10);
-  text-align: center;
-  color: var(--text-faint);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-}
 
 /* ---- workspace card ---------------------------------------------------- */
 .wsCard {
@@ -114,8 +106,8 @@
 .wsPending {
   padding: var(--haus-space-1) var(--haus-space-2);
   border-radius: var(--r-full);
-  background: color-mix(in oklch, var(--st-proposed) 15%, var(--surface));
-  color: color-mix(in oklch, var(--st-proposed) 72%, black);
+  background: var(--haus-color-info-subtle);
+  color: var(--haus-color-info-on-subtle);
   font-size: var(--haus-text-13);
   font-weight: var(--haus-weight-semibold);
 }
@@ -237,11 +229,9 @@
 }
 
 .noticeWarn {
-  background: color-mix(in oklch, var(--st-superseded) 12%, var(--surface));
-  border-left-color: var(--st-superseded);
+  background: var(--haus-color-warning-subtle);
+  border-left-color: var(--haus-color-warning-border);
 }
-
-
 
 /* ---- the sheet ----------------------------------------------------------
    The one piece of paper on the page, and what the tabs swap the contents of.
@@ -395,9 +385,12 @@
   border-radius: var(--r-sm);
   padding: var(--haus-space-2) var(--haus-space-3);
 }
-.opAdd { color: color-mix(in oklch, var(--st-accepted) 80%, black); }
-.opRemove { color: color-mix(in oklch, var(--st-rejected) 85%, black); }
-.opReplace { color: color-mix(in oklch, var(--st-superseded) 80%, black); }
+/* A diff operation is feedback, not a decision state. These read haus's roles
+   directly now: the ink haus already publishes for text on a tinted surface,
+   rather than a colour-mix toward black that only approximated one. */
+.opAdd { color: var(--haus-color-success-on-subtle); }
+.opRemove { color: var(--haus-color-error-on-subtle); }
+.opReplace { color: var(--haus-color-warning-on-subtle); }
 
 /* ---- references -------------------------------------------------------- */
 .refList {
@@ -437,7 +430,6 @@
   flex: 1;
   min-width: 8rem;
 }
-
 
 /* ---- members ----------------------------------------------------------- */
 .memberRow {
