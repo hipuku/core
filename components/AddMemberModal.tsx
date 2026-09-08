@@ -3,8 +3,7 @@
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { inviteMember } from "@/app/app/actions";
-import { Button, Input } from "haus-components";
-import { Dropdown } from "./Dropdown";
+import { Button, Input, Listbox } from "haus-components";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
 import styles from "./Modal.module.css";
@@ -45,16 +44,13 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
               autoFocus
               placeholder="teammate@example.com"
             />
-            <label className="field">
-              <span>Role</span>
-              <Dropdown
-                label="Role"
-                name="role"
-                value={role}
-                onChange={setRole}
-                options={ROLE_OPTIONS}
-              />
-            </label>
+            <Listbox
+              label="Role"
+              name="role"
+              value={role}
+              onChange={setRole}
+              options={ROLE_OPTIONS}
+            />
             <div className={styles.actions}>
               <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                 Cancel

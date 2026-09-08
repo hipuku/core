@@ -2,10 +2,9 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { Button } from "haus-components";
+import { Button, Listbox } from "haus-components";
 import { connectRepo, listMyGithubRepos } from "@/app/app/actions";
 import type { GithubRepo } from "@/lib/github";
-import { Dropdown } from "./Dropdown";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
 import styles from "./Modal.module.css";
@@ -53,29 +52,26 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
               onSuccess={() => setOpen(false)}
               className={styles.form}
             >
-              <label className="field">
-                <span>Repository</span>
-                {/* The custom Dropdown, like every other choose-a-thing in
-                    this app: a native select's popup cannot be themed, and
-                    "private" reads better as a hint than as parenthetical text
-                    appended to the name. */}
-                <Dropdown
-                  label="Repository"
-                  name="repo"
-                  value={chosen}
-                  onChange={setChosen}
-                  placeholder="Choose a repository"
-                  options={repos.map((repo) => ({
-                    value: JSON.stringify({
-                      owner: repo.owner,
-                      name: repo.name,
-                      defaultBranch: repo.defaultBranch,
-                    }),
-                    label: repo.fullName,
-                    hint: repo.private ? "Private" : undefined,
-                  }))}
-                />
-              </label>
+              {/* haus Listbox, like every other choose-a-thing in this app: a
+                  native select's popup cannot be themed, and "private" reads
+                  better as a hint than as parenthetical text appended to the
+                  name. The hint is why this is a Listbox and not a Select. */}
+              <Listbox
+                label="Repository"
+                name="repo"
+                value={chosen}
+                onChange={setChosen}
+                placeholder="Choose a repository"
+                options={repos.map((repo) => ({
+                  value: JSON.stringify({
+                    owner: repo.owner,
+                    name: repo.name,
+                    defaultBranch: repo.defaultBranch,
+                  }),
+                  label: repo.fullName,
+                  hint: repo.private ? "Private" : undefined,
+                }))}
+              />
               <div className={styles.actions}>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                   Cancel

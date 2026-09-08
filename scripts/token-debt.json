@@ -1,12 +1,11 @@
 {
-  "total": 21,
+  "total": 19,
   "byFile": {
     "app/app/app.module.css": 3,
     "app/app/shell.module.css": 3,
     "components/AuthShell.module.css": 1,
     "components/ChipPit.module.css": 1,
     "components/DecisionEditor.module.css": 4,
-    "components/Dropdown.module.css": 2,
     "components/FileToken.module.css": 1,
     "components/Lineage.module.css": 1,
     "components/Markdown.module.css": 2,
