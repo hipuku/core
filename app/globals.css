@@ -262,40 +262,6 @@ h1, h2, h3, h4 {
   padding: 0;
 }
 
-/* inputs */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.field > span {
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  font-weight: 500;
-}
-/* PasswordField is the only remaining consumer: it keeps its own markup because
-   its label deliberately does not wrap the input, and it carries a reveal toggle
-   and a strength meter. Every other field is a haus Input. C4. */
-.input {
-  font: inherit;
-  font-size: 0.9rem;
-  width: 100%;
-  padding: 0.55rem 0.7rem;
-  border-radius: var(--r-sm);
-  border: 1px solid transparent;
-  background: var(--surface-2);
-  color: var(--text);
-  transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-}
-.input::placeholder {
-  color: var(--text-faint);
-}
-.input:focus-visible {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: var(--focus-ring);
-}
-
 /* Every ring here is a box-shadow, and forced-colors mode drops box-shadows
    entirely: without this, a Windows high-contrast user gets no focus indicator at
    all. `outline` survives, and `Highlight` is the system's own focus colour. */

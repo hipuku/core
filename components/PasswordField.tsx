@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
+import { Input } from "haus-components";
 import { scorePassword } from "@/lib/password-strength";
 import styles from "./PasswordField.module.css";
 
@@ -26,26 +27,24 @@ export function PasswordField({
 
   return (
     <div className={styles.wrap}>
-      {/* Explicit association, and the toggle outside the label.
+      {/* haus Input renders `<label htmlFor>` beside the field rather than
+          wrapping it, which is the structure this component already required.
           Wrapping both controls made the label's text content "Password Show",
           which is the input's accessible name: a screen reader announced the
           field as "Password Show, edit text". It also meant a click on the
           toggle was a click on the label, so the browser moved focus into the
           input on every reveal. Found by an end-to-end test that could not
-          address the field by its name. */}
-      <div className="field">
-        <label htmlFor={id}>Password</label>
-        <div className={styles.inputRow}>
-          <input
-            id={id}
-            className="input"
-            type={reveal ? "text" : "password"}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            required
-            minLength={minLength}
-            autoComplete={autoComplete}
-          />
+          address the field by its name. The reveal toggle rides in `suffix`,
+          which sits outside the label for the same reason. */}
+      <Input
+        id={id}
+        label="Password"
+        type={reveal ? "text" : "password"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        minLength={minLength}
+        autoComplete={autoComplete}
+        suffix={
           <button
             type="button"
             className={styles.toggle}
@@ -55,8 +54,8 @@ export function PasswordField({
           >
             {reveal ? "Hide" : "Show"}
           </button>
-        </div>
-      </div>
+        }
+      />
 
       {showMeter && strength && (
         <div className={styles.meter} data-score={value ? strength.score : -1}>
