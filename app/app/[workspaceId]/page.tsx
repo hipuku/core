@@ -8,7 +8,7 @@ import { repoChipColor } from "@/lib/brand";
 import { decisionLabel, decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "../app.module.css";
-import { EmptyState, Card } from "haus-components";
+import { EmptyState, Card, Button } from "haus-components";
 
 export default async function WorkspacePage({
   params,
@@ -46,10 +46,12 @@ export default async function WorkspacePage({
           </p>
         </div>
         <div className={styles.headActions}>
-          <Link href={`/app/${workspaceId}/new`} className="btn btn--primary">
-            <Plus size={16} />
-            New decision
-          </Link>
+          <Button asChild variant="primary">
+            <Link href={`/app/${workspaceId}/new`}>
+              <Plus size={16} />
+              New decision
+            </Link>
+          </Button>
           {role === "maintainer" && (
             <Link
               href={`/app/${workspaceId}/settings`}

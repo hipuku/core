@@ -45,6 +45,7 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
               placeholder="teammate@example.com"
             />
             <Listbox
+              portal
               label="Role"
               name="role"
               value={role}

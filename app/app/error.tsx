@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "haus-components";
 
 export default function AppError({ error }: { error: Error }) {
   return (
@@ -14,9 +15,9 @@ export default function AppError({ error }: { error: Error }) {
       <p style={{ color: "var(--text-dim)", marginBottom: "1.5rem" }}>
         {error.message}
       </p>
-      <Link href="/app" className="btn">
-        Back to workspaces
-      </Link>
+      <Button asChild variant="secondary">
+        <Link href="/app">Back to workspaces</Link>
+      </Button>
     </div>
   );
 }

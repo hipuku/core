@@ -29,7 +29,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Markdown, type CitationRepo } from "@/components/Markdown";
 import { CitationInsertProvider } from "@/components/CitationInsert";
 import { FileRow } from "@/components/FileToken";
@@ -527,9 +527,9 @@ export function DecisionEditor({
 
         <div className={styles.barRight}>
           {pristine ? (
-            <Link href={cancelHref} className="btn">
-              Cancel
-            </Link>
+            <Button asChild variant="secondary">
+              <Link href={cancelHref}>Cancel</Link>
+            </Button>
           ) : (
             <Button
               type="button"

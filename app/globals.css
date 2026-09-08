@@ -194,10 +194,13 @@ h1, h2, h3, h4 {
    belong to the thing they sit in rather than to the page.
    -------------------------------------------------------------------------- */
 .btn {
-  /* A restatement of haus Button's `secondary` / `md` geometry, and nothing
-     more. It exists only because haus Button renders its own `<a>` for `href`
-     and has no polymorphic `as` (haus#57), so core's five Next `<Link>` buttons
-     cannot be haus Buttons without losing client-side navigation and prefetch.
+  /* A restatement of haus Button's `secondary` / `md` geometry, kept for one
+     element: the workspace-settings gear, an icon-only 36px square inside a Next
+     `<Link>`. The other four Link buttons are `Button asChild` now. This one
+     cannot be, because it is an IconButton and **haus IconButton has no
+     `asChild`** (haus#70). Sizing it with `Button asChild` plus a core class
+     would be core overriding haus geometry again, which is the thing this
+     migration removed.
 
      Every value here reads a haus token rather than restating a number, so the
      two stay together on their own: when haus#57 lands this block is deleted,
@@ -242,17 +245,6 @@ h1, h2, h3, h4 {
   cursor: not-allowed;
   opacity: var(--haus-opacity-disabled);
   pointer-events: none;
-}
-
-/* One per view: the action being recommended. haus Button's `primary` weight. */
-.btn--primary {
-  background: var(--haus-color-primary-default);
-  border-color: var(--haus-color-primary-default);
-  color: var(--haus-color-ink-on-primary);
-}
-.btn--primary:hover {
-  background: var(--haus-color-primary-hover);
-  border-color: var(--haus-color-primary-hover);
 }
 
 /* A labelled button reduced to its icon: same height, square. haus has no

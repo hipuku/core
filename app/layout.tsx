@@ -37,7 +37,11 @@ export default function RootLayout({
     <html lang="en" data-haus-theme="core" className={`${gabarito.variable} ${geistMono.variable}`}>
       <body>
         {children}
-        <Toaster position="bottom-right" richColors closeButton />
+        {/* haus Toast draws the surface now, through lib/toast, so sonner's own
+            styling is off: `richColors` and `closeButton` would paint a second
+            card under the first and a second dismiss beside it. sonner keeps
+            what it is good at, the queue and the position. */}
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );

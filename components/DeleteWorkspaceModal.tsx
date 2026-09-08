@@ -3,7 +3,7 @@
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "haus-components";
 import { deleteWorkspace } from "@/app/app/actions";
 import { ModalShell } from "./ModalShell";

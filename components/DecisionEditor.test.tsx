@@ -27,7 +27,10 @@ vi.mock("next/link", () => ({
 
 const toastError = vi.fn();
 const toastSuccess = vi.fn();
-vi.mock("sonner", () => ({
+// core's own module, not sonner. The editor's contract is that a failure and a
+// success each say so; which library queues them, and which surface it draws,
+// is lib/toast's business and changed once already without this test caring.
+vi.mock("@/lib/toast", () => ({
   toast: { error: (m: string) => toastError(m), success: (m: string) => toastSuccess(m) },
 }));
 

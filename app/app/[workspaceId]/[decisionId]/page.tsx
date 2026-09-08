@@ -25,6 +25,7 @@ import { changeStatus, checkReferenceDrift, supersede } from "../../actions";
 import styles from "../../app.module.css";
 import { SubmitButton } from "@/components/SubmitButton";
 import { SubmitIconButton } from "@/components/SubmitIconButton";
+import { Button } from "haus-components";
 
 function field(body: Json, key: string): string {
   if (body && typeof body === "object" && !Array.isArray(body)) {
@@ -155,10 +156,12 @@ export default async function DecisionPage({
             filled control on the page. */}
         <div className={styles.headActions}>
           {editable.ok && (
-            <Link href={`${base}/edit`} className="btn">
-              <Pencil size={15} />
-              Edit
-            </Link>
+            <Button asChild variant="secondary">
+              <Link href={`${base}/edit`}>
+                <Pencil size={15} />
+                Edit
+              </Link>
+            </Button>
           )}
           {canReject && (
             <ToastForm action={reject}>

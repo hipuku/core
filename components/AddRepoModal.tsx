@@ -57,6 +57,7 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
                   better as a hint than as parenthetical text appended to the
                   name. The hint is why this is a Listbox and not a Select. */}
               <Listbox
+                portal
                 label="Repository"
                 name="repo"
                 value={chosen}
