@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { Button } from "haus-components";
+import { Button, Input } from "haus-components";
 import { createWorkspace } from "@/app/app/actions";
 import { ModalShell } from "./ModalShell";
 import styles from "./Modal.module.css";
@@ -22,16 +22,13 @@ export function NewWorkspaceModal() {
       {open && (
         <ModalShell title="New workspace" onClose={() => setOpen(false)}>
           <ToastForm action={createWorkspace} className={styles.form}>
-            <label className="field">
-              <span>Name</span>
-              <input
-                className="input"
-                name="name"
-                required
-                autoFocus
-                placeholder="Platform team"
-              />
-            </label>
+            <Input
+              label="Name"
+              name="name"
+              required
+              autoFocus
+              placeholder="Platform team"
+            />
             <div className={styles.actions}>
               <Button
                 type="button"

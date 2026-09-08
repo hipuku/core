@@ -16,6 +16,7 @@ import {
   updateWorkspaceGeneral,
 } from "../../actions";
 import styles from "../../app.module.css";
+import { Input } from "haus-components";
 import { SubmitButton } from "@/components/SubmitButton";
 import { SubmitIconButton } from "@/components/SubmitIconButton";
 
@@ -58,23 +59,20 @@ export default async function SettingsPage({
           action={updateWorkspaceGeneral.bind(null, workspaceId)}
           className={styles.form}
         >
-          <label className="field">
-            <span>Workspace name</span>
-            <input className="input" name="name" defaultValue={workspace.name} required />
-          </label>
-          <label className="field">
-            <span>Decision key</span>
-            <input
-              className="input"
-              name="key"
-              defaultValue={workspace.key}
-              maxLength={6}
-              style={{ maxWidth: "10rem", textTransform: "uppercase" }}
-            />
-            <span className={styles.hint}>
-              Decisions are labelled {workspace.key}-001, {workspace.key}-002, …
-            </span>
-          </label>
+          <Input
+            label="Workspace name"
+            name="name"
+            defaultValue={workspace.name}
+            required
+          />
+          <Input
+            label="Decision key"
+            name="key"
+            defaultValue={workspace.key}
+            maxLength={6}
+            hint={`Decisions are labelled ${workspace.key}-001, ${workspace.key}-002, …`}
+            style={{ maxWidth: "10rem", textTransform: "uppercase" }}
+          />
           <div className={styles.actions}>
             <SubmitButton variant="primary">
               <Check size={16} />

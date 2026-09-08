@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "haus-components";
+import { Button, Input } from "haus-components";
 import { signIn, signUp } from "@/lib/auth-client";
 import { PasswordField } from "@/components/PasswordField";
 import styles from "./AuthForm.module.css";
@@ -57,29 +57,23 @@ export function AuthForm({
       </div>
 
       {isSignUp && (
-        <label className="field">
-          <span>Name</span>
-          <input
-            className="input"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            autoComplete="name"
-          />
-        </label>
+        <Input
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          autoComplete="name"
+        />
       )}
 
-      <label className="field">
-        <span>Email</span>
-        <input
-          className="input"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-        />
-      </label>
+      <Input
+        label="Email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        autoComplete="email"
+      />
 
       <PasswordField
         value={password}
