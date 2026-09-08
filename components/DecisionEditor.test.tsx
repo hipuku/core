@@ -165,9 +165,14 @@ describe("DecisionEditor: leaving with unsaved work", () => {
     // event knows its submitter. jsdom does not populate `event.submitter` from
     // a plain click, so a click here silently runs the *form's* action, which
     // would propose the decision instead of parking it.
+    //
+    // The dialog is portaled out of the form now (haus Modal), so the button is
+    // not a form descendant; it associates by its `form` attribute instead, and
+    // the form is fetched by id rather than by `closest`.
     const save = screen.getByRole("button", { name: /Save as draft/ });
+    const form = document.getElementById("decision-editor-form") as HTMLFormElement;
     await act(async () => {
-      save.closest("form")!.requestSubmit(save);
+      form.requestSubmit(save);
     });
 
     await waitFor(() => expect(onSaveDraft).toHaveBeenCalled());

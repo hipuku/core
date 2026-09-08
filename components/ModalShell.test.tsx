@@ -7,8 +7,10 @@ import { axe } from "vitest-axe";
 /**
  * The shell fronts every destructive dialog in the app, so the parts worth
  * testing are the ones a keyboard or screen-reader user hits first: focus goes
- * into the panel, Tab stays there, closing gives focus back, and a drag that
- * ends on the backdrop does not throw away what was typed.
+ * into the panel, Tab stays there, closing gives focus back, and a stray
+ * backdrop click does not throw away a half-filled form. Since C3 the shell
+ * composes haus's Modal with dismissOnBackdrop off, which is how the last of
+ * those is guaranteed rather than by the old drag-release detection.
  */
 function Harness({ onClose = () => {} }: { onClose?: () => void }) {
   return (
@@ -35,17 +37,27 @@ describe("ModalShell", () => {
     const user = userEvent.setup();
     render(<Harness />);
     const field = screen.getByLabelText("name");
-    const confirm = screen.getByRole("button", { name: "confirm" });
+    const dialog = screen.getByRole("dialog");
+    const behind = screen.getByRole("button", { name: "behind" });
 
+    // Focus lands on the first body field, not the dialog and not haus Modal's
+    // header close button.
     expect(document.activeElement).toBe(field);
 
-    await user.tab();
-    expect(document.activeElement).toBe(confirm);
-    // Past the last item, focus wraps rather than reaching "behind".
-    await user.tab();
-    expect(document.activeElement).toBe(field);
-    await user.tab({ shift: true });
-    expect(document.activeElement).toBe(confirm);
+    // Tab cycles within the dialog and never reaches the page behind it. The
+    // dialog now carries a keyboard-reachable close button, so the cycle is
+    // close → field → confirm rather than the two-item wrap the hand-rolled
+    // shell had; what matters is that focus stays trapped.
+    for (let i = 0; i < 4; i++) {
+      await user.tab();
+      expect(document.activeElement).not.toBe(behind);
+      expect(dialog.contains(document.activeElement)).toBe(true);
+    }
+    for (let i = 0; i < 4; i++) {
+      await user.tab({ shift: true });
+      expect(document.activeElement).not.toBe(behind);
+      expect(dialog.contains(document.activeElement)).toBe(true);
+    }
   });
 
   it("gives focus back to the opener when it closes", async () => {
@@ -96,23 +108,18 @@ describe("ModalShell", () => {
     expect(document.body.style.overflow).toBe("");
   });
 
-  it("closes on a backdrop click but not on a drag released there", async () => {
+  it("does not close on a backdrop click: dismiss is off for these dialogs", async () => {
+    // Every core modal is a form or a destructive confirm, so the shell sets
+    // dismissOnBackdrop={false}. A stray click on the backdrop, including one
+    // ending a text-selection drag out of a field, cannot discard the dialog:
+    // it closes by Escape or its own controls, never by the backdrop.
     const user = userEvent.setup();
     const onClose = vi.fn();
-    const { container } = render(<Harness onClose={onClose} />);
-    const backdrop = container.querySelector("div")!;
-    const field = screen.getByLabelText("name");
-
-    // A selection drag that starts in the field and releases on the backdrop.
-    await user.pointer([
-      { target: field, keys: "[MouseLeft>]" },
-      { target: backdrop },
-      { keys: "[/MouseLeft]", target: backdrop },
-    ]);
-    expect(onClose).not.toHaveBeenCalled();
+    render(<Harness onClose={onClose} />);
+    const backdrop = screen.getByRole("dialog").parentElement!;
 
     await user.click(backdrop);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it("does not close on a click inside the panel", async () => {

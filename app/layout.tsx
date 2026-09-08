@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Gabarito, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+// globals.css first: it imports haus-tokens/layers.css, which declares the
+// @layer order (…semantics, motion, components). haus-components' styles fill
+// the haus.components layer and must come after that declaration, or the layer
+// registers out of order and component styles lose to the role layer.
 import "./globals.css";
+import "haus-components/styles.css";
 
 const gabarito = Gabarito({
   variable: "--font-gabarito",

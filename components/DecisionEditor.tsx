@@ -424,6 +424,7 @@ export function DecisionEditor({
 
   return (
     <form
+      id="decision-editor-form"
       className={styles.editor}
       action={async (formData) => {
         setSubmitting(true);
@@ -791,6 +792,11 @@ export function DecisionEditor({
               <button
                 type="submit"
                 className="btn btn--primary"
+                /* The dialog is portaled to document.body by haus Modal, so this
+                   submit button is no longer a DOM descendant of the editor
+                   form. `form` re-associates it by id, which is what keeps
+                   "Save as draft" submitting the editor's fields. */
+                form="decision-editor-form"
                 formNoValidate
                 formAction={async (formData) => {
                   const result = await onSaveDraft(formData);

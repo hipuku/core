@@ -1,28 +1,6 @@
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  padding: var(--haus-space-6);
-  background: oklch(30% 0.02 60 / 0.35);
-  backdrop-filter: blur(2px);
-}
-
-.panel {
-  width: 100%;
-  max-width: 26rem;
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-lg);
-  padding: var(--haus-space-6);
-}
-
-.panelTitle {
-  font-size: var(--haus-text-16);
-  font-weight: 650;
-  margin-bottom: var(--haus-space-4);
-}
+/* The backdrop, panel and title moved to haus Modal with C3; the shell composes
+   it now. What stays is the two layout classes the modal bodies use for their
+   form and action-row rhythm. */
 
 .form {
   display: flex;
