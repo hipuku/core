@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${gabarito.variable} ${geistMono.variable}`}>
+    <html lang="en" data-haus-theme="core" className={`${gabarito.variable} ${geistMono.variable}`}>
       <body>
         {children}
         <Toaster position="bottom-right" richColors closeButton />

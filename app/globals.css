@@ -6,16 +6,29 @@
    medium-lightness "ink", never neon. Committed light.
    ============================================================================ */
 
-/* haus-tokens' primitive layer, for the two scales core never had.
-   Only primitives.css: core keeps its own palette, its own radii and its own
-   shadows, and reads none of haus's roles. What it takes is the type ladder,
-   the space ladder and the weights, because it had no scale for any of them and
-   was choosing sizes by hand at 355 sites.
+/* haus-tokens, the full role stack under core's own brand. C2.
 
-   Declaring these changes nothing on its own. A custom property that nothing
-   reads has no effect, which is why this import is safe to land ahead of the
-   conversion it enables. */
+   Until C2 this was primitives.css alone, for the type and space ladders core
+   never had. It now imports the whole cascade in haus's order, with
+   brands/core.css between the default brand and the semantics that read it, so
+   core resolves haus's roles for the first time under its own palette. core is
+   the third haus brand (haus-tokens 3.0.0): warm-paper neutrals and a cobalt
+   accent, stated in brands/core.css, activated by data-haus-theme="core" on the
+   <html> element in layout.tsx.
+
+   This changes nothing on screen. core's own components still read core's own
+   --surface / --text / --accent, and the haus roles this makes available are
+   unread until C3 converts the ~22 components that have a haus counterpart. A
+   custom property that nothing reads has no effect, which is what makes the
+   import safe to land ahead of the conversion it enables — the same reason the
+   primitives-only import was safe before it. core declares no @layer, so its own
+   unlayered rules continue to win over haus's layered ones during the overlap. */
+@import url('haus-tokens/layers.css');
 @import url('haus-tokens/primitives.css');
+@import url('haus-tokens/brand.css');
+@import url('haus-tokens/brands/core.css');
+@import url('haus-tokens/motion.css');
+@import url('haus-tokens/semantics.css');
 :root {
   /* neutrals, a warm paper ramp. The page is a light-grey "desk"; white cards sit
      on it and separate by fill, not by borders. */
