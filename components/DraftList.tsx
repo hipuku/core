@@ -2,6 +2,7 @@ import Link from "next/link";
 import { draftLabel } from "@/lib/decisions/draft-label";
 import { timeAgo } from "@/lib/time-ago";
 import styles from "./DraftList.module.css";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export interface DraftSummary {
   id: string;
@@ -63,8 +64,8 @@ export function DraftList({
             </span>
             {/* The tag sits where every other row carries its status, so the
                 column scans top to bottom without a gap. */}
-            <span className="pill pill--draft" title="Only you can see this">
-              Draft
+            <span title="Only you can see this">
+              <StatusBadge status="draft" />
             </span>
           </Link>
         </li>

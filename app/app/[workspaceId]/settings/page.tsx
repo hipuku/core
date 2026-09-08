@@ -16,7 +16,7 @@ import {
   updateWorkspaceGeneral,
 } from "../../actions";
 import styles from "../../app.module.css";
-import { Input } from "haus-components";
+import { Badge, Input } from "haus-components";
 import { SubmitButton } from "@/components/SubmitButton";
 import { SubmitIconButton } from "@/components/SubmitIconButton";
 
@@ -97,9 +97,15 @@ export default async function SettingsPage({
                   {person?.name ?? "Unknown"}
                   <span className={styles.memberEmail}>{person?.email}</span>
                 </span>
-                <span className={`pill pill--${member.role === "maintainer" ? "accepted" : "proposed"}`}>
+                {/* A role is not a decision state. This used to paint
+                    `pill--accepted` and `pill--proposed`, borrowing the colours
+                    of "this decision was accepted" for "this person can
+                    maintain", which decision 0021 names as the misuse that a
+                    domain palette invites. Both are neutral now and the weight
+                    carries the difference. */}
+                <Badge tone="neutral" appearance={member.role === "maintainer" ? "solid" : "subtle"}>
                   {member.role}
-                </span>
+                </Badge>
                 {!isOwner && (
                   <ToastForm action={removeMember.bind(null, workspaceId, member.userId)}>
                     <SubmitIconButton className="iconbtn iconbtn--danger" aria-label="Remove member">

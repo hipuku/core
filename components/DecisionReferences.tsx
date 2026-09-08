@@ -1,11 +1,18 @@
+import { Badge, type BadgeTone } from "haus-components";
 import { FileRow } from "@/components/FileToken";
 import { referenceDrift, type DriftStatus } from "@/lib/decisions/drift";
 import styles from "./DecisionReferences.module.css";
 
-const DRIFT_PILL: Record<DriftStatus, { cls: string; label: string } | null> = {
-  synced: { cls: "pill pill--accepted", label: "in sync" },
-  drifted: { cls: "pill pill--superseded", label: "changed" },
-  missing: { cls: "pill pill--rejected", label: "missing" },
+/**
+ * Drift is its own vocabulary, not a decision state, so it maps to tones
+ * directly rather than borrowing `StatusBadge`. It used to spend `pill--accepted`
+ * and `pill--superseded`, which read as decision states on something that is a
+ * property of a citation.
+ */
+const DRIFT_BADGE: Record<DriftStatus, { tone: BadgeTone; label: string } | null> = {
+  synced: { tone: "success", label: "in sync" },
+  drifted: { tone: "warning", label: "changed" },
+  missing: { tone: "error", label: "missing" },
   unknown: null,
 };
 
@@ -38,7 +45,7 @@ export function DecisionReferences({ references }: { references: ReferenceView[]
   return (
     <ul className={styles.list}>
       {references.map((ref) => {
-        const pill = DRIFT_PILL[
+        const badge = DRIFT_BADGE[
           referenceDrift({
             kind: ref.kind,
             baselineSha: ref.baselineSha ?? null,
@@ -72,7 +79,7 @@ export function DecisionReferences({ references }: { references: ReferenceView[]
               lines={ref.lines}
               href={ref.url ?? undefined}
             >
-              {pill && <span className={pill.cls}>{pill.label}</span>}
+              {badge && <Badge tone={badge.tone}>{badge.label}</Badge>}
             </FileRow>
           </li>
         );

@@ -318,9 +318,10 @@ h1, h2, h3, h4 {
   color: var(--text-dim);
   font-weight: 500;
 }
-.input,
-.textarea,
-.select {
+/* PasswordField is the only remaining consumer: it keeps its own markup because
+   its label deliberately does not wrap the input, and it carries a reveal toggle
+   and a strength meter. Every other field is a haus Input. C4. */
+.input {
   font: inherit;
   font-size: 0.9rem;
   width: 100%;
@@ -331,17 +332,10 @@ h1, h2, h3, h4 {
   color: var(--text);
   transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
-.textarea {
-  resize: vertical;
-  line-height: var(--haus-leading-loose);
-}
-.input::placeholder,
-.textarea::placeholder {
+.input::placeholder {
   color: var(--text-faint);
 }
-.input:focus-visible,
-.textarea:focus-visible,
-.select:focus-visible {
+.input:focus-visible {
   outline: none;
   border-color: var(--accent);
   box-shadow: var(--focus-ring);
@@ -357,59 +351,3 @@ h1, h2, h3, h4 {
   }
 }
 
-/* cards / panels */
-.panel {
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-/* status pills */
-.pill {
-  --pc: var(--text-dim);
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: var(--haus-tracking-wide);
-  text-transform: uppercase;
-  padding: 0.22rem 0.5rem;
-  border-radius: var(--r-full);
-  color: color-mix(in oklch, var(--pc) 78%, black);
-  background: color-mix(in oklch, var(--pc) 13%, var(--surface));
-  border: 1px solid color-mix(in oklch, var(--pc) 32%, transparent);
-  white-space: nowrap;
-}
-/* decision key (VAU-001), outlined and neutral: an identifier, never a status */
-.key-chip {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: var(--haus-tracking-wide);
-  padding: 0.22rem 0.5rem;
-  border-radius: var(--r-full);
-  color: var(--text-dim);
-  background: transparent;
-  border: 1px solid color-mix(in oklch, var(--text-faint) 45%, transparent);
-  white-space: nowrap;
-}
-
-/* A draft is not a lifecycle state, so it takes no status ink. Neutral grey
-   marks it as "not yet in the log" rather than as another kind of decision. */
-.pill--draft { --pc: var(--text-faint); }
-
-/* The key slot for a row that has no number yet. Filled rather than dashed: a
-   draft is a real thing waiting for a number, not a broken row. Same footprint
-   as .key-chip so draft and decision rows stay aligned. */
-.key-chip--pending {
-  border-color: transparent;
-  background: var(--surface-3);
-  color: var(--text-dim);
-  letter-spacing: var(--haus-tracking-wider);
-}
-.pill--proposed { --pc: var(--st-proposed); }
-.pill--accepted { --pc: var(--st-accepted); }
-.pill--rejected { --pc: var(--st-rejected); }
-.pill--deprecated { --pc: var(--st-deprecated); }
-.pill--superseded { --pc: var(--st-superseded); }

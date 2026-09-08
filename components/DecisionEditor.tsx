@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "haus-components";
+import { StatusBadge } from "@/components/StatusBadge";
 import { useRouter } from "next/navigation";
 import {
   useCallback,
@@ -463,13 +464,13 @@ export function DecisionEditor({
           >
             {nextKey ?? "—"}
           </span>
-          <span className="pill pill--draft">Draft</span>
+          <StatusBadge status="draft" />
         </div>
       ) : (
         headingKey && (
           <div className={styles.props}>
             <span className="key-chip">{headingKey}</span>
-            {status && <span className={`pill pill--${status}`}>{status}</span>}
+            {status && <StatusBadge status={status} />}
             {headingTitle && (
               <span className={styles.headingTitle}>{headingTitle}</span>
             )}
