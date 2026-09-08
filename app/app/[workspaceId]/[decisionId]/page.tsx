@@ -24,6 +24,7 @@ import { usersById } from "@/lib/users";
 import { changeStatus, checkReferenceDrift, supersede } from "../../actions";
 import styles from "../../app.module.css";
 import { SubmitButton } from "@/components/SubmitButton";
+import { SubmitIconButton } from "@/components/SubmitIconButton";
 
 function field(body: Json, key: string): string {
   if (body && typeof body === "object" && !Array.isArray(body)) {
@@ -346,13 +347,12 @@ export default async function DecisionPage({
                         ? `checked ${timeAgo(lastChecked.getTime())}`
                         : "never checked"}
                     </span>
-                    <SubmitButton
-                      className="iconbtn iconbtn--accent"
+                    <SubmitIconButton
+                      icon={<RefreshCw size={14} />}
+                      label="Check for drift"
                       title="Check whether the cited code has changed"
-                      aria-label="Check for drift"
-                    >
-                      <RefreshCw size={14} />
-                    </SubmitButton>
+                      variant="ghost"
+                    />
                   </span>
                 </ToastForm>
               )}

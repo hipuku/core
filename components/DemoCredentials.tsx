@@ -3,6 +3,7 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import styles from "./DemoCredentials.module.css";
+import { IconButton } from "haus-components";
 
 /**
  * The way in, on the page where someone needs it.
@@ -60,15 +61,14 @@ function Field({ label, value }: { label: string; value: string }) {
         aria-label={label}
         onFocus={(e) => e.currentTarget.select()}
       />
-      <button
-        type="button"
-        className="iconbtn iconbtn--sm iconbtn--accent"
-        onClick={copy}
-        aria-label={copied ? `${label} copied` : `Copy ${label.toLowerCase()}`}
+      <IconButton
+        icon={copied ? <Check size={14} /> : <Copy size={14} />}
+        label={copied ? `${label} copied` : `Copy ${label.toLowerCase()}`}
         title={copied ? "Copied" : "Copy"}
-      >
-        {copied ? <Check size={14} /> : <Copy size={14} />}
-      </button>
+        variant="ghost"
+        size="sm"
+        onClick={copy}
+      />
     </div>
   );
 }

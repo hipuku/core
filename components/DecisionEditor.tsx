@@ -17,7 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "haus-components";
+import { Button, IconButton } from "haus-components";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useRouter } from "next/navigation";
 import {
@@ -507,19 +507,19 @@ export function DecisionEditor({
           {tab === "write" && (
             <div className={styles.tools} role="toolbar" aria-label="Formatting">
               {TOOLS.map((tool) => (
-                <button
+                <IconButton
                   key={tool.label}
-                  type="button"
-                  className={`iconbtn ${styles.tool}`}
+                  className={styles.tool}
+                  variant="ghost"
+                  size="sm"
                   // Keep the caret in the textarea; a focused button would lose
                   // the selection the edit is about to act on.
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => format(tool.edit)}
                   title={tool.hint ? `${tool.label} · ${mod}${tool.hint}` : tool.label}
-                  aria-label={tool.label}
-                >
-                  <tool.icon size={15} />
-                </button>
+                  icon={<tool.icon size={15} />}
+                  label={tool.label}
+                />
               ))}
             </div>
           )}

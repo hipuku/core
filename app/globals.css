@@ -267,46 +267,6 @@ h1, h2, h3, h4 {
   padding: 0;
 }
 
-/* ---- icon affordances --------------------------------------------------- */
-.iconbtn {
-  --ib-size: 28px;
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: var(--ib-size);
-  height: var(--ib-size);
-  padding: 0;
-  border: none;
-  border-radius: var(--r-sm);
-  background: none;
-  color: var(--text-faint);
-  cursor: pointer;
-  transition: color 0.12s ease, background 0.12s ease;
-}
-.iconbtn:hover {
-  color: var(--text);
-  background: var(--surface-3);
-}
-.iconbtn:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-.iconbtn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-.iconbtn--sm {
-  --ib-size: 22px;
-}
-.iconbtn--accent:hover {
-  color: var(--accent);
-  background: var(--accent-tint);
-}
-.iconbtn--danger:hover {
-  color: var(--danger);
-  background: color-mix(in oklch, var(--danger) 10%, transparent);
-}
-
 /* inputs */
 .field {
   display: flex;

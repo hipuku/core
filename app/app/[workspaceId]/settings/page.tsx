@@ -108,9 +108,12 @@ export default async function SettingsPage({
                 </Badge>
                 {!isOwner && (
                   <ToastForm action={removeMember.bind(null, workspaceId, member.userId)}>
-                    <SubmitIconButton className="iconbtn iconbtn--danger" aria-label="Remove member">
-                      ×
-                    </SubmitIconButton>
+                    <SubmitIconButton
+                      icon="×"
+                      label="Remove member"
+                      variant="ghost"
+                      tone="error"
+                    />
                   </ToastForm>
                 )}
               </li>
@@ -146,9 +149,12 @@ export default async function SettingsPage({
                   <span className={styles.memberEmail}>{repo.defaultBranch}</span>
                 </span>
                 <ToastForm action={disconnectRepo.bind(null, workspaceId, repo.id)}>
-                  <SubmitIconButton className="iconbtn iconbtn--danger" aria-label="Disconnect repository">
-                    ×
-                  </SubmitIconButton>
+                  <SubmitIconButton
+                    icon="×"
+                    label="Disconnect repository"
+                    variant="ghost"
+                    tone="error"
+                  />
                 </ToastForm>
               </li>
             ))}

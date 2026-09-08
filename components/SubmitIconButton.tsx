@@ -1,38 +1,21 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import { Spinner } from "haus-components";
+import { IconButton, type IconButtonProps } from "haus-components";
 
 /**
- * The icon-sized sibling of `SubmitButton`, and product-local on purpose. C3.
+ * The icon-sized sibling of `SubmitButton`, composing haus `IconButton`.
  *
- * haus has no icon-button counterpart. Its component set is Avatar, Badge,
- * Button, Callout, Card, Checkbox, Divider, EmptyState, Input, Modal, Popover,
- * Radio, Select, Spinner, Tabs, Textarea, Toast, Toggle, Tooltip, so core's
- * `.iconbtn` stays, and this stays with it. Recorded for `C4` rather than
- * migrated.
- *
- * What it does take from haus is the `Spinner`, so the busy state is the same
- * one `Button`'s `loading` renders rather than another local keyframes block.
- * The `aria-busy` that Button sets for free has to be set by hand here.
+ * It began as a product-local component because haus had no icon-button
+ * counterpart. That was the gap C3 measured, `haus#58` promoted it on the
+ * evidence, and this is now a four-line adapter over the real thing: all it
+ * adds is `useFormStatus`, which has to be read by a child of the form rather
+ * than by the form itself.
  */
 export function SubmitIconButton({
-  children,
-  className,
   disabled,
   ...rest
-}: React.ComponentProps<"button">) {
+}: Omit<IconButtonProps, "type" | "loading">) {
   const { pending } = useFormStatus();
-
-  return (
-    <button
-      {...rest}
-      type="submit"
-      className={className}
-      disabled={pending || disabled}
-      aria-busy={pending || undefined}
-    >
-      {pending ? <Spinner size="text" announcedBy="the button's aria-busy state" /> : children}
-    </button>
-  );
+  return <IconButton {...rest} loading={pending} disabled={disabled} />;
 }

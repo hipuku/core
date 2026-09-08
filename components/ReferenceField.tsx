@@ -5,6 +5,7 @@ import { FileBrowser } from "@/components/FileBrowser";
 import { FileRow } from "@/components/FileToken";
 import type { WorkspaceFile } from "@/app/app/actions";
 import styles from "./ReferenceField.module.css";
+import { IconButton } from "haus-components";
 
 export interface ReferenceChip {
   /** Stable per row: the reference id when live, repo:path:lines when buffered. */
@@ -70,25 +71,24 @@ export function ReferenceField({
               )}
               <FileRow repo={chip.repo} path={chip.path} lines={chip.lines}>
                 {onInsert && (
-                  <button
-                    type="button"
-                    className="iconbtn iconbtn--sm iconbtn--accent"
-                    aria-label={`Cite ${chip.path} in the text`}
+                  <IconButton
+                    icon={<AtSign size={13} />}
+                    label={`Cite ${chip.path} in the text`}
                     title="Insert into the document"
+                    variant="ghost"
+                    size="sm"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => onInsert(chip)}
-                  >
-                    <AtSign size={13} />
-                  </button>
+                  />
                 )}
-                <button
-                  type="button"
-                  className="iconbtn iconbtn--sm iconbtn--danger"
-                  aria-label={`Remove ${chip.path}`}
+                <IconButton
+                  icon={<X size={13} />}
+                  label={`Remove ${chip.path}`}
+                  variant="ghost"
+                  tone="error"
+                  size="sm"
                   onClick={() => void onRemove(chip)}
-                >
-                  <X size={13} />
-                </button>
+                />
               </FileRow>
             </li>
           ))}
