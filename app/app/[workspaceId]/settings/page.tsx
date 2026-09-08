@@ -17,6 +17,7 @@ import {
 } from "../../actions";
 import styles from "../../app.module.css";
 import { SubmitButton } from "@/components/SubmitButton";
+import { SubmitIconButton } from "@/components/SubmitIconButton";
 
 export default async function SettingsPage({
   params,
@@ -75,7 +76,7 @@ export default async function SettingsPage({
             </span>
           </label>
           <div className={styles.actions}>
-            <SubmitButton className="btn btn--primary">
+            <SubmitButton variant="primary">
               <Check size={16} />
               Save
             </SubmitButton>
@@ -103,9 +104,9 @@ export default async function SettingsPage({
                 </span>
                 {!isOwner && (
                   <ToastForm action={removeMember.bind(null, workspaceId, member.userId)}>
-                    <SubmitButton className="iconbtn iconbtn--danger" aria-label="Remove member">
+                    <SubmitIconButton className="iconbtn iconbtn--danger" aria-label="Remove member">
                       ×
-                    </SubmitButton>
+                    </SubmitIconButton>
                   </ToastForm>
                 )}
               </li>
@@ -122,7 +123,7 @@ export default async function SettingsPage({
           ) : (
             // Offering a Connect button that cannot work is worse than
             // offering nothing; the seeded repos still display either way.
-            !githubOff && <ConnectGithubButton />
+            !githubOff && <ConnectGithubButton variant="secondary" />
           )}
         </div>
         {repos.length === 0 ? (
@@ -141,9 +142,9 @@ export default async function SettingsPage({
                   <span className={styles.memberEmail}>{repo.defaultBranch}</span>
                 </span>
                 <ToastForm action={disconnectRepo.bind(null, workspaceId, repo.id)}>
-                  <SubmitButton className="iconbtn iconbtn--danger" aria-label="Disconnect repository">
+                  <SubmitIconButton className="iconbtn iconbtn--danger" aria-label="Disconnect repository">
                     ×
-                  </SubmitButton>
+                  </SubmitIconButton>
                 </ToastForm>
               </li>
             ))}

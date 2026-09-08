@@ -2,6 +2,7 @@
 
 import { ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
+import { Button } from "haus-components";
 import { Dropdown } from "@/components/Dropdown";
 import { ModalShell } from "@/components/ModalShell";
 import { ToastForm } from "@/components/ToastForm";
@@ -36,10 +37,10 @@ export function SupersedeModal({
 
   return (
     <>
-      <button type="button" className="btn" onClick={() => setOpen(true)}>
+      <Button type="button" variant="secondary" onClick={() => setOpen(true)}>
         <ArrowLeftRight size={15} />
         Supersede
-      </button>
+      </Button>
 
       {open && (
         <ModalShell title="Supersede this decision" onClose={close}>
@@ -64,13 +65,13 @@ export function SupersedeModal({
               }))}
             />
             <div className={styles.actions}>
-              <button type="button" className="btn" onClick={close}>
+              <Button type="button" variant="secondary" onClick={close}>
                 Cancel
-              </button>
-              <button type="submit" className="btn btn--primary" disabled={!chosen}>
+              </Button>
+              <Button type="submit" variant="primary" disabled={!chosen}>
                 <ArrowLeftRight size={15} />
                 Supersede
-              </button>
+              </Button>
             </div>
           </ToastForm>
         </ModalShell>

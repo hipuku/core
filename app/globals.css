@@ -206,38 +206,11 @@ h1, h2, h3, h4 {
 
 /* Approve keeps its own colour: green says "yes, and permanently" in a way the
    brand accent, which also means "primary" and "link", cannot. */
-.btn--accept {
-  --btn-bg: var(--st-accepted);
-  --btn-border: var(--st-accepted);
-  --btn-fg: var(--accent-fg);
-  font-weight: 550;
-}
-.btn--accept:hover {
-  --btn-bg: color-mix(in oklch, var(--st-accepted) 86%, black);
-  --btn-border: color-mix(in oklch, var(--st-accepted) 86%, black);
-}
 
 /* Reversible destructive, Reject and Discard. Tinted rather than solid: the weight
    should match the consequence. */
-.btn--danger {
-  --btn-bg: color-mix(in oklch, var(--danger) 8%, var(--surface-2));
-  --btn-fg: var(--danger);
-}
-.btn--danger:hover {
-  --btn-bg: color-mix(in oklch, var(--danger) 15%, var(--surface-2));
-}
 
 /* Irreversible, deleting a workspace. Solid, and rare. */
-.btn--destructive {
-  --btn-bg: var(--danger);
-  --btn-border: var(--danger);
-  --btn-fg: var(--accent-fg);
-  font-weight: 550;
-}
-.btn--destructive:hover {
-  --btn-bg: color-mix(in oklch, var(--danger) 88%, black);
-  --btn-border: color-mix(in oklch, var(--danger) 88%, black);
-}
 
 /* A labelled button reduced to its icon: same height, square. */
 .btn--icon {

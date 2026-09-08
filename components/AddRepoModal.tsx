@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { Button } from "haus-components";
 import { connectRepo, listMyGithubRepos } from "@/app/app/actions";
 import type { GithubRepo } from "@/lib/github";
 import { Dropdown } from "./Dropdown";
@@ -33,10 +34,10 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
 
   return (
     <>
-      <button type="button" className="btn" onClick={openModal}>
+      <Button type="button" variant="secondary" onClick={openModal}>
         <Plus size={16} />
         Connect a repository
-      </button>
+      </Button>
 
       {open && (
         <ModalShell title="Connect a repository" onClose={() => setOpen(false)}>
@@ -76,10 +77,10 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
                 />
               </label>
               <div className={styles.actions}>
-                <button type="button" className="btn" onClick={() => setOpen(false)}>
+                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                   Cancel
-                </button>
-                <SubmitButton className="btn btn--primary" disabled={!chosen}>
+                </Button>
+                <SubmitButton variant="primary" disabled={!chosen}>
                   <Plus size={16} />
                   Connect
                 </SubmitButton>

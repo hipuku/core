@@ -161,7 +161,7 @@ export default async function DecisionPage({
           )}
           {canReject && (
             <ToastForm action={reject}>
-              <SubmitButton className="btn btn--danger">
+              <SubmitButton variant="secondary" tone="error">
                 <X size={16} />
                 Reject
               </SubmitButton>
@@ -169,7 +169,7 @@ export default async function DecisionPage({
           )}
           {canAccept && (
             <ToastForm action={accept}>
-              <SubmitButton className="btn btn--accept">
+              <SubmitButton variant="primary" tone="success">
                 <Check size={16} />
                 Approve
               </SubmitButton>
@@ -187,7 +187,7 @@ export default async function DecisionPage({
           )}
           {canDeprecate && (
             <ToastForm action={deprecate}>
-              <SubmitButton className="btn">
+              <SubmitButton variant="secondary">
                 <Archive size={16} />
                 Deprecate
               </SubmitButton>

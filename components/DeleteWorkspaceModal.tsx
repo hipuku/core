@@ -4,6 +4,7 @@ import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Button } from "haus-components";
 import { deleteWorkspace } from "@/app/app/actions";
 import { ModalShell } from "./ModalShell";
 import styles from "./Modal.module.css";
@@ -34,14 +35,15 @@ export function DeleteWorkspaceModal({
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        className="btn btn--danger"
+        variant="secondary"
+        tone="error"
         onClick={() => setOpen(true)}
       >
         <Trash2 size={15} />
         Delete workspace
-      </button>
+      </Button>
 
       {open && (
         <ModalShell title="Delete workspace" onClose={() => setOpen(false)}>
@@ -51,23 +53,24 @@ export function DeleteWorkspaceModal({
             cannot be undone.
           </p>
           <div className={styles.actions}>
-            <button
+            <Button
               type="button"
-              className="btn"
+              variant="secondary"
               onClick={() => setOpen(false)}
               disabled={pending}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="btn btn--destructive"
+              variant="primary"
+              tone="error"
               onClick={onDelete}
-              disabled={pending}
+              loading={pending}
             >
               <Trash2 size={15} />
               {pending ? "Deleting…" : "Delete workspace"}
-            </button>
+            </Button>
           </div>
         </ModalShell>
       )}

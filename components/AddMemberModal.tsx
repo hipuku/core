@@ -3,6 +3,7 @@
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { inviteMember } from "@/app/app/actions";
+import { Button } from "haus-components";
 import { Dropdown } from "./Dropdown";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
@@ -24,10 +25,10 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
 
   return (
     <>
-      <button type="button" className="btn" onClick={() => setOpen(true)}>
+      <Button type="button" variant="secondary" onClick={() => setOpen(true)}>
         <UserPlus size={16} />
         Add member
-      </button>
+      </Button>
 
       {open && (
         <ModalShell title="Add member" onClose={() => setOpen(false)}>
@@ -58,10 +59,10 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
               />
             </label>
             <div className={styles.actions}>
-              <button type="button" className="btn" onClick={() => setOpen(false)}>
+              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                 Cancel
-              </button>
-              <SubmitButton className="btn btn--primary">
+              </Button>
+              <SubmitButton variant="primary">
                 <UserPlus size={16} />
                 Add member
               </SubmitButton>

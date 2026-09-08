@@ -17,6 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "haus-components";
 import { useRouter } from "next/navigation";
 import {
   useCallback,
@@ -529,21 +530,21 @@ export function DecisionEditor({
               Cancel
             </Link>
           ) : (
-            <button
+            <Button
               type="button"
-              className="btn"
+              variant="secondary"
               onClick={() => {
                 setPendingHref(null);
                 setConfirmingDiscard(true);
               }}
             >
               Cancel
-            </button>
+            </Button>
           )}
-          <button type="submit" className="btn btn--primary" disabled={submitting}>
+          <Button type="submit" variant="primary" loading={submitting}>
             <Send size={16} />
             {submitLabel}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -555,16 +556,16 @@ export function DecisionEditor({
             You have an unsent draft from <strong>{timeAgo(recoverable.savedAt)}</strong>.
           </span>
           <span className={styles.recoveredActions}>
-            <button type="button" className="btn" onClick={restore}>
+            <Button type="button" variant="secondary" onClick={restore}>
               Restore it
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="btn"
+              variant="secondary"
               onClick={() => draft.clear()}
             >
               Discard
-            </button>
+            </Button>
           </span>
         </div>
       )}
@@ -757,10 +758,11 @@ export function DecisionEditor({
               : "Leaving now discards the changes you have made."}
           </p>
           <div className={styles.modalActions}>
-            <button
+            <Button
               type="button"
-              className="btn btn--danger"
-              disabled={discarding}
+              variant="secondary"
+              tone="error"
+              loading={discarding}
               onClick={async () => {
                 setDiscarding(true);
                 try {
@@ -777,21 +779,21 @@ export function DecisionEditor({
             >
               <Trash2 size={15} />
               Discard
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="btn"
+              variant="secondary"
               onClick={() => {
                 setConfirmingDiscard(false);
                 setPendingHref(null);
               }}
             >
               Keep editing
-            </button>
+            </Button>
             {onSaveDraft && (
-              <button
+              <Button
                 type="submit"
-                className="btn btn--primary"
+                variant="primary"
                 /* The dialog is portaled to document.body by haus Modal, so this
                    submit button is no longer a DOM descendant of the editor
                    form. `form` re-associates it by id, which is what keeps
@@ -813,7 +815,7 @@ export function DecisionEditor({
               >
                 <FileText size={15} />
                 Save as draft
-              </button>
+              </Button>
             )}
           </div>
         </ModalShell>

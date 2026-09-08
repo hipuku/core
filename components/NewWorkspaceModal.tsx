@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { Button } from "haus-components";
 import { createWorkspace } from "@/app/app/actions";
 import { ModalShell } from "./ModalShell";
 import styles from "./Modal.module.css";
@@ -13,14 +14,10 @@ export function NewWorkspaceModal() {
 
   return (
     <>
-      <button
-        type="button"
-        className="btn btn--primary"
-        onClick={() => setOpen(true)}
-      >
+      <Button type="button" variant="primary" onClick={() => setOpen(true)}>
         <Plus size={16} />
         New workspace
-      </button>
+      </Button>
 
       {open && (
         <ModalShell title="New workspace" onClose={() => setOpen(false)}>
@@ -36,14 +33,14 @@ export function NewWorkspaceModal() {
               />
             </label>
             <div className={styles.actions}>
-              <button
+              <Button
                 type="button"
-                className="btn"
+                variant="secondary"
                 onClick={() => setOpen(false)}
               >
                 Cancel
-              </button>
-              <SubmitButton className="btn btn--primary">
+              </Button>
+              <SubmitButton variant="primary">
                 <Plus size={16} />
                 Create workspace
               </SubmitButton>

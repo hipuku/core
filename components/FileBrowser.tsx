@@ -2,6 +2,7 @@
 
 import { Check, Loader2, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "haus-components";
 import { listWorkspaceFiles, type WorkspaceFile } from "@/app/app/actions";
 // Imported from the module, not the `@/lib/decisions` barrel: the barrel also
 // exports the Drizzle store, and pulling it into a client component drags
@@ -161,25 +162,25 @@ export function FileBrowser({
             aria-label="Line range"
             aria-invalid={rangeInvalid}
           />
-          <button
+          <Button
             type="button"
-            className="btn btn--primary"
+            variant="primary"
             disabled={!range}
             onClick={() => commit(narrowing, lines)}
           >
             <Check size={15} />
             Cite lines
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="btn"
+            variant="secondary"
             onClick={() => {
               setNarrowing(null);
               setLines("");
             }}
           >
             Cancel
-          </button>
+          </Button>
           {rangeInvalid && (
             <p className={styles.status} data-tone="error">
               Use a range like <code>L47-L120</code>, or a single line: <code>L47</code>.

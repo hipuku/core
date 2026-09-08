@@ -1,11 +1,10 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
-import styles from "./SubmitButton.module.css";
+import { Button, type ButtonProps } from "haus-components";
 
 /**
- * A submit button that knows its form is busy.
+ * A submit button that knows its form is busy. Composes haus `Button`. C3.
  *
  * Every mutation here is a server action: a round trip, then a revalidation.
  * Without feedback the button looks inert for the whole of it, so people press
@@ -15,26 +14,26 @@ import styles from "./SubmitButton.module.css";
  *
  * `useFormStatus` reads the enclosing form, so this has to be a child of it
  * rather than the form itself.
+ *
+ * The spinner used to be local — a `Loader2` plus a keyframes block in
+ * `SubmitButton.module.css`, one more of the independent spinners haus#55
+ * consolidated on the haus side. haus `Button`'s `loading` owns all of it now:
+ * the Spinner, the `disabled`, and the `aria-busy` that announces it. What stays
+ * local is `pendingLabel`, which is copy rather than behaviour and which haus
+ * `Button` has no opinion on.
  */
 export function SubmitButton({
   children,
-  className = "btn",
   /** Shown in place of the label while the action is in flight. */
   pendingLabel,
+  disabled,
   ...rest
-}: React.ComponentProps<"button"> & { pendingLabel?: string }) {
+}: ButtonProps & { pendingLabel?: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <button {...rest} type="submit" className={className} disabled={pending || rest.disabled}>
-      {pending ? (
-        <>
-          <Loader2 size={15} className={styles.spinner} />
-          {pendingLabel ?? children}
-        </>
-      ) : (
-        children
-      )}
-    </button>
+    <Button {...rest} type="submit" loading={pending} disabled={disabled}>
+      {pending ? (pendingLabel ?? children) : children}
+    </Button>
   );
 }

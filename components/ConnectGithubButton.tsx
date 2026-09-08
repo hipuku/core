@@ -1,19 +1,17 @@
 "use client";
 
+import { Button, type ButtonProps } from "haus-components";
 import { authClient } from "@/lib/auth-client";
 import { GithubMark } from "@/components/icons/GithubMark";
 
 export function ConnectGithubButton({
-  className = "btn",
   label = "Connect GitHub",
-}: {
-  className?: string;
-  label?: string;
-}) {
+  ...rest
+}: ButtonProps & { label?: string }) {
   return (
-    <button
+    <Button
+      {...rest}
       type="button"
-      className={className}
       onClick={() =>
         authClient.linkSocial({
           provider: "github",
@@ -23,6 +21,6 @@ export function ConnectGithubButton({
     >
       <GithubMark />
       {label}
-    </button>
+    </Button>
   );
 }
