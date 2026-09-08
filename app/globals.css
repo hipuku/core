@@ -155,66 +155,71 @@ h1, h2, h3, h4 {
    belong to the thing they sit in rather than to the page.
    -------------------------------------------------------------------------- */
 .btn {
-  --btn-bg: var(--surface-2);
-  --btn-border: transparent;
-  --btn-fg: var(--text);
+  /* A restatement of haus Button's `secondary` / `md` geometry, and nothing
+     more. It exists only because haus Button renders its own `<a>` for `href`
+     and has no polymorphic `as` (haus#57), so core's five Next `<Link>` buttons
+     cannot be haus Buttons without losing client-side navigation and prefetch.
+
+     Every value here reads a haus token rather than restating a number, so the
+     two stay together on their own: when haus#57 lands this block is deleted,
+     and until then a change to haus's control rhythm moves both. It used to
+     disagree on four things at once, all of them visible side by side: a 5px
+     corner against 8px, 14.4px of inset against 16px, 14px text against 13px,
+     and a resting shadow haus Button does not have. */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1;
-  /* Uniform height across every variant; vertical size comes from min-height,
-     not padding, so icon and text buttons line up exactly. */
-  min-height: 36px;
-  padding: 0 0.9rem;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--btn-border);
-  background: var(--btn-bg);
-  color: var(--btn-fg);
+  gap: var(--haus-space-gap-xs);
+  font-family: var(--haus-font-sans);
+  font-size: var(--haus-type-label-size);
+  line-height: var(--haus-type-label-leading);
+  font-weight: var(--haus-weight-emphasis);
+  letter-spacing: var(--haus-type-label-tracking);
+  min-height: var(--haus-control-height-md);
+  padding: var(--haus-space-inset-xs) var(--haus-space-inset-md);
+  border-radius: var(--haus-radius-control);
+  border: var(--haus-border-width-default) solid var(--haus-color-border-default);
+  background: var(--haus-color-surface-subtle);
+  color: var(--haus-color-ink-primary);
   cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    background-color var(--haus-motion-micro),
+    border-color     var(--haus-motion-micro),
+    color            var(--haus-motion-micro),
+    box-shadow       var(--haus-motion-micro);
+  text-decoration: none;
   white-space: nowrap;
-  box-shadow: var(--shadow-sm);
+  user-select: none;
 }
 .btn:hover {
-  --btn-bg: var(--surface-3);
+  background: var(--haus-color-surface-sunken);
+  border-color: var(--haus-color-border-strong);
 }
 .btn:focus-visible {
   outline: none;
-  box-shadow: var(--focus-ring);
+  box-shadow: var(--haus-focus-ring);
 }
 .btn:disabled {
-  opacity: 0.5;
-  cursor: default;
-  box-shadow: none;
+  cursor: not-allowed;
+  opacity: var(--haus-opacity-disabled);
+  pointer-events: none;
 }
 
-/* One per view: the action being recommended. */
+/* One per view: the action being recommended. haus Button's `primary` weight. */
 .btn--primary {
-  --btn-bg: var(--accent);
-  --btn-border: var(--accent);
-  --btn-fg: var(--accent-fg);
-  font-weight: 550;
+  background: var(--haus-color-primary-default);
+  border-color: var(--haus-color-primary-default);
+  color: var(--haus-color-ink-on-primary);
 }
 .btn--primary:hover {
-  --btn-bg: var(--accent-hover);
-  --btn-border: var(--accent-hover);
+  background: var(--haus-color-primary-hover);
+  border-color: var(--haus-color-primary-hover);
 }
 
-/* Approve keeps its own colour: green says "yes, and permanently" in a way the
-   brand accent, which also means "primary" and "link", cannot. */
-
-/* Reversible destructive, Reject and Discard. Tinted rather than solid: the weight
-   should match the consequence. */
-
-/* Irreversible, deleting a workspace. Solid, and rare. */
-
-/* A labelled button reduced to its icon: same height, square. */
+/* A labelled button reduced to its icon: same height, square. haus has no
+   icon-button counterpart, so this stays core's (C4). */
 .btn--icon {
-  width: 36px;
+  width: var(--haus-control-height-md);
   padding: 0;
 }
 
