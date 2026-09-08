@@ -6,6 +6,25 @@
    medium-lightness "ink", never neon. Committed light.
    ============================================================================ */
 
+/* The cascade order, imported first. It has to be an @import rather than a
+   bare `@layer` statement: Turbopack hoists @imported content above statements,
+   so a statement here would land *after* haus/layers.css and put core.reset at
+   the top of the order instead of the bottom. See app/layers.css.
+
+   Only the reset goes in a layer. Everything else core writes stays unlayered
+   and so still beats every haus layer, which is what haus intends: "an
+   unlayered rule wins against any layered one regardless of specificity, so
+   overriding haus never needs a specificity fight."
+
+   The reset is the one thing that must not have that power. `* { padding: 0 }`
+   is unlayered and matches every element, so it was beating haus Button's
+   `padding: 8px 16px` and rendering every haus component with no inset at all:
+   measured at `padding: 0px` on a live Button whose radius, gap and font-size
+   were all correct. A blanket reset is an accidental override of the entire
+   design system, and layering it is what makes it a floor instead of a
+   ceiling. */
+@import url('./layers.css');
+
 /* haus-tokens, the full role stack under core's own brand. C2.
 
    Until C2 this was primitives.css alone, for the type and space ladders core
@@ -112,10 +131,12 @@
   color-scheme: light;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer core.reset {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html {

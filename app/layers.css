@@ -1,0 +1,21 @@
+/* ─── core / layer order ─────────────────────────────────────────────────────
+   The cascade order for the whole app, stated in one place and as an @import
+   so it survives bundling.
+
+   A bare `@layer core.reset;` at the top of globals.css does not survive:
+   Turbopack hoists @imported content above statements, so haus/layers.css
+   named its five layers first and core.reset was appended after them, which is
+   the highest position rather than the lowest. The reset then still won, and
+   the symptom is silent because layer order has no error state.
+
+   An @import is hoisted too, but hoisted @imports keep their order relative to
+   each other, so naming the layers here and importing this first is what fixes
+   the position. Re-listing the haus names below is a no-op for them: a layer's
+   position is fixed the first time it is named.
+
+   core.reset sits at the bottom so it is a floor for unstyled elements rather
+   than a ceiling over the design system. Everything else core writes stays
+   unlayered and still beats every haus layer, which is what haus intends.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@layer core.reset, haus.primitives, haus.brand, haus.semantics, haus.motion, haus.components;
