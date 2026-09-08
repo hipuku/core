@@ -47,7 +47,12 @@ export async function createWorkspace(formData: FormData) {
   const refused = refuseDemo(user);
   if (refused) return refused;
   const name = String(formData.get("name") ?? "").trim();
-  if (!name) return;
+  // Returned rather than bare, because nothing else reports it. The native
+  // `required` attribute used to make this branch unreachable from the UI; haus
+  // form components set `aria-required` and not the native one, deliberately,
+  // so the browser no longer blocks the empty submit and a bare return would be
+  // a button that does nothing at all. core#20.
+  if (!name) return { error: "A workspace needs a name." };
   const workspace = await decisionService.createWorkspace(user.id, name);
   redirect(`/app/${workspace.id}`);
 }
@@ -544,7 +549,7 @@ export async function propose(workspaceId: string, formData: FormData) {
   const refused = refuseDemo(user);
   if (refused) return refused;
   const title = String(formData.get("title") ?? "").trim();
-  if (!title) return;
+  if (!title) return { error: "A decision needs a title." };
   const decision = await decisionService.propose(workspaceId, user.id, {
     title,
     body: adrBody(formData),
@@ -734,7 +739,7 @@ export async function supersede(
   const refused = refuseDemo(user);
   if (refused) return refused;
   const supersededId = String(formData.get("supersededId") ?? "");
-  if (!supersededId) return;
+  if (!supersededId) return { error: "Choose the decision this one supersedes." };
   await decisionService.supersede(supersedingId, supersededId, user.id);
   revalidatePath(`/app/${workspaceId}`);
   redirect(`/app/${workspaceId}/${supersedingId}`);
