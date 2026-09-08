@@ -16,8 +16,8 @@ import { Modal } from "haus-components";
  *   drag-release guard, does not bite here: it is off.
  * · Focus lands on the first field, not the dialog. haus Modal focuses the
  *   dialog by default and offers `initialFocus` for a specific element. Rather
- *   than thread a ref through every call site — several of which open onto the
- *   custom Dropdown, which would then need to forward one — this effect focuses
+ *   than thread a ref through every call site (several of which open onto the
+ *   custom Dropdown, which would then need to forward one), this effect focuses
  *   the first focusable in the body. Parent effects run after the child's, so it
  *   wins over Modal's own focus-on-open. haus Modal renders a close button in
  *   its header before the body, so that one is skipped by its label; a caller

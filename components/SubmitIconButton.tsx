@@ -6,9 +6,9 @@ import { Spinner } from "haus-components";
 /**
  * The icon-sized sibling of `SubmitButton`, and product-local on purpose. C3.
  *
- * haus has no icon-button counterpart — its component set is Avatar, Badge,
+ * haus has no icon-button counterpart. Its component set is Avatar, Badge,
  * Button, Callout, Card, Checkbox, Divider, EmptyState, Input, Modal, Popover,
- * Radio, Select, Spinner, Tabs, Textarea, Toast, Toggle, Tooltip — so core's
+ * Radio, Select, Spinner, Tabs, Textarea, Toast, Toggle, Tooltip, so core's
  * `.iconbtn` stays, and this stays with it. Recorded for `C4` rather than
  * migrated.
  *

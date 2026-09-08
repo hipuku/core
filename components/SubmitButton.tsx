@@ -15,7 +15,7 @@ import { Button, type ButtonProps } from "haus-components";
  * `useFormStatus` reads the enclosing form, so this has to be a child of it
  * rather than the form itself.
  *
- * The spinner used to be local — a `Loader2` plus a keyframes block in
+ * The spinner used to be local: a `Loader2` plus a keyframes block in
  * `SubmitButton.module.css`, one more of the independent spinners haus#55
  * consolidated on the haus side. haus `Button`'s `loading` owns all of it now:
  * the Spinner, the `disabled`, and the `aria-busy` that announces it. What stays

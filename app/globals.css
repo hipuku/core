@@ -20,7 +20,7 @@
    --surface / --text / --accent, and the haus roles this makes available are
    unread until C3 converts the ~22 components that have a haus counterpart. A
    custom property that nothing reads has no effect, which is what makes the
-   import safe to land ahead of the conversion it enables — the same reason the
+   import safe to land ahead of the conversion it enables, the same reason the
    primitives-only import was safe before it. core declares no @layer, so its own
    unlayered rules continue to win over haus's layered ones during the overlap. */
 @import url('haus-tokens/layers.css');
@@ -71,10 +71,33 @@
 
   --danger: oklch(50% 0.2 26);
 
-  /* radii: tight, paper-like */
-  --r-sm: 5px;
+  /* radii: tight, paper-like. Three of the four now resolve through haus's
+     radius form group, which brands/core.css took in haus-tokens 3.1.0, so the
+     literals that used to sit here are stated once in the brand and read back
+     rather than kept in two places that drift.
+
+     --r-sm was 5px against a control rung of 4px, which is the 1px disagreement
+     the Button slice left behind: the buttons had already moved to the haus
+     token and these had not.
+
+     --r-sm serves two roles at once. Its control uses are .iconbtn, .select,
+     Dropdown's .trigger, .rangeInput, .segBtn, PasswordField's .toggle and
+     .backBtn; its marker uses are .chip, .check, inline code, .option, .node
+     and the rest. core's brand puts control and marker on the same rung, so the
+     conflation resolves identically today and is invisible. It would need
+     splitting in two the day those rungs diverge, and not before.
+
+     --r has no form-tier role and keeps its literal. haus's group offers
+     control, surface, overlay and marker, which in core's brand resolve to two
+     distinct values (4px and 12px), while core's scale uses three. 7px sits
+     between them on .card, .notice, .menu, .pre and Dropdown's .panel, and
+     there is no role to point it at. Forcing it to one would move a rung
+     nothing asked to move. This is drift's elevation problem from D3 in another
+     shape: a brand file can only express the parts of a product's identity the
+     system already has vocabulary for. */
+  --r-sm: var(--haus-radius-control);
   --r: 7px;
-  --r-lg: 11px;
+  --r-lg: var(--haus-radius-surface);
   --r-full: 999px;
 
   /* soft warm shadows */
