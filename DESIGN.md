@@ -270,6 +270,68 @@ paths and diffs.
 
 ---
 
+## What core takes from haus, and what it keeps
+
+**C4**, the register the adoption owes. Written as the migration landed rather
+than reconstructed after it, because the reasons are the point and they go stale
+fastest.
+
+### Taken
+
+`Button`, `Modal`, `Input`, `Badge`, `IconButton`, `Listbox`, `Spinner`, and the
+token layer under all of them via `brands/core.css`. Four thin adapters remain
+and each adds exactly one thing haus cannot know about: `SubmitButton` and
+`SubmitIconButton` read `useFormStatus`, which has to be read by a child of the
+form; `ModalShell` sets `dismissOnBackdrop={false}` and focuses the first field;
+`ConnectGithubButton` carries an OAuth call.
+
+### Kept, and why
+
+**The domain.** `DecisionEditor`, `DecisionMeta`, `DecisionReferences`,
+`Lineage`, `DraftList`. These are the product. A design system has no opinion on
+what an architecture decision record looks like.
+
+**The citation model.** `FileBrowser`, `FileToken`, `ReferenceField`,
+`LiveReferenceField`, `CitationInsert`. Same reason.
+
+**Content rendering.** `Markdown`, `Mermaid`. Both wrap libraries and neither is
+a control.
+
+**The shell.** `AuthShell`, `TopBar`, `AuthForm`, `DemoCredentials`. Layout, and
+layout is the one thing every product does differently.
+
+**`PasswordField`.** Its label deliberately does not wrap its input: wrapping
+made the accessible name *"Password Show, edit text"* and moved focus into the
+field on every reveal, found by an end-to-end test. It also carries a reveal
+toggle and a strength meter. haus `Input` has a `suffix` that could hold the
+toggle, so this is deferrable rather than impossible, and it is the sole
+remaining consumer of `.field` and `.input`. Those two rules go when it does.
+
+**The editor's `<textarea>`.** Not a labelled field: it is the writing surface,
+with a ref, keyboard handling and its own sizing, and haus `Textarea` would wrap
+it in label and hint scaffolding it has no use for.
+
+**The Write / Preview switch.** haus `Tabs` renders its tablist and panel as
+adjacent siblings in one wrapper, and core's are a sticky toolbar and a document
+sheet with the whole form between them. `haus#67`.
+
+**sonner.** haus `Toast` ships a surface and deliberately no provider, queue,
+positioning or dismissal, which decision 0008 records as a boundary rather than
+a gap. Measured across the portfolio, core is the only product with toasts at
+all, so a haus provider would have exactly one consumer. The open move is to
+render haus's `Toast` surface inside sonner's queue via `toast.custom`.
+
+**Five Next `<Link>` buttons.** `Button asChild` exists now (`haus#57`) and these
+can move; they are the last consumer of `.btn`.
+
+**The six `--st-*` tokens.** Not decision-state colours any more. Migrating the
+badges retired `.pill` and left 21 uses in a password strength meter, timeline
+banners and diff-op colours: a general status palette wearing a decision-state
+name. Mapping those onto haus's feedback roles is its own change with its own
+visible result.
+
+---
+
 ## Deliberate omissions
 
 - **No real-time collaborative editing.** ADRs are drafted by one person and
