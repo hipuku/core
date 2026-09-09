@@ -15,7 +15,7 @@ import { IconButton, type IconButtonProps } from "haus-components";
 export function SubmitIconButton({
   disabled,
   ...rest
-}: Omit<IconButtonProps, "type" | "loading">) {
+}: Omit<Extract<IconButtonProps, { asChild?: false }>, "type" | "loading">) {
   const { pending } = useFormStatus();
   return <IconButton {...rest} loading={pending} disabled={disabled} />;
 }

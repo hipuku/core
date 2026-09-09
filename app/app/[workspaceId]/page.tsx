@@ -8,7 +8,7 @@ import { repoChipColor } from "@/lib/brand";
 import { decisionLabel, decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "../app.module.css";
-import { EmptyState, Card, Button } from "haus-components";
+import { EmptyState, Card, Button, IconButton } from "haus-components";
 
 export default async function WorkspacePage({
   params,
@@ -53,14 +53,14 @@ export default async function WorkspacePage({
             </Link>
           </Button>
           {role === "maintainer" && (
-            <Link
-              href={`/app/${workspaceId}/settings`}
-              className="btn btn--icon"
-              aria-label="Workspace settings"
-              title="Workspace settings"
+            <IconButton
+              asChild
+              icon={<Settings size={16} />}
+              label="Workspace settings"
+              variant="secondary"
             >
-              <Settings size={17} />
-            </Link>
+              <Link href={`/app/${workspaceId}/settings`} title="Workspace settings" />
+            </IconButton>
           )}
         </div>
       </div>
