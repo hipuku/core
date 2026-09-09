@@ -1,0 +1,32 @@
+diff --git a/node_modules/next/dist/esm/server/lib/generate-agent-files.js b/node_modules/next/dist/esm/server/lib/generate-agent-files.js
+index 15c00d2..4365bea 100644
+--- a/node_modules/next/dist/esm/server/lib/generate-agent-files.js
++++ b/node_modules/next/dist/esm/server/lib/generate-agent-files.js
+@@ -72,6 +72,11 @@ const CLAUDE_MD_CONTENT = `@AGENTS.md\n`;
+  * reported as `unchanged`.
+  */ export function writeAgentFiles(projectDir) {
+     var _tryReadFile, _tryReadFile1;
++    // patched (patch-package): never scaffold or rewrite AGENTS.md/CLAUDE.md.
++    return {
++        agentsMd: 'skipped',
++        claudeMd: 'skipped'
++    };
+     const agentsMdPath = path.join(projectDir, 'AGENTS.md');
+     const claudeMdPath = path.join(projectDir, 'CLAUDE.md');
+     const block = buildAgentRulesBlock();
+diff --git a/node_modules/next/dist/server/lib/generate-agent-files.js b/node_modules/next/dist/server/lib/generate-agent-files.js
+index 9cda40c..6957fcf 100644
+--- a/node_modules/next/dist/server/lib/generate-agent-files.js
++++ b/node_modules/next/dist/server/lib/generate-agent-files.js
+@@ -89,6 +89,11 @@ function hasCurrentAgentRules(dir) {
+ }
+ function writeAgentFiles(projectDir) {
+     var _tryReadFile, _tryReadFile1;
++    // patched (patch-package): never scaffold or rewrite AGENTS.md/CLAUDE.md.
++    return {
++        agentsMd: 'skipped',
++        claudeMd: 'skipped'
++    };
+     const agentsMdPath = _path.default.join(projectDir, 'AGENTS.md');
+     const claudeMdPath = _path.default.join(projectDir, 'CLAUDE.md');
+     const block = buildAgentRulesBlock();
