@@ -153,5 +153,7 @@ out.
 ## Stack
 
 Next.js (App Router) · React · TypeScript · Postgres · Drizzle ORM ·
-better-auth · Vitest. No Tailwind: CSS modules and a small token layer in
-`app/globals.css`.
+better-auth · haus · Vitest. No Tailwind: CSS modules over the haus design
+system (`haus-tokens` under core's own brand, `haus-components` for the
+controls), with core's domain components on top. See [DESIGN.md](./DESIGN.md)
+for what it takes and what it keeps.

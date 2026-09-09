@@ -19,10 +19,15 @@ about the code it decided.
 
 ## Standing decisions
 
-### core depends on no local package
+### core builds on haus
 
-It has its own CSS and its own visual language. Depending on a library under
-active development would mean its interface moved whenever that library did.
+It did not at first, and the reason it did not is worth keeping: depending on a
+library under active development means its interface moves whenever the library
+does, and for most of core's life haus was that library. haus reaching `1.0.0`
+with a published token contract changed the trade. core adopted it in four
+packages. Its warm-paper palette became the third haus brand in `brands/core.css`,
+and the controls it had hand-rolled became haus components. What stays core's, and
+why, is the register at the end of this document.
 
 ### The module map
 
@@ -240,14 +245,15 @@ the record.
 
 ### Two button families
 
-`.btn` is a labelled action on the page, and every one carries a background: a
-transparent button with a word in it reads as a link, and a row mixing filled and
-unfilled controls has no rhythm. There is no ghost variant. The default *is* the
-quiet one, and it is quiet by carrying the lightest fill. One filled accent per
-view; Approve keeps its own green, because it says "yes, and permanently" in a
+Both are haus components now; what follows is how core spends their vocabulary. A
+labelled action on the page is haus `Button`, and every one carries a background:
+a transparent button with a word in it reads as a link, and a row mixing filled
+and unfilled controls has no rhythm. There is no ghost variant. The default *is*
+the quiet one, and it is quiet by carrying the lightest fill. One filled accent
+per view; Approve keeps its own green, because it says "yes, and permanently" in a
 way an accent that also means "primary" and "link" cannot.
 
-`.iconbtn` is an icon-only affordance inside a container: the × on a row, a
+An icon-only affordance inside a container is haus `IconButton`: the × on a row, a
 formatting tool, a refresh beside a timestamp. Those fill on hover only, because
 eight filled squares in a toolbar is noise, and because they belong to the thing
 they sit in rather than to the page.
@@ -278,12 +284,13 @@ fastest.
 
 ### Taken
 
-`Button`, `Modal`, `Input`, `Badge`, `IconButton`, `Listbox`, `Spinner`, and the
-token layer under all of them via `brands/core.css`. Four thin adapters remain
-and each adds exactly one thing haus cannot know about: `SubmitButton` and
-`SubmitIconButton` read `useFormStatus`, which has to be read by a child of the
-form; `ModalShell` sets `dismissOnBackdrop={false}` and focuses the first field;
-`ConnectGithubButton` carries an OAuth call.
+`Button`, `Modal`, `Input`, `Badge`, `IconButton`, `Listbox`, `Card`,
+`EmptyState`, `Spinner`, and the token layer under all of them via
+`brands/core.css`. Four thin adapters remain and each adds exactly one thing haus
+cannot know about: `SubmitButton` and `SubmitIconButton` read `useFormStatus`,
+which has to be read by a child of the form; `ModalShell` sets
+`dismissOnBackdrop={false}` and focuses the first field; `ConnectGithubButton`
+carries an OAuth call.
 
 ### Kept, and why
 
@@ -300,12 +307,13 @@ a control.
 **The shell.** `AuthShell`, `TopBar`, `AuthForm`, `DemoCredentials`. Layout, and
 layout is the one thing every product does differently.
 
-**`PasswordField`.** Its label deliberately does not wrap its input: wrapping
-made the accessible name *"Password Show, edit text"* and moved focus into the
-field on every reveal, found by an end-to-end test. It also carries a reveal
-toggle and a strength meter. haus `Input` has a `suffix` that could hold the
-toggle, so this is deferrable rather than impossible, and it is the sole
-remaining consumer of `.field` and `.input`. Those two rules go when it does.
+**`PasswordField`.** It composes haus `Input` now, with the reveal toggle riding
+in the `suffix` slot, so `.field` and `.input` are gone. What stays core's is the
+strength meter and the reason the label sits beside the input rather than wrapping
+it: wrapping made the accessible name *"Password Show, edit text"* and moved focus
+into the field on every reveal, found by an end-to-end test. haus `Input` renders
+its label beside the field the same way, which is what made the composition clean
+rather than a fight.
 
 **The editor's `<textarea>`.** Not a labelled field: it is the writing surface,
 with a ref, keyboard handling and its own sizing, and haus `Textarea` would wrap
@@ -316,13 +324,11 @@ adjacent siblings in one wrapper, and core's are a sticky toolbar and a document
 sheet with the whole form between them. `haus#67`.
 
 **sonner.** haus `Toast` ships a surface and deliberately no provider, queue,
-positioning or dismissal, which decision 0008 records as a boundary rather than
-a gap. Measured across the portfolio, core is the only product with toasts at
-all, so a haus provider would have exactly one consumer. The open move is to
-render haus's `Toast` surface inside sonner's queue via `toast.custom`.
-
-**Five Next `<Link>` buttons.** `Button asChild` exists now (`haus#57`) and these
-can move; they are the last consumer of `.btn`.
+positioning or dismissal, which decision 0008 records as a boundary rather than a
+gap. Measured across the portfolio, core is the only product with toasts at all,
+so a haus provider would have exactly one consumer. So core renders haus's `Toast`
+surface inside sonner's queue via `toast.custom`: sonner keeps the queue and the
+dismissal, haus draws the surface, and neither half is a compromise. `lib/toast.tsx`.
 
 **The six `--st-*` tokens.** Not decision-state colours any more. Migrating the
 badges retired `.pill` and left 21 uses in a password strength meter, timeline
@@ -440,14 +446,15 @@ Issue #1, closed in `4dfa1a2`. The section above says what it does and does not
 prove; the short version is that `drizzle-store` is no longer exercised by
 nothing.
 
-**The token layer covers colour, radius and shadow, and nothing else.** There is
-no type scale and no spacing scale, so every size, weight and gap in the app is
-chosen per declaration: 172 distinct raw declarations across 355 sites, eleven
-font sizes between 0.72rem and 1.7rem, and seven weights including 550 and 650,
-which most faces do not have. `scripts/check-token-debt.mjs` holds that number
-in CI, failing in both directions, and the fix is not to invent scales here: it
-is to adopt haus's, which is what this app's migration is for. The number
-reaching zero is what "migrated" will mean.
+**~~The token layer covers colour, radius and shadow, and nothing else.~~
+Adopted.** core imports haus's full cascade now (primitives, `brands/core.css`
+and the semantic roles), so the type scale, the spacing scale and the weight scale
+it never had are haus's, not invented here. `scripts/check-token-debt.mjs` holds
+the debt in CI, failing in both directions; it started at 355 and stands at **11**.
+The eleven are the sites with no haus token to land on: `em` padding that tracks
+its own font size, a negative margin, two page clearances, two `z-index`, a
+`min-height`, a `box-shadow` and a `4px` radius. Zero is not the target: those
+eleven are correct as written, and the ratchet records why they stay.
 
 **`app/app/actions.ts` is 741 lines and has no tests of its own.** It is the
 security boundary, holding `requireUser` and the demo refusals. The pure helpers
