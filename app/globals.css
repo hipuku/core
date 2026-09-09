@@ -132,36 +132,47 @@
     margin: 0;
     padding: 0;
   }
-}
 
-html {
-  height: 100%;
-}
+  /* Element defaults, and they belong in here for the same reason the reset
+     does. `a { color: inherit }` is the one that proved it: unlayered, it beat
+     haus Button's layered `color`, so a primary Button wrapping a Next `Link`
+     drew its label in the page's dark ink instead of the ink haus publishes for
+     a solid fill. `h1`-`h4`'s tracking was the same defect waiting to happen to
+     any haus component that sets its own heading tracking.
 
-body {
-  min-height: 100%;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 15.5px;
-  line-height: var(--haus-leading-relaxed);
-  letter-spacing: var(--haus-tracking-normal);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
+     A page default should never outrank a component that has deliberately
+     styled itself. */
 
-a {
-  color: inherit;
-  text-decoration: none;
+  html {
+    height: 100%;
+  }
+
+  body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 15.5px;
+    line-height: var(--haus-leading-relaxed);
+    letter-spacing: var(--haus-tracking-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: var(--haus-tracking-tighter);
+  }
+
 }
 
 ::selection {
   background: var(--accent-tint);
-}
-
-h1, h2, h3, h4 {
-  letter-spacing: var(--haus-tracking-tighter);
 }
 
 /* ---- shared primitives ------------------------------------------------- */

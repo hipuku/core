@@ -29,7 +29,7 @@
     "@zxcvbn-ts/language-en": "^4.1.1",
     "better-auth": "^1.7.2",
     "drizzle-orm": "^0.45.2",
-    "haus-components": "^2.2.1",
+    "haus-components": "^2.2.2",
     "haus-tokens": "^3.1.0",
     "lucide-react": "^1.41.0",
     "matter-js": "^0.20.0",
