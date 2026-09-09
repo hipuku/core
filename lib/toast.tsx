@@ -24,11 +24,13 @@ import { Toast } from "haus-components";
  */
 
 /** sonner hands the render function the id it assigned, which is what dismisses it. */
-const surface =
-  (tone: "success" | "error", title: string) =>
-  (id: number | string) => (
+const surface = (tone: "success" | "error", title: string) => {
+  const Surface = (id: number | string) => (
     <Toast tone={tone} title={title} onClose={() => sonner.dismiss(id)} />
   );
+  Surface.displayName = "ToastSurface";
+  return Surface;
+};
 
 export const toast = {
   success: (title: string) => sonner.custom(surface("success", title)),
