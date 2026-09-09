@@ -99,7 +99,7 @@
 }
 .wsName {
   font-size: var(--haus-text-20);
-  font-weight: 650;
+  font-weight: var(--haus-weight-semibold);
   letter-spacing: var(--haus-tracking-tight);
 }
 .wsMeta {
@@ -130,7 +130,7 @@
   background: color-mix(in oklch, var(--chip, var(--text-faint)) 15%, var(--surface));
   color: color-mix(in oklch, var(--chip, var(--text-dim)) 72%, black);
   font-size: var(--haus-text-13);
-  font-weight: 550;
+  font-weight: var(--haus-weight-medium);
 }
 
 /* ---- sections ---------------------------------------------------------- */
@@ -145,7 +145,7 @@
 }
 .sectionTitle {
   font-size: var(--haus-text-14);
-  font-weight: 650;
+  font-weight: var(--haus-weight-semibold);
   color: var(--text);
 }
 .form {

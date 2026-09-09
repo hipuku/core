@@ -107,7 +107,7 @@
 }
 .menuName {
   font-size: var(--haus-text-14);
-  font-weight: 550;
+  font-weight: var(--haus-weight-medium);
 }
 .menuEmail {
   font-size: var(--haus-text-12);

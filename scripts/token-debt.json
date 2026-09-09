@@ -1,14 +1,12 @@
 {
-  "total": 19,
+  "total": 11,
   "byFile": {
-    "app/app/app.module.css": 3,
-    "app/app/shell.module.css": 3,
+    "app/app/shell.module.css": 2,
     "components/AuthShell.module.css": 1,
     "components/ChipPit.module.css": 1,
-    "components/DecisionEditor.module.css": 4,
+    "components/DecisionEditor.module.css": 3,
     "components/FileToken.module.css": 1,
-    "components/Lineage.module.css": 1,
-    "components/Markdown.module.css": 2,
-    "components/PasswordField.module.css": 3
+    "components/Markdown.module.css": 1,
+    "components/PasswordField.module.css": 2
   }
 }

@@ -14,7 +14,7 @@
 .prose h2,
 .prose h3,
 .prose h4 {
-  font-weight: 650;
+  font-weight: var(--haus-weight-semibold);
   line-height: var(--haus-leading-snug);
   margin: var(--haus-space-6) 0 var(--haus-space-2);
 }

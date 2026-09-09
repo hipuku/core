@@ -43,7 +43,7 @@
 }
 .headingTitle {
   font-size: var(--haus-text-14);
-  font-weight: 550;
+  font-weight: var(--haus-weight-medium);
   color: var(--text);
   min-width: 0;
   overflow: hidden;
