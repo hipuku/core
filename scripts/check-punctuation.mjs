@@ -49,9 +49,18 @@ const SELF = 'scripts/check-punctuation.mjs'
  *  noise, and a lockfile is not somewhere a house style applies. */
 const SKIP = /(^|\/)(package-lock\.json|pnpm-lock\.yaml|.*\.(png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|pdf|zip))$/i
 
+/** Files a tool regenerates, so their punctuation is not ours to hold to the
+ *  house style. `next dev` rewrites AGENTS.md on every startup (and CLAUDE.md,
+ *  whichever hosts its managed block) with em dashes baked in; see
+ *  node_modules/next/dist/server/lib/generate-agent-files.js. There is no
+ *  opt-out short of patching that vendored file, so linting these only fails CI
+ *  on bytes no human here authored. */
+const GENERATED = /(^|\/)(AGENTS|CLAUDE)\.md$/
+
 function tracked() {
   return execFileSync('git', ['ls-files', '-z'], { cwd: ROOT, maxBuffer: 32 * 1024 * 1024 })
-    .toString('utf8').split('\0').filter(Boolean).filter((f) => f !== SELF && !SKIP.test(f))
+    .toString('utf8').split('\0').filter(Boolean)
+    .filter((f) => f !== SELF && !SKIP.test(f) && !GENERATED.test(f))
 }
 
 function count(file) {
