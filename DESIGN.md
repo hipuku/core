@@ -25,9 +25,10 @@ It did not at first, and the reason it did not is worth keeping: depending on a
 library under active development means its interface moves whenever the library
 does, and for most of core's life haus was that library. haus reaching `1.0.0`
 with a published token contract changed the trade. core adopted it in four
-packages. Its warm-paper palette became the third haus brand in `brands/core.css`,
-and the controls it had hand-rolled became haus components. What stays core's, and
-why, is the register at the end of this document.
+packages. Its warm-paper palette became one of haus's two brands in
+`brands/core.css`, alongside vault (drift's was removed when drift took its tokens
+in-house), and the controls it had hand-rolled became haus components. What stays
+core's, and why, is the register at the end of this document.
 
 ### The module map
 

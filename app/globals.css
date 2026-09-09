@@ -30,18 +30,16 @@
    Until C2 this was primitives.css alone, for the type and space ladders core
    never had. It now imports the whole cascade in haus's order, with
    brands/core.css between the default brand and the semantics that read it, so
-   core resolves haus's roles for the first time under its own palette. core is
-   the third haus brand (haus-tokens 3.0.0): warm-paper neutrals and a cobalt
-   accent, stated in brands/core.css, activated by data-haus-theme="core" on the
-   <html> element in layout.tsx.
+   core resolves haus's roles under its own palette. core is one of haus's two
+   brands, alongside vault (drift's was removed in haus-tokens 4.0.0, when drift
+   took its tokens in-house): warm-paper neutrals and a cobalt accent, stated in
+   brands/core.css, activated by data-haus-theme="core" on the <html> element in
+   layout.tsx.
 
-   This changes nothing on screen. core's own components still read core's own
-   --surface / --text / --accent, and the haus roles this makes available are
-   unread until C3 converts the ~22 components that have a haus counterpart. A
-   custom property that nothing reads has no effect, which is what makes the
-   import safe to land ahead of the conversion it enables, the same reason the
-   primitives-only import was safe before it. core declares no @layer, so its own
-   unlayered rules continue to win over haus's layered ones during the overlap. */
+   C3 is done, so core's components read these roles directly. The reset lives in
+   its own @layer core.reset, declared first in the order in layers.css, so haus's
+   layered component styles win over it rather than being beaten by an unlayered
+   reset, which is the defect the layering fixed. */
 @import url('haus-tokens/layers.css');
 @import url('haus-tokens/primitives.css');
 @import url('haus-tokens/brand.css');
