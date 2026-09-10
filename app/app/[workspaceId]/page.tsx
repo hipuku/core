@@ -55,9 +55,10 @@ export default async function WorkspacePage({
           {role === "maintainer" && (
             <IconButton
               asChild
-              icon={<Settings size={16} />}
+              icon={<Settings size={18} />}
               label="Workspace settings"
               variant="secondary"
+              size="lg"
             >
               <Link href={`/app/${workspaceId}/settings`} title="Workspace settings" />
             </IconButton>
