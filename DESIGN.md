@@ -259,6 +259,16 @@ formatting tool, a refresh beside a timestamp. Those fill on hover only, because
 eight filled squares in a toolbar is noise, and because they belong to the thing
 they sit in rather than to the page.
 
+### A transition you cannot take back asks first
+
+Approve, Reject and Deprecate each move a decision one way, and Approve makes it
+immutable, so one click was too little friction for what they do. Each opens a
+confirmation over haus `Modal` (`ConfirmAction`). The trigger stays the button it
+was, Approve the filled green, and the confirm repeats its tone, so the modal's
+primary action reads as the same decision. Supersede keeps its own modal, because
+it needs the replacement chosen and not just confirmed. The drift re-check stays
+one click: it changes nothing.
+
 ### One file token, two arrangements
 
 A path rendered four different ways looked like a different kind of object
@@ -285,10 +295,31 @@ fastest.
 
 ### Taken
 
-`Button`, `Modal`, `Input`, `Badge`, `IconButton`, `Listbox`, `Card`,
-`EmptyState`, `Spinner`, and the token layer under all of them via
-`brands/core.css`. Four thin adapters remain and each adds exactly one thing haus
-cannot know about: `SubmitButton` and `SubmitIconButton` read `useFormStatus`,
+Thirteen components: `Button`, `IconButton`, `Modal`, `Input`, `Select`,
+`Badge`, `Card`, `Callout`, `EmptyState`, `Tabs`, `Popover`, `Avatar`, and
+`Toast`'s surface. The token layer sits under all of them via
+`brands/core.css`. `Select` is the themed picker haus used to call `Listbox`;
+haus retired its native select and gave the name to this one.
+
+The account menu is `Avatar` inside `Popover` with `role="menu"`, which took the
+hand-rolled open, close, outside-click and placement with it. The one visible
+change is the avatar's fill: haus hashes the name onto its own palette rather
+than core's accent tint.
+
+The Write / Preview switch is `Tabs` at `appearance="segmented"`. It was the
+last hand-rolled control, kept because haus `Tabs` rendered its tablist and
+panel as adjacent siblings, and core's are a sticky toolbar and a document sheet
+with the whole form between them. `haus#67` gave `Tabs` a `panelId`, so the
+switch owns the roving tabindex and the arrow keys and the sheet carries
+`role="tabpanel"`.
+
+The status palette went too. Retiring `.pill` left the six `--st-*` tokens
+behind in a password strength meter, timeline banners and diff-op colours: a
+general status palette wearing a decision-state name. Those read haus's
+feedback roles now, and the six tokens are deleted.
+
+Four thin adapters remain and each adds exactly one thing haus cannot know
+about: `SubmitButton` and `SubmitIconButton` read `useFormStatus`,
 which has to be read by a child of the form; `ModalShell` sets
 `dismissOnBackdrop={false}` and focuses the first field; `ConnectGithubButton`
 carries an OAuth call.
@@ -320,22 +351,12 @@ rather than a fight.
 with a ref, keyboard handling and its own sizing, and haus `Textarea` would wrap
 it in label and hint scaffolding it has no use for.
 
-**The Write / Preview switch.** haus `Tabs` renders its tablist and panel as
-adjacent siblings in one wrapper, and core's are a sticky toolbar and a document
-sheet with the whole form between them. `haus#67`.
-
 **sonner.** haus `Toast` ships a surface and deliberately no provider, queue,
 positioning or dismissal, which decision 0008 records as a boundary rather than a
 gap. Measured across the portfolio, core is the only product with toasts at all,
 so a haus provider would have exactly one consumer. So core renders haus's `Toast`
 surface inside sonner's queue via `toast.custom`: sonner keeps the queue and the
 dismissal, haus draws the surface, and neither half is a compromise. `lib/toast.tsx`.
-
-**The six `--st-*` tokens.** Not decision-state colours any more. Migrating the
-badges retired `.pill` and left 21 uses in a password strength meter, timeline
-banners and diff-op colours: a general status palette wearing a decision-state
-name. Mapping those onto haus's feedback roles is its own change with its own
-visible result.
 
 ---
 

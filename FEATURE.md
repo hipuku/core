@@ -21,14 +21,15 @@ review, and how many records, members and repositories there are.
 
 ## The decision log
 
-![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status pill, above the connected repositories](./screenshots/decisions-list.png)
+![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status badge, above the connected repositories](./screenshots/decisions-list.png)
 
 Every decision, newest first, with its key and its status. The line under the
 title states your own role, because what you can do to a record depends on it.
 
-Statuses take poster inks that are theirs alone: an accepted decision is never
-the same green as a button, and a deprecated one is never the mustard of a
-warning notice.
+Each status is a haus `Badge` tone, one to a status: proposed is info, accepted
+is success, rejected is error and deprecated is warning. Superseded takes
+primary, because a replaced decision is still historically valid and should not
+read as a failure.
 
 ---
 
@@ -74,7 +75,9 @@ and refused, the interface can say why.
 
 A maintainer sees Edit, Reject and Approve. Approve carries its own green: it is
 irreversible and audited, and it is the one action on the page that says "yes,
-and permanently".
+and permanently". So it asks first, and so do Reject and Deprecate: each opens a
+confirmation whose primary button carries the same tone as the one that opened
+it.
 
 The dossier card holds the facts a reader wants before the prose: status, owner,
 when it was created, when it was last edited, and who accepted it.
@@ -228,7 +231,7 @@ conversation.
 
 ## Settings
 
-![The workspace settings page: general fields for name and decision key, the members list with role pills, and the connected repositories](./screenshots/settings.png)
+![The workspace settings page: general fields for name and decision key, the members list with role badges, and the connected repositories](./screenshots/settings.png)
 
 Maintainers manage the workspace, its members and its repositories from one
 page. The decision key is editable here, with the labels it produces shown

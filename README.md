@@ -8,7 +8,7 @@ React over Postgres.
 **[core.hipuku.dev](https://core.hipuku.dev)** is a read-only demo, with
 credentials on the sign-in page.
 
-![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status pill, above the connected repositories](./screenshots/decisions-list.png)
+![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status badge, above the connected repositories](./screenshots/decisions-list.png)
 
 Notion holds the document but not the governance. Jira holds the workflow and is
 not a document. core is a governed document that knows about the code it
