@@ -446,6 +446,9 @@ export function DecisionEditor({
           // Only now is the text safe on the server.
           draft.clear();
           if (result?.ok) toast.success(result.ok);
+          // `revise` returns and stays on the page, so the button has to come out
+          // of its loading state here; `propose` redirects and never reaches this.
+          setSubmitting(false);
         } catch (error) {
           // A redirect is thrown rather than returned. That path is a success, and the
           // draft has to go before the navigation completes.
