@@ -2,7 +2,7 @@
 
 import { ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
-import { Button, Listbox } from "haus-components";
+import { Button, Select } from "haus-components";
 import { ModalShell } from "@/components/ModalShell";
 import { ToastForm } from "@/components/ToastForm";
 import type { ActionResult } from "@/lib/action-result";
@@ -51,7 +51,7 @@ export function SupersedeModal({
             {/* The key leads and the title is the hint: a reader scans for
                 VAU-014, and a title long enough to matter would otherwise be
                 truncated into uselessness on one line. */}
-            <Listbox
+            <Select
               portal
               label="Decision to supersede"
               name="supersededId"

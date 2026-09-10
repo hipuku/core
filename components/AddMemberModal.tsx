@@ -3,7 +3,7 @@
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { inviteMember } from "@/app/app/actions";
-import { Button, Input, Listbox } from "haus-components";
+import { Button, Input, Select } from "haus-components";
 import { ModalShell } from "./ModalShell";
 import { ToastForm } from "./ToastForm";
 import styles from "./Modal.module.css";
@@ -44,7 +44,7 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
               autoFocus
               placeholder="teammate@example.com"
             />
-            <Listbox
+            <Select
               portal
               label="Role"
               name="role"

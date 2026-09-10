@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { Button, Listbox } from "haus-components";
+import { Button, Select } from "haus-components";
 import { connectRepo, listMyGithubRepos } from "@/app/app/actions";
 import type { GithubRepo } from "@/lib/github";
 import { ModalShell } from "./ModalShell";
@@ -52,11 +52,11 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
               onSuccess={() => setOpen(false)}
               className={styles.form}
             >
-              {/* haus Listbox, like every other choose-a-thing in this app: a
-                  native select's popup cannot be themed, and "private" reads
-                  better as a hint than as parenthetical text appended to the
-                  name. The hint is why this is a Listbox and not a Select. */}
-              <Listbox
+              {/* haus Select, like every other choose-a-thing in this app:
+                  "private" reads better as a hint than as parenthetical text
+                  appended to the name, and Select carries that hint under each
+                  option where a raw native <select> could not. */}
+              <Select
                 portal
                 label="Repository"
                 name="repo"
