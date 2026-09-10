@@ -17,12 +17,13 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { Button, IconButton } from "haus-components";
+import { Button, IconButton, Tabs, tabIdFor } from "haus-components";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -309,6 +310,10 @@ export function DecisionEditor({
   onDiscardDraft?: (id: string) => Promise<void>;
 }) {
   const [tab, setTab] = useState<"write" | "preview">("write");
+  // haus Tabs owns the tablist, roving tabindex and arrow keys; the panel it
+  // controls is the document sheet further down, so it takes panelId (haus#67).
+  const editorTabsId = useId();
+  const docPanelId = `${editorTabsId}-doc`;
   const [title, setTitle] = useState(defaultTitle);
   const [body, setBody] = useState<Body>(defaults);
   const [cited, setCited] = useState<Cited[]>(defaultCited);
@@ -481,28 +486,19 @@ export function DecisionEditor({
       {/* ---- sticky bar: mode, formatting, actions ------------------------- */}
       <div className={styles.bar}>
         <div className={styles.barLeft}>
-          <div className={styles.seg} role="tablist" aria-label="Editor mode">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={tab === "write"}
-              className={`${styles.segBtn} ${tab === "write" ? styles.segOn : ""}`}
-              onClick={() => setTab("write")}
-            >
-              <PenLine size={14} />
-              Write
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={tab === "preview"}
-              className={`${styles.segBtn} ${tab === "preview" ? styles.segOn : ""}`}
-              onClick={() => setTab("preview")}
-            >
-              <Eye size={14} />
-              Preview
-            </button>
-          </div>
+          <Tabs
+            appearance="segmented"
+            size="sm"
+            aria-label="Editor mode"
+            id={editorTabsId}
+            panelId={docPanelId}
+            value={tab}
+            onValueChange={(v) => setTab(v as "write" | "preview")}
+            items={[
+              { value: "write", label: <span className={styles.tabLabel}><PenLine size={14} />Write</span> },
+              { value: "preview", label: <span className={styles.tabLabel}><Eye size={14} />Preview</span> },
+            ]}
+          />
 
           {tab === "write" && (
             <div className={styles.tools} role="toolbar" aria-label="Formatting">
@@ -571,8 +567,14 @@ export function DecisionEditor({
         </div>
       )}
 
-      {/* ---- the document -------------------------------------------------- */}
-      <div className={styles.sheet}>
+      {/* ---- the document (the panel haus Tabs controls) ------------------- */}
+      <div
+        className={styles.sheet}
+        role="tabpanel"
+        id={docPanelId}
+        tabIndex={0}
+        aria-labelledby={tabIdFor(editorTabsId, tab)}
+      >
         {/* The write pane stays mounted while previewing so its fields still submit. */}
         <div className={tab === "preview" ? styles.hidden : undefined}>
           {withTitle && (

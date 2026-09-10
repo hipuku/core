@@ -84,35 +84,13 @@
 }
 
 /* Write / Preview */
-.seg {
-  display: inline-flex;
-  padding: var(--haus-space-1);
-  border-radius: var(--r);
-  background: var(--surface-3);
-  flex: none;
-}
-.segBtn {
-  font: inherit;
-  font-size: var(--haus-text-14);
-  font-weight: var(--haus-weight-medium);
+/* The Write / Preview switch is haus Tabs (segmented) now; it brings its own
+   tablist and selected-tab styling. All that is left is aligning the icon with
+   the word inside each tab label. */
+.tabLabel {
   display: inline-flex;
   align-items: center;
   gap: var(--haus-space-1);
-  padding: var(--haus-space-1) var(--haus-space-3);
-  border: none;
-  border-radius: var(--r-sm);
-  background: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
-}
-.segBtn:hover {
-  color: var(--text);
-}
-.segOn {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow-sm);
 }
 
 /* ---- formatting toolbar -------------------------------------------------

@@ -93,7 +93,7 @@
      token and these had not.
 
      --r-sm serves two roles at once. Its control uses are .iconbtn, .select,
-     Dropdown's .trigger, .rangeInput, .segBtn, PasswordField's .toggle and
+     Dropdown's .trigger, .rangeInput, PasswordField's .toggle and
      .backBtn; its marker uses are .chip, .check, inline code, .option, .node
      and the rest. core's brand puts control and marker on the same rung, so the
      conflation resolves identically today and is invisible. It would need
