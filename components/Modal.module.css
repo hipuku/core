@@ -14,3 +14,10 @@
   gap: var(--haus-space-2);
   margin-top: var(--haus-space-1);
 }
+
+/* The sentence a confirmation modal asks before a one-way lifecycle change. */
+.confirmBody {
+  color: var(--text-dim);
+  line-height: var(--haus-leading-loose);
+  margin-bottom: var(--haus-space-5);
+}

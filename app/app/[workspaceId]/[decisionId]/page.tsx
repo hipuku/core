@@ -1,6 +1,7 @@
 import { Archive, Check, Pencil, RefreshCw, X } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ConfirmAction } from "@/components/ConfirmAction";
 import { DecisionMeta } from "@/components/DecisionMeta";
 import { DecisionReferences } from "@/components/DecisionReferences";
 import { Lineage } from "@/components/Lineage";
@@ -164,20 +165,29 @@ export default async function DecisionPage({
             </Button>
           )}
           {canReject && (
-            <ToastForm action={reject}>
-              <SubmitButton variant="secondary" tone="error">
-                <X size={16} />
-                Reject
-              </SubmitButton>
-            </ToastForm>
+            <ConfirmAction
+              action={reject}
+              tone="error"
+              icon={<X size={16} />}
+              label="Reject"
+              title="Reject this decision?"
+              description="Rejecting closes this proposal. The record and its history stay, but it is no longer a decision the team is weighing."
+              confirmLabel="Reject"
+              pendingLabel="Rejecting…"
+            />
           )}
           {canAccept && (
-            <ToastForm action={accept}>
-              <SubmitButton variant="primary" tone="success">
-                <Check size={16} />
-                Approve
-              </SubmitButton>
-            </ToastForm>
+            <ConfirmAction
+              action={accept}
+              tone="success"
+              triggerVariant="primary"
+              icon={<Check size={16} />}
+              label="Approve"
+              title="Approve this decision?"
+              description="Approving accepts this decision and fixes its reference point. Accepted decisions are immutable: to change one later you supersede it."
+              confirmLabel="Approve"
+              pendingLabel="Approving…"
+            />
           )}
           {canSupersede && (
             <SupersedeModal
@@ -190,12 +200,15 @@ export default async function DecisionPage({
             />
           )}
           {canDeprecate && (
-            <ToastForm action={deprecate}>
-              <SubmitButton variant="secondary">
-                <Archive size={16} />
-                Deprecate
-              </SubmitButton>
-            </ToastForm>
+            <ConfirmAction
+              action={deprecate}
+              icon={<Archive size={16} />}
+              label="Deprecate"
+              title="Deprecate this decision?"
+              description="Deprecating retires this decision. It stays in the record and its history, marked no longer current."
+              confirmLabel="Deprecate"
+              pendingLabel="Deprecating…"
+            />
           )}
         </div>
       </div>
