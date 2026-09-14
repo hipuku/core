@@ -33,8 +33,9 @@ import { findUserByEmail } from "@/lib/users";
 /**
  * Refuse a write from the read-only demo account.
  *
- * Called at the top of every action that changes the decision log, and
- * deliberately *not* by the draft actions, which the demo is allowed to use.
+ * Called at the top of every action that writes to the decision log, including
+ * the drift re-check, which records reference state. Not called by the draft
+ * actions, which the demo is allowed to use.
  * Returning rather than throwing means the existing toast path reports it as a
  * boundary rather than an error page.
  */
@@ -434,6 +435,10 @@ export async function checkReferenceDrift(
   decisionId: string,
 ): Promise<ActionResult> {
   const user = await requireUser();
+  // A re-check records each reference's current state, which every later
+  // visitor to the demo would see, so it counts as a change to the log.
+  const refused = refuseDemo(user);
+  if (refused) return refused;
   const token = await getReadToken(user.id);
   if (!token) {
     return { error: "Connect your GitHub account to check for drift." };
