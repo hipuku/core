@@ -24,7 +24,6 @@ import { timeAgo } from "@/lib/time-ago";
 import { usersById } from "@/lib/users";
 import { changeStatus, checkReferenceDrift, supersede } from "../../actions";
 import styles from "../../app.module.css";
-import { SubmitButton } from "@/components/SubmitButton";
 import { SubmitIconButton } from "@/components/SubmitIconButton";
 import { Button } from "haus-components";
 
