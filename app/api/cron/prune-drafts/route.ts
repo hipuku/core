@@ -2,9 +2,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { user as userTable } from "@/lib/db/schema";
 import { decisionService } from "@/lib/decisions";
+import { restoreSeededDraft } from "@/lib/decisions/seeded-draft";
 
 /**
- * Age out the demo account's abandoned drafts.
+ * Age out the demo account's abandoned drafts, then restore the seeded one.
  *
  * On the public deployment every visitor writes as the same account, so a
  * draft, private to its author by design, is in practice shared with every
@@ -62,10 +63,14 @@ export async function GET(request: Request): Promise<Response> {
 
   const cutoff = new Date(Date.now() - MAX_AGE_HOURS * 60 * 60 * 1000);
   const removed = await decisionService.pruneDrafts(demo.id, cutoff);
+  // The prune can take the seeded draft with it, and a visitor can discard it,
+  // so it is put back whenever it is missing.
+  const restored = await restoreSeededDraft(decisionService, demo.id);
 
   console.log(
     `[prune-drafts] removed ${removed} draft${removed === 1 ? "" : "s"} ` +
-      `older than ${cutoff.toISOString()}`,
+      `older than ${cutoff.toISOString()}` +
+      (restored ? "; restored the seeded draft" : ""),
   );
-  return Response.json({ removed, olderThan: cutoff.toISOString() });
+  return Response.json({ removed, restored, olderThan: cutoff.toISOString() });
 }

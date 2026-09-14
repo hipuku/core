@@ -7,7 +7,7 @@
  * and argue itself out of it, HAU-004 really was rejected, and the draft is
  * genuinely undecided. It used to be a plausible invention about a product
  * called Vault, and two of those invented records had quietly drifted into
- * being false — one asserted a rule this codebase breaks, another described a
+ * being false: one asserted a rule this codebase breaks, another described a
  * dependency the repository has since taken.
  *
  * A decision log demoing itself with fiction is the wrong advertisement for a
@@ -29,11 +29,12 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { user as userTable, workspaces } from "@/lib/db/schema";
 import { decisionService } from "@/lib/decisions";
+import { DEMO_WORKSPACE_NAME, SEEDED_DRAFT } from "@/lib/decisions/seeded-draft";
 
 const DEMO_EMAIL = process.env.DEMO_USER_EMAIL ?? "demo@core.hipuku.dev";
 const DEMO_PASSWORD = process.env.DEMO_USER_PASSWORD ?? "read-only-demo-2026";
 const DEMO_NAME = "Demo";
-const WORKSPACE_NAME = "haus";
+const WORKSPACE_NAME = DEMO_WORKSPACE_NAME;
 /** The workspace this seed used to build, cleared on the way past. */
 const RETIRED_NAME = "Vault";
 
@@ -175,7 +176,7 @@ async function main() {
         "  S --> C[haus.components]\n" +
         "  linkStyle 1 stroke:#7c5cbf,stroke-width:2\n" +
         "```\n\n" +
-        "- [x] Agree the contract before writing it — " +
+        "- [x] Agree the contract before writing it: " +
         "{{hipuku/haus:docs/decisions/0003-brand-and-roles-are-separate-layers.md}}\n" +
         "- [ ] A fourth cascade layer for the brand map\n" +
         "- [ ] `--haus-` on every property at every layer\n" +
@@ -225,8 +226,8 @@ async function main() {
       "`var(--x)` for an undefined `--x` drops the declaration silently: no " +
       "console warning, no build error, and a focus ring that is simply absent.\n\n" +
       "This is not hypothetical. The one consumer that wrote the check found " +
-      "five undefined roles before they reached a screen — " +
-      "{{hipuku/drift:client/src/tokens/tokens.test.ts}} — and then caught a " +
+      "five undefined roles before they reached a screen " +
+      "({{hipuku/drift:client/src/tokens/tokens.test.ts}}), and then caught a " +
       "sixth defect in a *published* package within an hour of upgrading: " +
       "three control-height roles read by `haus-components` and not declared " +
       "by the `haus-tokens` version it depends on. Button, Input and Select " +
@@ -293,8 +294,8 @@ async function main() {
     demoId,
     "rejected",
     "The convenience was worth less than it looked. Going to 1.x already " +
-      "fixed what motivated it — under a caret a minor now reaches a consumer " +
-      "on their next install — so the pain was the 0.x caret rule rather than " +
+      "fixed what motivated it: under a caret a minor now reaches a consumer " +
+      "on their next install. So the pain was the 0.x caret rule rather than " +
       "the package count. What is left is a second place a version is stated, " +
       "and two sources of truth for one fact is the failure mode this project " +
       "keeps paying for. Tier-per-package is also what a tiered system should " +
@@ -329,7 +330,7 @@ async function main() {
       "the hue bins; both consumers were pinned to `^0.2.1`, neither picked it " +
       "up, and the refit sat unshipped until someone went looking. Replaced by " +
       "the 1.x ruling and the bump table in " +
-      "{{hipuku/haus:RELEASING.md}} — where a token rename is a major at an " +
+      "{{hipuku/haus:RELEASING.md}}, where a token rename is a major at an " +
       "identical value, and a contrast change is a major even when the hex " +
       "barely moves.",
   );
@@ -399,32 +400,10 @@ async function main() {
   /* ---- a parked draft ---------------------------------------------------
      So the drafts zone is not empty on arrival, and the difference between a
      draft and a decision (no number, a Draft tag, private to its author) is
-     visible rather than described. This one is genuinely undecided. */
-  await decisionService.saveDraft(workspace.id, demoId, {
-    title: "Reopen polarity, so dark mode can exist",
-    body: {
-      context:
-        "Surface polarity is fixed by the contract: white cards on a subtle " +
-        "page, and not a brand-map axis. Every surface role is paired with the " +
-        "ink that is safe on it, and that pairing is what makes contrast " +
-        "decidable once at the token layer.\n\n" +
-        "The consequence nobody wrote down until recently is that **a dark " +
-        "theme cannot arrive as a brand map**, because it is a polarity " +
-        "inversion. It is the first thing anyone asks a design system.",
-      decision:
-        "Still deciding. Three shapes, none costed:\n\n" +
-        "- [ ] Leave it. Say plainly that dark mode is out of scope and why\n" +
-        "- [ ] Make polarity an axis, and pair ink per polarity — doubles the " +
-        "colour decision surface\n" +
-        "- [ ] A second contract rather than a second brand, so the pairing " +
-        "guarantee survives\n\n" +
-        "The third is the only one that keeps the promise the roles make. It " +
-        "is also the most work, and it is not obvious it should happen before " +
-        "a consumer asks for it.",
-      consequences: "",
-    },
-    refs: [],
-  });
+     visible rather than described. This one is genuinely undecided. The
+     content lives in lib/decisions/seeded-draft.ts, because the prune cron
+     restores it. */
+  await decisionService.saveDraft(workspace.id, demoId, SEEDED_DRAFT);
   log("parked one draft, still being written");
 
   console.log("\nDone.");
