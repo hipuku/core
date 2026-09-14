@@ -4,8 +4,7 @@
  *
  * stylelint reports every declaration that bypasses the token layer; this
  * asserts how many there are. The rule itself is a warning because 355 build
- * failures on day one would have meant switching it off, and a rule nobody runs
- * protects nothing.
+ * failures on the day it was added would have meant switching it off.
  *
  * Equality rather than a ceiling, in both directions. Adding one fails. And
  * removing one *also* fails, until the recorded number comes down with it,
@@ -16,12 +15,10 @@
  *   node scripts/check-token-debt.mjs           check
  *   node scripts/check-token-debt.mjs --write   record
  *
- * What the number means: core's token layer covers colour, radius and shadow.
- * There is no type scale and no spacing scale, so 172 distinct raw
- * declarations, at 355 sites, choose a size, a weight or a gap by hand.
- * Eleven different font sizes between 0.72rem and 1.7rem, and seven weights
- * including 550 and 650. Step 8 migrates this app onto haus, which has both
- * scales, and this reaching zero is what "migrated" will mean.
+ * What the number means: declarations that bypass the token layer. It was 355
+ * before core adopted haus's full token cascade, and is recorded in
+ * scripts/token-debt.json. The ones left have no haus token to land on; DESIGN.md
+ * lists them. Zero is not the target.
  */
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs'

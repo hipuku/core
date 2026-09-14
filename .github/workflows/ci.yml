@@ -31,8 +31,8 @@ jobs:
 
       - run: npm ci
 
-      # `if: always()` on each step so one failure does not hide the others.
-      # A run that reports "lint failed" and nothing else wastes a round trip.
+      # `if: always()` on every step after the first, so one failure does not
+      # skip the checks after it.
       - name: Lint
         run: npm run lint
 
@@ -40,20 +40,19 @@ jobs:
       # than absolute: a rule that could only pass after a mechanical rewrite of
       # every file would have been turned off instead of adopted.
       - name: Lint prose
+        if: always()
         run: npm run lint:prose
 
-      # The hardcoded-value gate. The strict-value rule is a warning here rather
-      # than an error, because core's token layer covers colour, radius and
-      # shadow and nothing else: 355 declarations choose a size, a weight or a
-      # gap by hand. Failing on all of them today would have meant switching the
-      # rule off.
+      # The hardcoded-value gate. The strict-value rule is a warning rather than
+      # an error; the count is held by the token-debt step below.
       - name: Lint CSS
+        if: always()
         run: npm run lint:css
 
-      # So this is what fails. It asserts the count exactly, in both directions,
-      # and step 8 drives it to zero by migrating onto haus, which has the
-      # scales core is missing.
+      # Fails when the count of hardcoded declarations moves in either
+      # direction without scripts/token-debt.json moving with it.
       - name: Token debt
+        if: always()
         run: npm run lint:tokens
 
       - name: Typecheck
