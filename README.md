@@ -1,159 +1,147 @@
 # core
 
-A team decision log: architecture decision records with a lifecycle,
-permissions, two audit trails, and a link to the code they govern, so a decision
-can tell you when the thing it decided has changed underneath it. Next.js and
+A decision log for a team: architecture decision records with a permission-gated lifecycle, two
+audit trails, and citations to lines of code in GitHub that are checked for changes. Next.js and
 React over Postgres.
 
-**[core.hipuku.dev](https://core.hipuku.dev)** is a read-only demo, with
-credentials on the sign-in page.
+**[core.hipuku.dev](https://core.hipuku.dev)** is a read-only demo, with credentials on the
+sign-in page.
 
 ![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status badge, above the connected repositories](./screenshots/decisions-list.png)
 
-Notion holds the document but not the governance. Jira holds the workflow and is
-not a document. core is a governed document that knows about the code it
-decided.
-
 ## Features
 
-- **Propose, accept, deprecate or supersede**, as a state machine with
-  permission-gated transitions. Accepted records are immutable, and you supersede
-  them to change one.
-- **Two audit trails.** Content revisions live in a versioning engine; status
-  transitions live in their own append-only log. How the text changed and how the
-  decision moved are different questions, and are stored as such.
-- **Markdown and Mermaid** in the body, with inline file citations.
-  `{{owner/repo:path#L47-L120}}` renders as a link to the exact lines.
-- **Staleness detection.** Citing a file records the code as it stands, the
-  baseline moves to what the team agreed when the decision is accepted, and a
-  drift check reports whether the cited code has changed since. A citation can
-  name a line range, so drift means the cited lines changed.
-- **Drafts.** Unsent decisions, private to their author, holding no ADR number.
+- **Lifecycle.** A decision is proposed, then accepted or rejected; an accepted one can be
+  deprecated or superseded. Transitions are rows in a table, each gated by a capability. Once a
+  decision leaves `proposed` its body cannot be edited, and a change means superseding it.
+- **Two audit trails.** Revisions of the body are commits in a versioning engine. Status changes
+  are rows in an append-only transitions table.
+- **Markdown and Mermaid** in the body. `{{owner/repo:path#L47-L120}}` renders as a link to
+  those lines.
+- **Drift checks.** A reference to a file records its blob SHA and, when it names a line range,
+  the text of those lines. When the decision is accepted the baseline moves to the code at that
+  moment. A check reports whether the cited lines changed, moved or disappeared since.
+- **Drafts.** Private to their author, with no ADR number, stored outside the decision table.
 
-The full walkthrough is in [FEATURE.md](./FEATURE.md).
+[FEATURE.md](./FEATURE.md) has screenshots of each screen.
 
 ## Install
 
 ```bash
-cp .env.example .env.local   # fill in DATABASE_URL and BETTER_AUTH_SECRET
+cp .env.example .env.local
+```
+
+```bash
 npm install
-npm run db:push              # create the tables
+```
+
+```bash
+npm run db:push
+```
+
+```bash
 npm run dev
 ```
 
-A free [Neon](https://neon.tech) or Supabase Postgres works for local
-development. Generate the auth secret with `openssl rand -base64 32`.
-
-Nothing else is needed. No Redis, no queue, no third-party service. Node,
-Postgres and a browser.
+`.env.local` needs `DATABASE_URL` and `BETTER_AUTH_SECRET` (`openssl rand -base64 32`). A Neon or
+Supabase free-tier Postgres works for development. Nothing else is required: no Redis, queue or
+third-party service. Node 22.13 or later on 22, or 24 and later (`engines`); `.nvmrc` pins 22.
 
 ## Develop
 
-**Seed some data.** An empty decision log demonstrates nothing:
+**Seed data.**
 
 ```bash
 npm run db:seed
 ```
 
-That builds a workspace with five decisions covering the whole lifecycle:
-accepted, superseded, proposed and awaiting review, rejected, deprecated. Plus a
-revision, markdown and Mermaid, a parked draft, seven references and one that has
-already drifted.
+This creates a workspace called `haus` with five decisions: one accepted then superseded, one
+accepted, one proposed and revised, one rejected, one accepted then deprecated. They include
+Mermaid, inline citations, seven references (one already drifted) and a draft. Re-running
+replaces the `haus` workspace and removes the older `Vault` one, and touches nothing else.
 
-It is idempotent by workspace name: re-running replaces what it created and
-touches nothing else.
+**GitHub.** Connecting repositories needs a GitHub OAuth app: set `GITHUB_CLIENT_ID` and
+`GITHUB_CLIENT_SECRET`, with the callback `<BETTER_AUTH_URL>/api/auth/callback/github`, and set
+`BETTER_AUTH_URL` to the port the app runs on. Browsing and citing files uses the signed-in
+person's linked account, or `GITHUB_PUBLIC_TOKEN` (a read-only token for public repositories)
+when there is none. Without any of these, email and password sign-in and everything except files
+and repositories work.
 
-**GitHub is optional.** Without `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`,
-everything works except connecting a repository and citing files from it. Sign up
-with email and password and the rest of the product is there. To enable it,
-register an OAuth app at github.com/settings/developers with the callback
-`<BETTER_AUTH_URL>/api/auth/callback/github`, and set `BETTER_AUTH_URL` to
-whatever port you are actually running on.
-
-**To see it as the public demo does.** The deployment closes sign-up and signs
-everyone into one seeded account that may write drafts but may not change the
-decision log. To reproduce that locally, add to `.env.local`:
+**The public demo's configuration.** The deployment closes sign-up and shows the credentials of
+one seeded account, which may save drafts and may not change the decision log. To reproduce it,
+add to `.env.local`:
 
 ```bash
-DISABLE_SIGNUP=1                              # /sign-up 404s, its link disappears
-DEMO_USER_EMAIL=demo@core.hipuku.dev          # the account db:seed creates
+DISABLE_SIGNUP=1
+DEMO_USER_EMAIL=demo@core.hipuku.dev
 DEMO_USER_PASSWORD=read-only-demo-2026
-DISABLE_GITHUB=1                              # optional: hides Connect GitHub
+DISABLE_GITHUB=1
 ```
 
+`DISABLE_SIGNUP` makes `/sign-up` a 404 and removes its link. `DEMO_USER_*` names the account
+`db:seed` creates. `DISABLE_GITHUB` hides Connect GitHub.
 
-**Before committing:**
+### Tests
 
 ```bash
 npm run lint && npm run typecheck && npm test
-npm test -- --project=domain     # just the fast ones
-npm test -- --project=ui
 ```
 
-Two vitest projects, because the suites have different needs. `domain` runs in
-Node: every pure module has its own suite, exercised directly rather than through
-a component. `ui` runs in jsdom and covers what is only observable in a browser,
-which is draft autosave and recovery, the unsaved-navigation guard, and the
-compose editor's markdown keystrokes reaching the caret.
+```bash
+npm test -- --project=domain
+```
 
-The domain suite runs against the in-memory store, so what it proves about the
-permission model, which is the product, it proves about a double. Two suites
-close that gap and they close different halves of it.
+Vitest runs two projects. `domain` runs `lib/**/*.test.ts` in Node. `ui` runs the `.test.tsx`
+suites in jsdom: draft autosave and recovery, the unsaved-changes guard, the compose editor's
+keystrokes, the draft list and the modal shell. 342 tests in 23 files.
 
-`store-parity.test.ts` is **structural**. It holds `MemoryDecisionStore` and
-`DrizzleDecisionStore` to the same method set, so a port method added to one and
-forgotten on the other fails here rather than on a page. It is worth having
-because that failure is otherwise silent: TypeScript checks each class against
-the interface, so a method dropped from the interface and from both classes
-typechecks cleanly while the service still calls it. It catches nothing about
-behaviour.
+Domain tests use the in-memory store. Two suites check that it matches the Postgres store:
 
-`store-contract.test.ts` is **behavioural**, and it is the one that matters.
-**43 cases, each run twice against the same assertions, once per store**, so a
-difference between the double and the real thing is a failure rather than a
-surprise in production: an ordering that only holds because a `Map` preserves
-insertion order, a null the SQL side stores differently, a count that includes a
-row the other excludes.
+- `store-parity.test.ts` checks that both stores implement the port's 32 methods. It catches a
+  method added to one store and not the other, which TypeScript does not catch when the method is
+  also missing from the interface. It checks no behaviour.
+- `store-contract.test.ts` runs 43 cases against both stores with the same assertions, 86 runs.
+  It catches differences such as an order that only holds because a `Map` keeps insertion order,
+  or a null stored differently.
 
-It runs against **a real Postgres, with nothing installed**. PGlite is Postgres
-compiled to WebAssembly and run in this process, so the planner, the types and
-the constraint and transaction semantics are Postgres's rather than an
-emulator's. No Docker, no service container, no `DATABASE_URL`: `npm test` runs
-it on a laptop and in CI identically. The DDL is generated from the Drizzle
-schema rather than from a checked-in dump, so a column added to `lib/db/schema`
-is present on the next run and cannot drift out of step with the tables the
-tests write to.
+The Postgres side runs on PGlite, Postgres compiled to WebAssembly and run in the test process, so
+it needs no Docker, service or `DATABASE_URL`. The tables are created from the Drizzle schema on
+each run.
 
-See [DESIGN.md](./DESIGN.md) for what the pair still does not prove.
+`npm run e2e` runs four Playwright tests against a production build: sign-in, a decision's status
+and history, keyboard access, and signed-out access. It pushes the schema and seeds whatever
+`DATABASE_URL` points at, so that database must be disposable.
 
-CI runs lint, typecheck and test on every push and pull request, then a
-production build once they agree. Each check reports independently, so one run
-tells you everything that is wrong rather than only the first thing.
+CI runs on every push to `main` and every pull request. One job runs lint, `lint:prose`,
+`lint:css`, `lint:tokens`, typecheck and test, each step running even if an earlier one failed.
+A production build and the e2e tests (against a Postgres service container) run after it.
 
 ## Scripts
 
-| Script              | What it does                            |
-| ------------------- | --------------------------------------- |
-| `npm run dev`       | Next dev server                         |
-| `npm run build`     | Production build                        |
-| `npm run lint`      | eslint                                  |
-| `npm run typecheck` | `tsc --noEmit`                          |
-| `npm test`          | Vitest, the domain and ui suites        |
-| `npm run db:push`   | Push the Drizzle schema to the database |
-| `npm run db:seed`   | Populate a workspace worth looking at   |
-| `npm run db:studio` | Drizzle Studio                          |
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Next dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm run lint:prose` | Fails on a new em dash in a tracked file |
+| `npm run lint:css` | Stylelint, including the hardcoded-value rule |
+| `npm run lint:tokens` | Fails when the count of hardcoded declarations changes without its record |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Vitest, both projects |
+| `npm run e2e` | Playwright, against a disposable database |
+| `npm run db:generate` | Generate a Drizzle migration |
+| `npm run db:push` | Push the Drizzle schema to the database |
+| `npm run db:seed` | Create the seeded `haus` workspace |
+| `npm run db:studio` | Drizzle Studio |
 
 ## More
 
-[FEATURE.md](./FEATURE.md) walks through what the product does.
-[DESIGN.md](./DESIGN.md) covers the architecture, the storage port, why restore
-is a forward action, why a draft is not a status, and what is deliberately left
-out.
+- [FEATURE.md](./FEATURE.md): the screens and what each does.
+- [DESIGN.md](./DESIGN.md): the module layout, the storage port, restore as a forward commit,
+  drafts, drift, the interface, the demo deployment, and known gaps.
 
 ## Stack
 
-Next.js (App Router) · React · TypeScript · Postgres · Drizzle ORM ·
-better-auth · haus · Vitest. No Tailwind: CSS modules over the haus design
-system (`haus-tokens` under core's own brand, `haus-components` for the
-controls), with core's domain components on top. See [DESIGN.md](./DESIGN.md)
-for what it takes and what it keeps.
+Next.js (App Router) · React · TypeScript · Postgres · Drizzle ORM · better-auth · haus
+(`haus-tokens`, `haus-components`) · CSS Modules · Vitest · Playwright

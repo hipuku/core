@@ -1,7 +1,9 @@
 # Features
 
-What core does, as built. The reasoning behind each choice is in
-[DESIGN.md](./DESIGN.md).
+The screens of core and what each does. [DESIGN.md](./DESIGN.md) records why.
+
+The screenshots were taken on 2026-08-30, before the seed was changed to the `haus` workspace and
+before core moved onto haus components, so they show `VAU-*` keys and the earlier controls.
 
 ---
 
@@ -9,13 +11,12 @@ What core does, as built. The reasoning behind each choice is in
 
 ![The workspaces list, showing one workspace with its counts of decisions, members and connected repositories](./screenshots/home.png)
 
-A workspace is a team with its own decision log. Each has its own membership,
-its own connected repositories, and its own ADR numbering: a Jira-style key
-derived from the name, so decisions read as `VAU-001`. The key is editable and
-the numbers are not.
+A workspace has its own members, connected repositories and ADR numbering. Its key is derived
+from the name: initials for several words ("Platform team" is `PT`), the first three letters for
+one ("Vault" is `VAU`). The key can be changed in settings; decision numbers cannot.
 
-The row carries what tells you whether to open it: how many decisions await
-review, and how many records, members and repositories there are.
+Each row shows the number of decisions awaiting review, and the counts of decisions, members and
+repositories.
 
 ---
 
@@ -23,20 +24,16 @@ review, and how many records, members and repositories there are.
 
 ![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status badge, above the connected repositories](./screenshots/decisions-list.png)
 
-Every decision, newest first, with its key and its status. The line under the
-title states your own role, because what you can do to a record depends on it.
+Every decision, newest first, with its key and status. The line under the title names the
+signed-in person's role in the workspace.
 
-Each status is a haus `Badge` tone, one to a status: proposed is info, accepted
-is success, rejected is error and deprecated is warning. Superseded takes
-primary, because a replaced decision is still historically valid and should not
-read as a failure.
+Status badges use haus `Badge` tones: proposed is info, accepted success, rejected error,
+deprecated warning, superseded primary. Superseded is not error because a superseded decision was
+valid until it was replaced.
 
 ---
 
 ## The lifecycle
-
-A decision moves through a state machine held as a data table, and nothing moves
-it except by matching a row in that table.
 
 ```
 proposed ──accept──▶ accepted ──deprecate──▶ deprecated
@@ -46,26 +43,22 @@ proposed ──accept──▶ accepted ──deprecate──▶ deprecated
 rejected            superseded
 ```
 
-`rejected`, `deprecated` and `superseded` are terminal, since no row starts from
-them. Every transition is recorded with who made it, when, and optionally why.
+The four transitions are rows in a table (`lib/decisions/lifecycle.ts`). `rejected`,
+`deprecated` and `superseded` have no outgoing row, so they are terminal. Each transition is
+stored with its actor, time and an optional reason.
 
-**Accepted decisions are immutable.** Past `proposed`, the body cannot be
-edited. You supersede a decision and link its replacement, so what was decided
-and when cannot be quietly rewritten later.
+Once a decision leaves `proposed`, its body cannot be edited. Changing an accepted decision means
+writing a new one and superseding the old one with it; the new decision must already be accepted.
 
 ### Roles
-
-Two roles, defined as bundles of capabilities rather than as checks scattered
-through the code:
 
 | | propose | edit | accept | reject | deprecate | supersede |
 |---|---|---|---|---|---|---|
 | **author** | ✓ | ✓ | | | | |
 | **maintainer** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
-An author sees no lifecycle actions at all, and no disabled ones either. Every
-guard returns a *reason* rather than a boolean, so wherever an action is shown
-and refused, the interface can say why.
+Roles are lists of capabilities. An author is shown no lifecycle actions. Each check returns
+`{ ok: false, reason }` when it refuses, so the interface can show the reason.
 
 ---
 
@@ -73,33 +66,25 @@ and refused, the interface can say why.
 
 ![A proposed decision with Edit, Reject and Approve in the header, the dossier card showing status, owner and dates, and the activity drawer open on the status and content histories](./screenshots/decision-accept.png)
 
-A maintainer sees Edit, Reject and Approve. Approve carries its own green: it is
-irreversible and audited, and it is the one action on the page that says "yes,
-and permanently". So it asks first, and so do Reject and Deprecate: each opens a
-confirmation whose primary button carries the same tone as the one that opened
-it.
+A maintainer sees Edit, Reject and Approve on a proposed decision. Approve is green. Approve,
+Reject and Deprecate each open a confirmation whose primary button has the same tone as the button
+that opened it. Supersede opens its own dialog, to choose the replacement.
 
-The dossier card holds the facts a reader wants before the prose: status, owner,
-when it was created, when it was last edited, and who accepted it.
+The dossier card shows status, owner, created and last-edited dates, and who accepted the
+decision.
 
 ---
 
 ## Two audit trails
 
-They answer different questions and are stored separately.
+**Content history.** Each revision of the body is a commit, shown as a structural JSON diff over
+RFC 6901 pointers. Restoring a version writes a new commit whose content equals it, as
+`git revert` does, so no commit is removed.
 
-**Content history.** Every revision of the body, as a structural JSON diff over
-RFC 6901 pointers, shown as the fields that were added or replaced. Restoring an
-old version writes a *new* commit whose state equals the target rather than
-rewinding the head, the way `git revert` works. History stays append-only, and
-two people editing one document cannot silently erase each other.
+**Status history.** Every transition, with actor, time and reason.
 
-**Status history.** An append-only log of every transition, with actor, time
-and reason.
-
-Both live behind one Activity drawer, which carries a summary when closed
-("Last activity 5 days ago · 3 events") so you know whether opening it is worth
-the click.
+Both are in the Activity drawer. Closed, it shows when the last event was and how many events
+there are, for example "Last activity 5 days ago · 3 events".
 
 ---
 
@@ -107,114 +92,88 @@ the click.
 
 ![The compose editor: a Write and Preview toggle, a markdown toolbar, and the document showing Context, Decision, Consequences and Referenced code as gutter-marked blocks](./screenshots/decision-writing.png)
 
-### The editor is the document
+### The editor
 
-No field fills, no borders, and type metrics matching the rendered prose
-exactly, so a paragraph does not reflow between Write and Preview. The ADR's
-three blocks are marked by a left gutter rule that takes the accent on focus.
-That rule is the editor's only chrome.
+The editor has no field backgrounds or borders, and its type metrics match the rendered markdown,
+so text does not reflow between Write and Preview. The three sections, Context, Decision and
+Consequences, are marked by a rule in the left gutter that takes the accent colour on focus. None
+is marked optional.
 
-None of the three is labelled optional. A decision without its context cannot be
-re-argued later, which is most of why the record exists.
+### Keyboard
 
-### It behaves like markdown while you type
+The editor is a `<textarea>`. Its editing behaviour is in `lib/markdown/editing.ts`, as functions
+from text and selection to text and selection, tested without a DOM.
 
-A plain `<textarea>`, with the behaviour that makes one feel like an editor:
+- **Enter** continues a bulleted, numbered (`3.` then `4.`) or task list, or a blockquote, keeping
+  the indentation. Enter on an empty item ends the list.
+- **Tab** indents and **Shift+Tab** outdents every line the selection touches.
+- **⌘B, ⌘I, ⌘K, ⌘E** (Ctrl on other platforms) wrap the selection, or unwrap it if already
+  wrapped.
+- **⌘Enter** submits.
+- The toolbar inserts the same syntax as the shortcuts.
 
-- **Enter continues a list**: bullets, ordered (`3.` becomes `4.`), task items,
-  blockquotes, preserving indentation. Enter on an *empty* item ends the list.
-- **Tab indents**, Shift+Tab outdents, across every line the selection touches.
-- **⌘B / ⌘I / ⌘K / ⌘E** wrap, and unwrap if already wrapped.
-- **⌘↵ submits** from anywhere in the document.
-- A **toolbar** inserts the syntax in front of you, so it teaches the shortcut it
-  stands in for.
-
-All of that is pure text-in / text-out, tested directly rather than through the
-DOM.
-
-### What renders
+### Rendering
 
 ![A decision body rendering a bold lead sentence, two inline file citations as chips, and a Mermaid flowchart of a token pipeline](./screenshots/decision-links-mermaid.png)
 
-Full markdown with GitHub extensions (headings, tables, task lists, blockquotes,
-fenced code) plus **Mermaid diagrams** in ```mermaid fences, rendered
-client-side with `securityLevel: strict`.
+GitHub-flavoured markdown (tables, task lists, blockquotes, fenced code) and Mermaid diagrams in
+` ```mermaid ` fences, rendered in the browser with `securityLevel: "strict"`.
 
 ---
 
 ## Drafts
 
-An unsent decision, parked by its author.
+- **No ADR number.** Numbers are assigned when a decision is proposed.
+- **Private to the author**, maintainers included.
+- **No transitions.**
+- **No title required.** A missing title is taken from the first line written, preferring the
+  Decision section, with markdown removed.
 
-- **No ADR number.** Reserving one would leave permanent gaps in the sequence
-  every time a draft was abandoned, and a gap cannot be repaired, because
-  numbers are how people cite decisions.
-- **Private to its author**, including from maintainers.
-- **No transitions**, because nothing has happened to it yet.
-- **No title required.** A missing one is derived from the first line actually
-  written, preferring the Decision block, with markdown stripped.
+### Recovering unsaved work
 
-### Nothing is lost
+1. **Local autosave** to `localStorage` while composing a decision that has no server draft.
+   Found on return, it is offered, and applied only when accepted.
+2. **Save as draft** stores it on the server, and it appears in the decisions list. Local autosave
+   stops for that session.
+3. **A navigation guard** asks before leaving with unsaved changes, for in-app navigation as well
+   as closing the tab.
 
-Three layers, doing different jobs:
-
-1. **Local autosave** while composing, the net for a session that has never
-   reached the server. Offered on return, and applied only when accepted.
-2. **Save as draft**, the deliberate act of parking something, visible in the
-   decisions list.
-3. **A navigation guard**: leaving with unsaved work asks first, and catches
-   in-app navigation as well as closing the tab, because client routing never
-   touches `beforeunload`.
-
-Cancel offers three outcomes: keep editing, discard, or park it as a draft.
+Cancel offers three choices: keep editing, discard, or save as draft.
 
 ---
 
 ## Code references
 
-The part that makes a decision code-aware.
-
 ### Finding a file
 
-One search across **every connected repository at once**. Picking a repo first
-was a gate in front of the only step that mattered: an author citing a file
-knows the filename far more often than they know which repo holds it.
+The file search covers every repository connected to the workspace at once.
 
 ### Citing a range
 
-A reference may name a line span, which changes the claim from *"this file
-changed"* to *"the code this decision governs changed"*. A whole-file reference
-drifts on any commit touching the file, and a staleness signal that fires that
-often stops being read.
+A reference can name a line range. A whole-file reference is marked changed by any commit that
+touches the file; a range is marked changed only when those lines change.
 
-### Citing inside the prose
+### Citing in the text
 
-`{{owner/repo:path#L47-L120}}` renders as a file chip linking to those exact
-lines. It is inserted with a click from the reference list, and it stays plain
-text on purpose: it survives being copied into a commit message or a chat
-thread, which a rich-editor node would not.
+`{{owner/repo:path#L47-L120}}` renders as a file chip linking to those lines on GitHub. It can be
+inserted from the reference list or typed. A token that does not resolve renders as inline code.
 
 ### Drift
 
 ![An accepted decision showing a tinted "Referenced code has changed" notice above the document, with the lineage row above it](./screenshots/decision-deprecate.png)
 
-Citing a file records its blob SHA, and where a range was given, the cited text
-itself.
+A file reference records the file's blob SHA and, for a range, the cited text.
 
-**The baseline moves when the decision is accepted.** A citation made while
-drafting records the code the *author* was looking at, and the decision does not
-exist until the team accepts it. Without this, a proposal that sat in review for
-a fortnight is flagged as drifted the instant it is agreed.
+When a decision is accepted, each reference's baseline moves to the code at that moment, so
+changes made while the proposal was in review are not reported as drift.
 
-**Movement is not change.** Insert twenty lines above a cited block and it is
-untouched but now lives elsewhere. The stored text is searched for before
-anything is called drift, and a block found intact has its range updated to
-follow it. Trailing whitespace is normalised away, so a formatter run is not
-drift; changed indentation *is*, because the block changed scope.
+When the cited text is no longer at its lines, the file is searched for it. Found unchanged
+elsewhere, the reference's range moves to the new lines. Trailing whitespace is ignored; changed
+indentation counts as a change.
 
-Three outcomes, **in sync**, **changed** and **missing**, reported on the
-document where you would decide whether to act. They are not reported while
-writing, where a file cited moments ago can only be in sync.
+A file reference is **synced**, **drifted** or **missing**. A link reference, or a file reference
+with no baseline, is **unknown** and shows no status. Status is shown when reading a decision,
+not while composing it.
 
 ---
 
@@ -222,10 +181,7 @@ writing, where a file cited moments ago can only be in sync.
 
 ![A superseded decision showing the lineage row: VAU-001 followed by an arrow to VAU-002, with VAU-002 as the current record](./screenshots/decision-supersede.png)
 
-Changing an accepted decision means writing a new one and linking the two. The
-lineage row shows the whole chain the record sits in rather than the next hop,
-so a decision three revisions deep can be read as the latest word in a
-conversation.
+The lineage row shows every decision in the chain, before and after the current one.
 
 ---
 
@@ -233,52 +189,37 @@ conversation.
 
 ![The workspace settings page: general fields for name and decision key, the members list with role badges, and the connected repositories](./screenshots/settings.png)
 
-Maintainers manage the workspace, its members and its repositories from one
-page. The decision key is editable here, with the labels it produces shown
-underneath.
+Maintainers edit the workspace name and key, members and connected repositories on one page. The
+key field shows the labels it will produce.
 
-Numbers are assigned inside the same transaction that creates the decision, and
-a unique constraint on the workspace and number holds the guarantee that
-`max + 1` cannot make on its own. Two simultaneous proposals cannot take the
-same number.
+A decision's number is assigned in the transaction that creates it, and a unique constraint on
+workspace and number rejects a duplicate. When two proposals take the same number at once, the
+second retries with the next one (`lib/decisions/retry.ts`).
 
 ---
 
 ## The public demo
 
-[core.hipuku.dev](https://core.hipuku.dev) runs the same code with three
-deployment flags set.
+[core.hipuku.dev](https://core.hipuku.dev) runs the same code with these settings:
 
-**No sign-up.** The page does not exist. An invite code is a shared secret
-rather than access control, since whoever holds it can pass it on.
+- **No sign-up.** `/sign-up` is a 404.
+- **One shared account**, with its credentials on the sign-in page. It can save and discard
+  drafts. It cannot create, edit or delete workspaces, change members, repositories or
+  references, propose, revise, change a status, supersede, or re-check drift. Every visitor uses this account, so its drafts are shared
+  between visitors. A nightly job deletes its drafts not updated in 24 hours and restores the
+  seeded draft if it is gone.
+- **No GitHub linking.** The OAuth flow requests the `repo` scope, which allows writing to private
+  repositories, and the demo does not store those tokens. File browsing uses a read-only token for
+  public repositories.
 
-**One read-only account**, credentials on the sign-in page. It may write and
-save drafts, and it may not change the decision log. A draft is private and
-holds no number, so the worst a visitor leaves behind is unfinished text.
-Accepting a seeded decision would change what the next visitor sees.
-
-**No GitHub linking.** The app requests the `repo` scope, which is read *and
-write* on private repositories, and a public deployment holding a stranger's
-token with that reach is not a risk worth taking for a demo. File browsing still
-works, through a read-only public-repositories token belonging to the
-deployment, which is safe to hold where a user's would not be.
-
-Running it locally has none of these restrictions. See the
-[README](./README.md).
+Locally, none of these apply. See the [README](./README.md).
 
 ---
 
-## Deliberately not built
+## Not built
 
-- **Real-time collaborative editing.** ADRs are drafted by one person and
-  reviewed by others. CRDT co-editing would be an impressive answer to a
-  question this domain does not ask.
-- **A `draft` lifecycle status.** Drafts are their own table, for the reasons
-  above.
-- **Adding link references from the UI.** Composing never had it, and unifying
-  the reference field on the file flow meant dropping it. A markdown link in the
-  prose covers the need.
-- **Auto-tracking files cited inline.** Citing a file in prose does not start
-  watching it for drift. "Mentioned in an argument" and "this decision governs
-  this code" are different claims, and conflating them would fill the log with
-  drift from files cited as counter-examples.
+- **Real-time collaborative editing.** ADRs are written by one person and reviewed by others.
+- **A `draft` lifecycle status.** Drafts have their own table.
+- **Adding a link reference from the interface.** A markdown link in the body does the same job.
+- **Tracking files cited inline.** A citation in the text is not added to the references checked
+  for drift, because a file cited as a counter-example is not governed by the decision.

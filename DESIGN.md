@@ -1,157 +1,153 @@
-# DESIGN.md for core
+# core: design notes
 
-## Context
+## What core is
 
-core is a team decision log: architecture decision records with a lifecycle,
-permissions and an audit trail, for a signed-in team.
+A decision log for a signed-in team. Each decision is an architecture decision record (ADR) with
+a lifecycle, permission-gated transitions, a history of its text, a log of its status changes, and
+references to code in GitHub that are checked for changes.
 
-The centrepiece is the lifecycle state machine, its permission-gated
-transitions, and the supersession graph. Real-time collaborative editing was the
-alternative and it answers a question this domain does not ask: ADRs are drafted
-by one person and reviewed by others.
-
-**North star:** governed design documents connected to the code they govern.
-Notion holds the document but not the governance. Jira holds the workflow and is
-not a document. The gap is a document that carries its own governance and knows
-about the code it decided.
+The lifecycle, its permissions and supersession between decisions are the centre of the design.
+Real-time collaborative editing was considered and not built: an ADR is written by one person and
+reviewed by others.
 
 ---
 
-## Standing decisions
+## Architecture
 
-### core builds on haus
-
-It did not at first, and the reason it did not is worth keeping: depending on a
-library under active development means its interface moves whenever the library
-does, and for most of core's life haus was that library. haus reaching `1.0.0`
-with a published token contract changed the trade. core adopted it in four
-packages. Its warm-paper palette became one of haus's two brands in
-`brands/core.css`, alongside vault (drift's was removed when drift took its tokens
-in-house), and the controls it had hand-rolled became haus components. What stays
-core's, and why, is the register at the end of this document.
-
-### The module map
+Next.js App Router pages and server actions over two engines in `lib/`, each written against a
+storage interface with an in-memory and a Postgres implementation.
 
 ```
-lib/versioning/     append-only document history: pure, tested, domain-agnostic
-  diff.ts             structural JSON diff over RFC 6901 pointers
-  engine.ts           snapshot / commit / restore / history over a storage port
-  memory-store.ts     in-memory VersionStore
-  drizzle-store.ts    Postgres-backed VersionStore, same interface
+lib/versioning/        document history, independent of decisions
+  diff.ts                structural JSON diff over RFC 6901 pointers
+  engine.ts              snapshot, commit, restore and history over a VersionStore
+  memory-store.ts        in-memory VersionStore
+  drizzle-store.ts       Postgres VersionStore
 
-lib/decisions/      the domain
-  lifecycle.ts        the state machine as a data table, capability-gated
-  service.ts          orchestration over lifecycle + versioning + a store port
-  snippet.ts          comparing a cited range of a file, and finding it if it moved
-  citation.ts         the {{repo:path#lines}} token
-  drift.ts            where a reference stands relative to the code it cited
-  key.ts              per-workspace ADR keys (VAU-001)
-  retry.ts            the one write that can lose a race, and what it does about it
-  memory-store.ts     in-memory DecisionStore
-  drizzle-store.ts    Postgres-backed DecisionStore, same interface
+lib/decisions/         the decision domain
+  types.ts, store.ts     records and the DecisionStore port (32 methods)
+  lifecycle.ts           transitions as a data table, gated by capability
+  service.ts             DecisionService: lifecycle, versioning and the store together
+  lineage.ts             the supersession chain in both directions
+  snippet.ts             comparing a cited line range, and finding it if it moved
+  citation.ts            the {{owner/repo:path#lines}} token
+  drift.ts               a reference's status relative to its baseline
+  key.ts                 workspace keys and ADR labels (HAU-001)
+  retry.ts               retrying the ADR-number insert after a unique violation
+  form.ts, draft-label.ts  reading form data; naming an untitled draft
+  seeded-draft.ts        the demo's seeded draft and its nightly restore
+  memory-store.ts        in-memory DecisionStore
+  drizzle-store.ts       Postgres DecisionStore
 
-lib/markdown/       textarea editing behaviour: lists, indent, wrapping
-lib/db/             Drizzle schema and client
-lib/github.ts       repo trees, file contents, blob SHAs
+lib/markdown/editing.ts  textarea editing: lists, indentation, wrapping
+lib/db/                  Drizzle schema and client
+lib/github.ts            repository trees, file contents, blob SHAs, token selection
+app/app/actions.ts       server actions: authentication, demo refusals, GitHub calls
 ```
 
 ### Storage is a port
 
-Both engines depend on a store interface. `memory-store` and `drizzle-store`
-implement the same contract, so the test suite exercises real domain behaviour
-rather than mocks, and swapping storage changes where data lives and nothing
-about how the domain behaves.
+`DecisionService` and `Versioning` depend on store interfaces. The memory and Drizzle stores
+implement the same interface, so domain tests run real service code against the memory store.
 
-The two writes that must not tear are single methods on that interface, so the
-Drizzle implementation can wrap each in one transaction: a decision and its
-opening transition, and a status change and its audit row.
+Two writes must succeed or fail together, and each is one store method, so the Drizzle store wraps
+each in a transaction: creating a decision with its opening transition, and changing a status with
+its transition row.
 
-**What the suite proves, and what it does not.** Every domain test constructs
-`memory-store`, so what it establishes about permissions and the lifecycle it
-establishes about a double. Two suites close that, and they close different
-halves.
+### What the tests prove about the Postgres store
 
-`store-parity.test.ts` holds both stores to the port's 32 methods. It catches a
-method added to one side and forgotten on the other, and catches nothing about
-behaviour: an ordering difference, a null handled differently, a transaction
-boundary in the wrong place would all pass. It is still worth having because
-that failure is otherwise silent, since TypeScript checks each class against the
-interface and a method dropped from the interface and both classes typechecks
-cleanly while the service calls it.
+Every domain test uses the memory store. Two suites check the Postgres store against it.
 
-`store-contract.test.ts` is the behavioural half and it is the one that matters:
-**43 cases, each run twice against the same assertions, once per store.** A
-difference between the double and the real thing is a failure rather than a
-surprise in production.
+`store-parity.test.ts` checks that both stores implement the port's 32 methods, listed in the test
+rather than read from either store. TypeScript checks each class against the interface, but a
+method removed from the interface and both classes still typechecks while the service calls it.
+The suite checks no behaviour: a different order, a null handled differently or a transaction in
+the wrong place all pass.
 
-It needs a Postgres and does not need one installed. PGlite is Postgres compiled
-to WebAssembly and run in this process, so the planner, the types and the
-constraint and transaction semantics are Postgres's rather than an emulator's.
-No Docker, no service container, no `DATABASE_URL`. The DDL is generated from
-the Drizzle schema rather than a checked-in dump, so a column added to
-`lib/db/schema` is present on the next run and cannot drift out of step with the
-tables the tests write to.
+`store-contract.test.ts` runs 43 cases against both stores with the same assertions. The Postgres
+store runs on PGlite, Postgres compiled to WebAssembly and run in the test process, so constraints,
+types and transactions behave as in Postgres, with no Docker, service container or `DATABASE_URL`.
+`test/pg.ts` generates the DDL from the Drizzle schema on each run, so the tests use the current
+schema.
+
+The e2e suite runs against a real Postgres server instead. PGlite behind a socket was tried and
+failed there: it accepts one connection at a time, and Next.js with better-auth opens several.
+
+---
+
+## Data model
+
+| Table | Holds |
+|---|---|
+| `workspaces` | Name and key (`HAU`) |
+| `memberships` | User, workspace, role (`author` or `maintainer`) |
+| `decisions` | Workspace, number, title, status, author, `supersededById`, the versioned document's id. Unique on workspace and number |
+| `decision_transitions` | From, to, actor, time, reason. Append-only |
+| `decision_references` | File or link references: label, URL, repository, path, line range, cited text, baseline and current blob SHA, when last checked |
+| `decision_drafts` | Author, workspace, title, body, cited references. No number |
+| `workspace_repos` | Connected repositories. Unique on workspace, owner and name |
+| `documents`, `document_versions` | The versioning engine's documents and commits |
+| `user`, `session`, `account`, `verification` | better-auth. `account` holds linked GitHub tokens |
+
+---
+
+## Decisions
+
+### Build on haus
+
+core did not use haus at first, because a library still changing its interface would have moved
+core's with it. After haus 1.0.0 published a token contract, core took `haus-tokens` (primitives,
+its own brand in `brands/core.css`, and the semantic roles) and `haus-components`. What core took
+and kept is listed under [What core takes from haus](#what-core-takes-from-haus-and-what-it-keeps).
 
 ### Restore is a forward commit
 
-Restoring an old version writes a new commit whose state equals the target,
-rather than rewinding the head, the way `git revert` works. History stays
-append-only and auditable, a restore is itself a versioned event, and multiple
-people editing one document cannot silently erase each other's history.
+Restoring a version writes a new commit whose content equals it, as `git revert` does. Moving the
+head back was rejected: it removes commits, so a restore would erase work committed after the
+restored version, and the restore itself would leave no record.
 
-### Two audit trails, deliberately separate
+### Two audit trails
 
-Content revisions live in the versioning engine; status transitions live in an
-append-only `decision_transitions` log. "How did the text change" and "how did
-the decision move" are different questions asked by different people at different
-times, and collapsing them into one timeline would answer neither well.
+Text revisions are commits in the versioning engine. Status changes are rows in the append-only
+`decision_transitions` table. One asks how the text changed, the other when and by whom the decision
+moved, and a single timeline would mix edits with approvals.
 
 ### Accepted decisions are immutable
 
-Past `proposed`, the body cannot be edited. You supersede a decision and link the
-replacement, so what was decided and when cannot be quietly rewritten later.
+`canEditContent` refuses any decision not in `proposed`. To change an accepted decision, a new one
+is accepted and supersedes it, so the accepted text stays as it was agreed.
 
-### Guards return a reason rather than throwing
+### Guards return a reason
 
-Every lifecycle check returns `{ ok: false, reason }`. The UI can then say *why*
-an action is unavailable, so a person can tell a missing capability from a
-decision that has already moved on.
+Every lifecycle check returns `{ ok: true }` or `{ ok: false, reason }`, for example "requires the
+accept capability" or "a decision is immutable once it leaves 'proposed'". The interface can then
+tell a missing permission from a decision that has already moved on.
 
 ---
 
 ## Drafts
 
-A draft is **not a lifecycle status**, and lives in its own table.
+A draft is not a lifecycle status, and is stored in `decision_drafts`, not `decisions`.
 
-- It holds **no ADR number**. Reserving one would leave permanent gaps in the
-  sequence every time a draft is abandoned, and gaps in a numbered audit trail
-  are exactly the wrong kind of mystery, with no way to repair them, because
-  numbers are how people cite decisions.
-- It is **private to its author**, including from maintainers, who have no
-  business reading unfinished reasoning. Every real status is workspace-visible.
-- It has **no transitions**, because nothing has happened to it yet.
+- **No ADR number.** A number reserved for a draft that is then abandoned leaves a gap in the
+  sequence, and people cite decisions by number.
+- **Private to its author**, maintainers included. Every decision is visible to the workspace.
+- **No transitions.**
+- **No title required.** A missing title is derived from the first line written, preferring the
+  Decision section (`draft-label.ts`).
+- **Not versioned.** The versioning engine records how a decision's text changed for the team. A
+  draft has no readers yet.
+- **Bounded.** `saveDraft` is available to any member, so a draft is capped at 128KB and an author
+  at 20 drafts per workspace.
 
-Keeping drafts out of `decisions` is what lets the status enum stay an honest
-description of a decision's life.
+### Local autosave and server drafts
 
-**Titles are not required.** A draft exists so half-formed work can be parked;
-demanding a name before you may park it puts a form field in front of the escape
-hatch. A missing title is derived from the first thing actually written,
-preferring the Decision block.
+`localStorage` holds a compose session that has not reached the server, for a crashed browser or a
+closed tab. A server draft is saved on purpose and appears in the decisions list. Once a server
+draft exists, local autosave stops, because the list is where it will be found.
 
-**Draft edits are not versioned.** The versioning engine exists so a *team* can
-see how a decision's text evolved. A draft has no audience yet.
-
-### Two layers of draft safety, doing different jobs
-
-`localStorage` is the crash net for a compose session that has never reached the
-server. The browser dies twenty minutes in and there is nothing in any list to
-recover from. A **server draft** is the deliberate act of parking something, and
-appears in the decisions list. Once a server draft exists the local copy is
-disabled, because the list is the better recovery route.
-
-A found local draft is **offered**, and applied only when someone accepts it.
-Replacing what they see on screen with older text is its own kind of data loss.
+A local copy found on return is offered, not applied, because replacing what is on screen with
+older text would lose the newer text.
 
 ---
 
@@ -159,335 +155,229 @@ Replacing what they see on screen with older text is its own kind of data loss.
 
 ### A citation names a range
 
-A whole-file reference drifts on any commit touching the file, so a typo in an
-unrelated function marks the decision stale. False positives scale with file
-size, and a staleness signal that cries wolf gets ignored, which defeats the
-entire feature. Citing lines 47–120 changes the claim from "this file changed"
-to "the code this decision governs changed".
+A whole-file reference is marked changed by any commit to the file, including one to an unrelated
+function, and the larger the file the more often that happens. A line range is marked changed only
+when those lines change.
 
-### Movement is not change
+### A moved block is not a change
 
-The cited text is stored alongside the range. When a range no longer matches, the
-text is searched for elsewhere in the file before anything is called drift:
-insert twenty lines above a block and it is untouched but now lives at 67–140.
-Trailing whitespace is normalised away, so a formatter run is not drift; changed
-indentation *is* drift, because it means the block changed scope.
+The cited text is stored with the range. When the text is no longer at those lines, the file is
+searched for it before the reference is marked drifted. Twenty lines inserted above a block move it
+to new lines without changing it. Trailing whitespace is removed before comparing, so reformatting
+does not count. Leading indentation is kept, because a block that changed indentation changed
+scope.
 
-### The baseline moves when the decision is accepted
+### The baseline moves on acceptance
 
-A citation made while drafting records the code the *author* was looking at. The
-decision does not exist until the team accepts it, so that is when its reference
-point should be fixed. Without this, a proposal that sat in review for a
-fortnight is flagged as drifted the instant it is agreed.
+A citation made while drafting records the code the author saw. On acceptance, each reference's
+baseline moves to the code at that moment, so a proposal that sat in review while its code changed
+is not drifted the moment it is accepted. A block that moved during review is followed to its new
+lines, not pinned to the old line numbers. Re-baselining is best-effort: the acceptance is already
+recorded, and a GitHub failure does not undo it.
 
-A block that moved during review is *followed* rather than re-pinned. Pinning
-the old line numbers blind would silently re-point the citation at whatever now
-occupies them. Re-baselining is best-effort: the acceptance is an audited
-transition that has already happened, and a GitHub outage must not undo it.
+### Drift is checked when reading
 
-### Drift is a reading concern
-
-No drift status and no drift check while writing or editing. A file cited moments
-ago is in sync by construction, and a badge that can only ever say one thing is
-not a status. Checking whether the world moved underneath a decision is the
-question you ask *before* deciding to edit it, so it belongs on the document.
+Drift is not checked while composing or editing. A file cited seconds ago can only be in sync. The
+status is shown on the decision page, where someone decides whether the decision needs revisiting.
+A re-check records each reference's current SHA.
 
 ### Citations are plain text
 
-`{{owner/repo:path#L47-L120}}` is a form the author can type, paste and edit, and
-it survives being copied into a commit message or a chat thread, which a rich
-editor node would not. Tokens are rewritten into ordinary markdown links before
-parsing, so the renderer needs no plugin and inherits the escaping that
-react-markdown has already hardened. An unresolvable token renders as inline code
-rather than vanishing, so a typo stays visible.
+`{{owner/repo:path#L47-L120}}` can be typed, pasted and copied into a commit message or chat. An
+editor node would not survive the copy. Tokens become ordinary markdown links before parsing, so
+react-markdown renders them with no plugin and its escaping applies. A token that does not resolve
+renders as inline code.
 
 ---
 
 ## Interface
 
-### Writing and reading are the same surface
+### Write and Preview use the same type
 
-The compose editor carries no field fills, no borders, and type metrics matching
-the rendered prose exactly, so a paragraph does not reflow between Write and
-Preview. The ADR's structure survives as a left gutter rule that takes the accent
-on focus, the editor's only chrome. Preview is then a check on rendering rather
-than a mode you have to live in.
+The compose editor has no field backgrounds or borders, and its type metrics match the rendered
+markdown, so text does not reflow between Write and Preview. Each ADR section is marked by a left
+gutter rule that takes the accent colour on focus.
 
-The editor is a plain `<textarea>` by choice: no CodeMirror, no contenteditable,
-no third-party editor to keep in sync with how the document later renders. What
-makes it *feel* like markdown is behaviour while typing: lists that continue
-themselves, Tab that indents, wrapping shortcuts. All of that is pure
-text-in / text-out, tested directly.
+The editor is a `<textarea>`. A rich editor (CodeMirror, contenteditable) was rejected: it would be a
+second rendering of the document to keep in step with the markdown renderer. List continuation, Tab
+indentation and wrapping shortcuts are functions from text and selection to text and selection, in
+`lib/markdown/editing.ts`, tested without a DOM.
 
-### Editing is a page
+### Editing is its own page
 
-Inline editing left the properties, the notices and the tabs stacked above the
-editor, with two Edit affordances visible at once. Writing deserves the same
-undistracted page whether the document is new or already numbered.
+Inline editing left the properties, notices and tabs above the editor, with two Edit buttons
+visible at once. Editing an existing decision now uses the same page as composing a new one.
 
-### Only the document is paper
+### One sheet on the decision page
 
-The decision page had grown five cards across three widths, two grounds and two
-elevations, and nothing said which surface mattered. One white sheet holds the
-document; everything else (properties, notices, tabs) is annotation about it
-and sits on the desk. Every region shares the sheet's measure, so the page has
-two vertical edges rather than six.
+The decision page had five cards at three widths, on two backgrounds and two elevations. Now the
+document is the one white sheet; properties, notices and tabs sit on the page background, and every
+region shares the sheet's width.
 
-The **dossier** card is the one exception. Status, owner and dates *are* the
-current state of a decision's history, so the audit trail expands inside the card
-that summarises it.
+The dossier card is the exception. It holds status, owner and dates, and the activity history opens
+inside it, since those dates summarise that history.
 
-### Notices are tinted
+### One notice
 
-Raising a notice puts it in competition with the sheet. What makes one urgent is
-what it says. Only one notice survives, the drift warning; everything else that
-used to be a banner is a property, because state and authorship are facts about
-the record.
+Notices are tinted, not raised. The only notice left is the drift warning. Status and authorship,
+which used to be banners, are properties.
 
-### Two button families
+### Buttons
 
-Both are haus components now; what follows is how core spends their vocabulary. A
-labelled action on the page is haus `Button`, and every one carries a background:
-a transparent button with a word in it reads as a link, and a row mixing filled
-and unfilled controls has no rhythm. There is no ghost variant. The default *is*
-the quiet one, and it is quiet by carrying the lightest fill. One filled accent
-per view; Approve keeps its own green, because it says "yes, and permanently" in a
-way an accent that also means "primary" and "link" cannot.
+A labelled action is haus `Button`, and every one has a background, because a transparent button
+with a word in it reads as a link. There is no ghost variant; the default is the lightest fill.
+There is one filled accent per view. Approve is green instead of the accent, because the accent also
+marks primary actions and links.
 
-An icon-only affordance inside a container is haus `IconButton`: the × on a row, a
-formatting tool, a refresh beside a timestamp. Those fill on hover only, because
-eight filled squares in a toolbar is noise, and because they belong to the thing
-they sit in rather than to the page.
+An icon-only control inside a container is haus `IconButton`: the × on a row, a toolbar button, a
+refresh beside a timestamp. These fill on hover only, because a toolbar of eight filled squares is
+harder to scan.
 
-### A transition you cannot take back asks first
+### Irreversible transitions ask first
 
-Approve, Reject and Deprecate each move a decision one way, and Approve makes it
-immutable, so one click was too little friction for what they do. Each opens a
-confirmation over haus `Modal` (`ConfirmAction`). The trigger stays the button it
-was, Approve the filled green, and the confirm repeats its tone, so the modal's
-primary action reads as the same decision. Supersede keeps its own modal, because
-it needs the replacement chosen and not just confirmed. The drift re-check stays
-one click: it changes nothing.
+Approve, Reject and Deprecate each open a confirmation (`ConfirmAction`, over haus `Modal`) whose
+primary button has the tone of the button that opened it. Approve also makes the decision immutable.
+Supersede has its own modal, to choose the replacement. The drift re-check has no confirmation.
 
-### One file token, two arrangements
+### File tokens
 
-A path rendered four different ways looked like a different kind of object
-depending on the screen. A **chip** sits inside a line of text and carries the
-filename only, because a full path cannot sit mid-sentence. A **row** sits in a
-list, carries the whole path, and offers a slot on the right for what that list
-needs: a drift badge, a remove control, a range picker.
+A file path is shown two ways. A **chip** sits in a line of text and shows the filename. A **row**
+sits in a list, shows the full path, and has a slot on the right for a drift badge, a remove button
+or a range picker.
 
 ### Visual language
 
-Notion-inspired warm paper: an off-white desk, white cards separated by fill
-rather than borders, Gabarito for type. Colour is drawn from a retro-print
-palette of vermilion, mustard, teal and cobalt, at the saturation and lightness
-of printed ink, and used only where it earns its place. Monospace is for code,
-paths and diffs.
+An off-white page, white cards separated by fill instead of borders, Gabarito for text and Geist
+Mono for code, paths and diffs. Accent colours come from a print-like palette of vermilion, mustard,
+teal and cobalt, at the saturation and lightness of printed ink.
 
 ---
 
 ## What core takes from haus, and what it keeps
 
-**C4**, the register the adoption owes. Written as the migration landed rather
-than reconstructed after it, because the reasons are the point and they go stale
-fastest.
+**C4** in the haus adoption. Written as the migration landed.
 
 ### Taken
 
-Thirteen components: `Button`, `IconButton`, `Modal`, `Input`, `Select`,
-`Badge`, `Card`, `Callout`, `EmptyState`, `Tabs`, `Popover`, `Avatar`, and
-`Toast`'s surface. The token layer sits under all of them via
-`brands/core.css`. `Select` is the themed picker haus used to call `Listbox`;
-haus retired its native select and gave the name to this one.
+Thirteen components: `Button`, `IconButton`, `Modal`, `Input`, `Select`, `Badge`, `Card`, `Callout`,
+`EmptyState`, `Tabs`, `Popover`, `Avatar`, and `Toast`'s surface, over the token layer from
+`brands/core.css`. `Select` is the themed picker haus used to call `Listbox`.
 
-The account menu is `Avatar` inside `Popover` with `role="menu"`, which took the
-hand-rolled open, close, outside-click and placement with it. The one visible
-change is the avatar's fill: haus hashes the name onto its own palette rather
-than core's accent tint.
+The account menu is `Avatar` inside `Popover` with `role="menu"`, replacing core's own open, close,
+outside-click and placement code. The avatar's fill changed: haus derives it from the name, where
+core used its accent tint.
 
-The Write / Preview switch is `Tabs` at `appearance="segmented"`. It was the
-last hand-rolled control, kept because haus `Tabs` rendered its tablist and
-panel as adjacent siblings, and core's are a sticky toolbar and a document sheet
-with the whole form between them. `haus#67` gave `Tabs` a `panelId`, so the
-switch owns the roving tabindex and the arrow keys and the sheet carries
-`role="tabpanel"`.
+The Write and Preview switch is `Tabs` with `appearance="segmented"`. It stayed core's own until
+`haus#67` gave `Tabs` a `panelId`, because haus rendered the tablist and panel as adjacent siblings,
+and core's tablist is a sticky toolbar with the form between it and the document sheet.
 
-The status palette went too. Retiring `.pill` left the six `--st-*` tokens
-behind in a password strength meter, timeline banners and diff-op colours: a
-general status palette wearing a decision-state name. Those read haus's
-feedback roles now, and the six tokens are deleted.
+The status colours moved too. The six `--st-*` tokens were used by the password strength meter,
+timeline banners and diff colours as well as status. Those read haus's feedback roles now, status
+badges use haus `Badge` tones (haus decision 0021), and the six tokens are deleted.
 
-Four thin adapters remain and each adds exactly one thing haus cannot know
-about: `SubmitButton` and `SubmitIconButton` read `useFormStatus`,
-which has to be read by a child of the form; `ModalShell` sets
-`dismissOnBackdrop={false}` and focuses the first field; `ConnectGithubButton`
-carries an OAuth call.
+Four adapters remain, each adding one thing haus does not know about: `SubmitButton` and
+`SubmitIconButton` read `useFormStatus`, which only works inside the form; `ModalShell` sets
+`dismissOnBackdrop={false}` and focuses the first field; `ConnectGithubButton` starts the OAuth
+flow.
 
-### Kept, and why
+### Kept
 
-**The domain.** `DecisionEditor`, `DecisionMeta`, `DecisionReferences`,
-`Lineage`, `DraftList`. These are the product. A design system has no opinion on
-what an architecture decision record looks like.
+**Domain components**: `DecisionEditor`, `DecisionMeta`, `DecisionReferences`, `Lineage`,
+`DraftList`. A design system has no model of a decision record.
 
-**The citation model.** `FileBrowser`, `FileToken`, `ReferenceField`,
-`LiveReferenceField`, `CitationInsert`. Same reason.
+**Citation components**: `FileBrowser`, `FileToken`, `ReferenceField`, `LiveReferenceField`,
+`CitationInsert`.
 
-**Content rendering.** `Markdown`, `Mermaid`. Both wrap libraries and neither is
-a control.
+**Content rendering**: `Markdown` and `Mermaid`, which wrap libraries.
 
-**The shell.** `AuthShell`, `TopBar`, `AuthForm`, `DemoCredentials`. Layout, and
-layout is the one thing every product does differently.
+**The shell**: `AuthShell`, `TopBar`, `AuthForm`, `DemoCredentials`.
 
-**`PasswordField`.** It composes haus `Input` now, with the reveal toggle riding
-in the `suffix` slot, so `.field` and `.input` are gone. What stays core's is the
-strength meter and the reason the label sits beside the input rather than wrapping
-it: wrapping made the accessible name *"Password Show, edit text"* and moved focus
-into the field on every reveal, found by an end-to-end test. haus `Input` renders
-its label beside the field the same way, which is what made the composition clean
-rather than a fight.
+**`PasswordField`.** It uses haus `Input`, with the reveal toggle in the `suffix` slot. The strength
+meter stays core's. The label sits beside the input instead of wrapping it: wrapping made the
+accessible name "Password Show, edit text" and moved focus into the field on every reveal, which an
+end-to-end test found. haus `Input` places its label the same way.
 
-**The editor's `<textarea>`.** Not a labelled field: it is the writing surface,
-with a ref, keyboard handling and its own sizing, and haus `Textarea` would wrap
-it in label and hint scaffolding it has no use for.
+**The editor's `<textarea>`.** It is the writing surface, with a ref, keyboard handling and its own
+sizing. haus `Textarea` adds label and hint markup it does not need.
 
-**sonner.** haus `Toast` ships a surface and deliberately no provider, queue,
-positioning or dismissal, which decision 0008 records as a boundary rather than a
-gap. Measured across the portfolio, core is the only product with toasts at all,
-so a haus provider would have exactly one consumer. So core renders haus's `Toast`
-surface inside sonner's queue via `toast.custom`: sonner keeps the queue and the
-dismissal, haus draws the surface, and neither half is a compromise. `lib/toast.tsx`.
+**sonner.** haus `Toast` is a surface with no provider, queue, positioning or dismissal (haus
+decision 0008). core renders that surface inside sonner's queue with `toast.custom`, in
+`lib/toast.tsx`: sonner queues and dismisses, haus draws.
 
 ---
 
-## Deliberate omissions
+## Deployment
 
-- **No real-time collaborative editing.** ADRs are drafted by one person and
-  reviewed by others. CRDT co-editing would be an impressive answer to a question
-  nobody asked of this domain.
-- **No email verification yet.** Fine for a single-tenant deployment; a
-  prerequisite for opening sign-up. See the deployment notes below.
-- **No `Add link` reference from the UI.** Composing never had one, and unifying
-  the reference field on the file flow meant dropping it rather than building
-  link-buffering into propose. Markdown links in the prose cover the need, and
-  enough. A link sits in the sentence that needs it.
-- **Auto-tracking files cited inline.** Citing a file in prose does not start
-  watching it for drift. "Mentioned in an argument" is not "this decision
-  governs this code", and conflating them would fill the log with drift from
-  files cited as counter-examples. The gap is real: a chip in the text with no
-  entry in the reference list reads as an inconsistency, and the likely answer
-  is a "track this file" affordance on an untracked citation rather than doing
-  it silently.
+[core.hipuku.dev](https://core.hipuku.dev) runs on Vercel with functions in `syd1`, against a Neon
+database in Sydney. A signed-in page load makes several queries in sequence (session, membership,
+data). With the functions in Vercel's default US region, each query crossed the Pacific.
 
----
+### What the demo switches off
 
-## Deployed
+**Sign-up** (`DISABLE_SIGNUP=1`). `/sign-up` is a 404. An invite code was rejected: whoever holds one
+can pass it on. There is one seeded account.
 
-[core.hipuku.dev](https://core.hipuku.dev), on Vercel against a Neon database in
-Sydney, with the functions pinned to `syd1`. That last part is not a detail: a
-signed-in page load makes several queries in sequence (session, membership,
-then the data) and with the compute in Virginia every one of them crossed the
-Pacific. Putting them together was the single largest thing that made the
-deployed app feel like the local one.
+**Writing to the decision log.** The demo account (`DEMO_USER_EMAIL`) may save and discard drafts.
+Fifteen actions refuse it: creating, editing and deleting workspaces, inviting and removing members,
+connecting and disconnecting repositories, adding and removing references, proposing, revising,
+changing status, superseding, and re-checking drift. The refusal is in the action layer, because it
+belongs to this deployment, not to what a decision log allows. Three actions that only read from
+GitHub need no refusal.
 
-### What is switched off, and why
+Every visitor signs in as that account, so its drafts are shared between visitors, not private.
+`/api/cron/prune-drafts` runs nightly (`vercel.json`), deletes its drafts not updated in 24 hours, and
+then restores the seeded draft if no draft with its title remains. The route requires `CRON_SECRET`
+as a bearer token and refuses to run when the secret is unset where a demo account is configured.
 
-**Sign-up.** Not gated, absent. An invite code is a shared secret rather than
-access control: whoever holds it can pass it on, and you cannot choose who ends
-up with it. There is one seeded account and nothing for anyone to create.
+**GitHub linking** (`DISABLE_GITHUB=1`). The OAuth flow requests the `repo` scope, which can write
+to private repositories, and better-auth stores the token in `account`. On a public deployment that
+means holding strangers' write tokens.
 
-**Writing to the decision log.** The demo account may write and save drafts,
-because a draft is private to its author and holds no ADR number, so the worst a
-visitor leaves behind is unfinished text. It may not accept, reject, deprecate
-or supersede: that would change what the *next* visitor sees, which is not a
-demo but a shared document nobody owns. Fourteen actions refuse and two do not,
-enforced at the action layer because this is a property of one deployment rather
-than of what a decision log is.
+### Browsing without users' tokens
 
-**GitHub linking.** The app requests the `repo` scope, which is read *and
-write* on private repositories, and better-auth stores those tokens in the `account`
-table. On a single-tenant deployment that is the owner's own token and their own
-risk; on a public URL it would mean holding a stranger's credentials with write
-access to their code, on a hobby-tier database. The feature stays in the
-codebase, the tests and the docs. Only the storing of other people's tokens is
-switched off.
+`GITHUB_PUBLIC_TOKEN` is a token of the deployment owner's, read-only and limited to public
+repositories. `getReadToken` uses a linked account when there is one, since it can reach private
+repositories, and the public token otherwise. On the demo nobody has a linked account.
 
-### Browsing without holding anyone's credentials
+Connecting a repository still needs the person's own account: listing repositories with the
+deployment's token would show the owner's repositories to whoever is signed in.
 
-Switching off linking would also have switched off citing files, which is the
-feature most worth demonstrating. Those are separate concerns, so they are now
-separated: `GITHUB_PUBLIC_TOKEN` is a read-only, public-repositories-only token
-belonging to the deployment, used when the signed-in person has no account
-linked, which on the demo is everyone.
+Repository trees are cached per server instance for five minutes. The file picker requests every
+connected repository's tree on each mount, and without the cache a few visitors would use up the
+hourly GitHub API allowance.
 
-It is safe to hold exactly where a user's `repo` token is not: it is the owner's
-own, it cannot write, and it can reach nothing private. A linked account still
-takes precedence where there is one, because it can see private repositories the
-fallback cannot, and it is the person's own access.
+### Server actions return errors
 
-Connecting a repository deliberately still requires your own account. Listing
-"your repositories" through the deployment's token would show the *owner's*
-repositories to whoever happened to be signed in.
-
-Repository trees are cached for five minutes per instance. A tree is a few
-hundred KB and changes rarely, while the picker asks for every connected repo on
-every mount. Without it, a handful of visitors opening the compose screen would
-spend the hourly API budget on identical answers.
-
-### A server action should not throw
-
-React reports a rejected server action as error #441, "an error occurred in the
-Server Components render", with the message stripped out of the production
-build. Anything catching it and showing the text displays React's apology as
-though it were an explanation.
-
-Every way the file picker can fail is something a person can act on: not a
-member, GitHub off, no account linked, no repositories connected, GitHub
-unreachable. Each is returned as words. This cost two rounds of fixing the wrong
-throw to learn.
-
-### Bounds on what a stranger can write
-
-A draft may be empty, untitled and half-formed, which is the point of one. What
-it may not be is unbounded, because `saveDraft` is reachable by anyone with a
-session and on a public demo that is a scriptable way to fill a database. 128KB
-per draft, 20 per author per workspace: both far above anything a person writing
-a decision would reach, and low enough that the table cannot be used as free
-storage.
+React reports a server action that throws as error #441, with the message removed in production
+builds. Every failure the file picker can meet (not a member, GitHub off, no linked account, no
+connected repositories, GitHub unreachable) is returned as a message. Two earlier fixes changed the
+wrong throw before this was found.
 
 ---
 
 # Known trade-offs / next
 
-**~~The Postgres store is tested by nothing.~~ Done**, and this entry is kept
-rather than deleted because it was the largest piece of work outstanding here
-and a trade-offs list that only ever grows is not being read.
-
-`store-contract.test.ts` runs 43 cases twice, once per store, against PGlite.
-Issue #1, closed in `4dfa1a2`. The section above says what it does and does not
-prove; the short version is that `drizzle-store` is no longer exercised by
-nothing.
-
-**~~The token layer covers colour, radius and shadow, and nothing else.~~
-Adopted.** core imports haus's full cascade now (primitives, `brands/core.css`
-and the semantic roles), so the type scale, the spacing scale and the weight scale
-it never had are haus's, not invented here. `scripts/check-token-debt.mjs` holds
-the debt in CI, failing in both directions; it started at 355 and stands at **11**.
-The eleven are the sites with no haus token to land on: `em` padding that tracks
-its own font size, a negative margin, two page clearances, two `z-index`, a
-`min-height`, a `box-shadow` and a `4px` radius. Zero is not the target: those
-eleven are correct as written, and the ratchet records why they stay.
-
-**`app/app/actions.ts` is 741 lines and has no tests of its own.** It is the
-security boundary, holding `requireUser` and the demo refusals. The pure helpers
-have been lifted out and tested: `attempt` in `lib/attempt.ts`, and the form
-readers in `lib/decisions/form.ts`. What remains inside are `snapshotFile`,
-`attachCitedFiles` and `rebaselineOnAccept`, which each need GitHub and a store,
-so they want fakes rather than extraction.
-
-**Email verification is off and there is no explicit rate limiting.** Neither
-matters while nobody can create an account. Both are prerequisites the moment
-sign-up opens.
-
-**The `drizzle-kit` npm-audit warnings are dev-only.** `npm audit fix --force`
-destructively downgrades the migration tool. Leave them.
+- **Screenshots are out of date.** They were taken on 2026-08-30, before the seed moved to the
+  `haus` workspace and before haus components replaced core's controls. `new-workspace-modal.png` is
+  not used by any document.
+- **`app/app/actions.ts` (751 lines) has no tests of its own.** It holds `requireUser` and the demo
+  refusals. Its pure helpers are tested where they moved: `lib/attempt.ts` and
+  `lib/decisions/form.ts`. `snapshotFile`, `attachCitedFiles` and `rebaselineOnAccept` need GitHub
+  and a store, and need fakes to test.
+- **Token debt: 11** declarations with no haus token, held by `scripts/check-token-debt.mjs`, which
+  fails when the count moves either way. It started at 355. The eleven: two `em` paddings, two
+  `min-height`, two `z-index`, the app shell's padding, the password field's right padding for its
+  reveal button, a negative margin, a `box-shadow` and a `4px` radius. Zero is not the target.
+- **The seed's workspace is found by name.** Re-seeding deletes any workspace named `haus`, and the
+  draft restore looks for one. A real workspace with that name on the same database would be
+  replaced.
+- **Email verification is off, and there is no rate limiting** beyond the draft limits. Neither
+  matters while sign-up is closed. Both are needed before it opens.
+- **Tracking files cited in the text.** A citation in the body is not added to the references
+  checked for drift, because a file cited as a counter-example is not governed by the decision. A
+  citation with no matching reference looks inconsistent; a "track this file" control on it is the
+  likely next step.
+- **Adding link references from the interface.** Removed when the reference field was unified on
+  files. A markdown link in the body does the same job.
+- **`drizzle-kit` npm audit warnings** are in development dependencies. `npm audit fix --force`
+  downgrades `drizzle-kit`; they are left.
