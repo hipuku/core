@@ -29,8 +29,8 @@ export function DemoCredentials({
     // had no callout of its own to reach for.
     <Callout tone="info" className={styles.card}>
       <p className={styles.lead}>
-        <strong>Read-only demo.</strong> Sign in with these to look around. You
-        can write and save drafts; the decision log itself stays as it is.
+        <strong>Read-only demo.</strong> A shared account that can save drafts and
+        cannot change the decision log. Drafts are visible to every visitor.
       </p>
       <Field label="Email" value={email} />
       <Field label="Password" value={password} />

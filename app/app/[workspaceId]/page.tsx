@@ -31,7 +31,6 @@ export default async function WorkspacePage({
     .reverse();
   const repos = await decisionService.listWorkspaceRepos(workspaceId);
   const drafts = await decisionService.listDrafts(workspaceId, user.id);
-  const article = role === "author" ? "an" : "a";
 
   return (
     <div>
@@ -42,7 +41,7 @@ export default async function WorkspacePage({
             <span className={styles.titleMuted}>Decisions</span>
           </h1>
           <p className={styles.sub}>
-            You are {article} {role} in this workspace.
+            Role in this workspace: {role}
           </p>
         </div>
         <div className={styles.headActions}>
@@ -82,12 +81,12 @@ export default async function WorkspacePage({
       {decisions.length === 0 && drafts.length === 0 ? (
         <EmptyState
           title="No decisions yet"
-          description="Propose the first one to start the log."
+          description="Proposed decisions are listed here."
         />
       ) : decisions.length === 0 ? (
         <EmptyState
           title="Nothing proposed yet"
-          description="Your draft above is not visible to anyone else until you propose it."
+          description="Drafts are visible only to their author until proposed."
         />
       ) : (
         <ul className={styles.list}>

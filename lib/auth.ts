@@ -54,7 +54,7 @@ export const auth = betterAuth({
     // password itself never leaves the server in the clear.
     haveIBeenPwned({
       customPasswordCompromisedMessage:
-        "This password has appeared in a data breach. Please choose another.",
+        "This password appears in a known data breach. Choose another.",
     }),
   ],
 });

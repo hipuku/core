@@ -47,12 +47,12 @@ export function AuthForm({
     <form className={styles.form} onSubmit={onSubmit}>
       <div className={styles.head}>
         <h2 className={styles.title}>
-          {isSignUp ? "Create your account" : "Welcome back"}
+          {isSignUp ? "Create an account" : "Sign in"}
         </h2>
         <p className={styles.subtitle}>
           {isSignUp
-            ? "Start recording decisions in minutes."
-            : "Sign in to your decision log."}
+            ? "An account can create workspaces and propose decisions."
+            : "Sign in to core."}
         </p>
       </div>
 

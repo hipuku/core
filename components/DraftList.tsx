@@ -53,7 +53,7 @@ export function DraftList({
               <span className={styles.cardNum}>
                 <span
                   className="key-chip key-chip--pending"
-                  title="Your draft, numbered when you propose it"
+                  title="Draft: numbered when proposed"
                 >
                   {workspaceKey}-&bull;&bull;&bull;
                 </span>
@@ -66,7 +66,7 @@ export function DraftList({
               </span>
               {/* The tag sits where every other row carries its status, so the
                   column scans top to bottom without a gap. */}
-              <span title="Only you can see this">
+              <span title="Visible only to its author">
                 <StatusBadge status="draft" />
               </span>
             </Card>

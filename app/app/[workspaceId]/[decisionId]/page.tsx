@@ -170,7 +170,7 @@ export default async function DecisionPage({
               icon={<X size={16} />}
               label="Reject"
               title="Reject this decision?"
-              description="Rejecting closes this proposal. The record and its history stay, but it is no longer a decision the team is weighing."
+              description="Rejecting closes this proposal. The record and its history remain."
               confirmLabel="Reject"
               pendingLabel="Rejecting…"
             />
@@ -183,7 +183,7 @@ export default async function DecisionPage({
               icon={<Check size={16} />}
               label="Approve"
               title="Approve this decision?"
-              description="Approving accepts this decision and fixes its reference point. Accepted decisions are immutable: to change one later you supersede it."
+              description="Approving accepts this decision and moves its code references' baseline to the current code. An accepted decision cannot be edited; changing it later needs a decision that supersedes it."
               confirmLabel="Approve"
               pendingLabel="Approving…"
             />
@@ -204,7 +204,7 @@ export default async function DecisionPage({
               icon={<Archive size={16} />}
               label="Deprecate"
               title="Deprecate this decision?"
-              description="Deprecating retires this decision. It stays in the record and its history, marked no longer current."
+              description="Deprecating marks this decision as no longer current. The record and its history remain."
               confirmLabel="Deprecate"
               pendingLabel="Deprecating…"
             />
@@ -319,8 +319,8 @@ export default async function DecisionPage({
           <div className={styles.noticeText}>
             <span className={styles.noticeTitle}>Referenced code has changed</span>
             <span className={styles.noticeSub}>
-              Code this decision cites has drifted since it was recorded, so it may
-              be out of date. See References below.
+              Cited code has changed since its baseline, so this decision may be
+              out of date. See References below.
             </span>
           </div>
         </div>

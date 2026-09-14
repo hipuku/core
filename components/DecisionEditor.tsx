@@ -468,7 +468,7 @@ export function DecisionEditor({
         <div className={styles.props}>
           <span
             className="key-chip key-chip--pending"
-            title="The number this decision takes when you propose it"
+            title="The number assigned when this decision is proposed"
           >
             {nextKey ?? "—"}
           </span>
@@ -553,11 +553,11 @@ export function DecisionEditor({
         <div className={styles.recovered} role="status">
           <RotateCcw size={16} className={styles.recoveredIcon} />
           <span>
-            You have an unsent draft from <strong>{timeAgo(recoverable.savedAt)}</strong>.
+            An unsent draft from <strong>{timeAgo(recoverable.savedAt)}</strong> is saved in this browser.
           </span>
           <span className={styles.recoveredActions}>
             <Button type="button" variant="secondary" onClick={restore}>
-              Restore it
+              Restore
             </Button>
             <Button
               type="button"
@@ -613,13 +613,11 @@ export function DecisionEditor({
           {(workspaceId || referencesSlot) && (
             <fieldset className={styles.block}>
               <legend className={styles.blockLabel}>Referenced code</legend>
-              {/* Without this the field looks like somewhere to file links. It
-                  is the feature that makes a decision code-aware, and it costs
-                  one sentence to say so. */}
+              {/* Without this hint the field reads as a place to file links. */}
               <p className={styles.blockHint}>
-                Files this decision governs. Their state is recorded now, and
-                you&rsquo;ll be told when the cited code changes. Cite specific
-                lines where you can. A whole file drifts on any edit to it.
+                Files this decision governs. Their current state is recorded, and the
+                decision page reports when the cited code changes. A line range
+                changes only when those lines do; a whole file changes on any edit.
               </p>
               {/* The slot comes from a server component, so it cannot be
                   handed a callback: context reaches it where props cannot. */}
@@ -747,12 +745,11 @@ export function DecisionEditor({
       </div>
 
       {/* ---- leaving with unsaved work -------------------------------------
-          Three outcomes, because there genuinely are three. "Save as draft" is
-          the one that makes Cancel safe to press, so it leads; discarding is
-          destructive and reads as such. */}
+          Three outcomes. "Save as draft" leads, because it keeps the work;
+          discarding is destructive and styled as such. */}
       {confirmingDiscard && (
         <ModalShell
-          title="You have unsaved work"
+          title="Unsaved changes"
           onClose={() => {
             setConfirmingDiscard(false);
             setPendingHref(null);
@@ -760,8 +757,8 @@ export function DecisionEditor({
         >
           <p className={styles.modalText}>
             {onSaveDraft
-              ? "Park it as a draft and pick it up later, or discard it. A draft is private to you until you propose it."
-              : "Leaving now discards the changes you have made."}
+              ? "Save these changes as a draft or discard them. A draft is visible only to its author until proposed."
+              : "Leaving discards these changes."}
           </p>
           <div className={styles.modalActions}>
             <Button

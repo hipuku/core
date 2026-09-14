@@ -181,7 +181,7 @@ describe("drafts", () => {
     }
     await expect(
       service.saveDraft(ws.id, AUTHOR, { title: "one too many", body: EMPTY, refs: [] }),
-    ).rejects.toThrow(/already have/);
+    ).rejects.toThrow(/already has that many/);
   });
 
   it("still lets an existing draft be updated once at the cap", async () => {

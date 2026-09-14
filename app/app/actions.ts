@@ -167,7 +167,7 @@ export async function removeReference(
 export async function listMyGithubRepos() {
   const user = await requireUser();
   const token = await getGithubToken(user.id);
-  if (!token) throw new DecisionError("connect your GitHub account first");
+  if (!token) throw new DecisionError("Link a GitHub account first.");
   return listRepos(token);
 }
 
@@ -219,7 +219,7 @@ export async function listConnectedRepoFiles(repoId: string) {
   const role = await decisionService.roleOf(repo.workspaceId, user.id);
   if (!role) throw new DecisionError("you are not a member of this workspace");
   const token = await getReadToken(user.id);
-  if (!token) throw new DecisionError("connect your GitHub account first");
+  if (!token) throw new DecisionError("Link a GitHub account first.");
   return listRepoFiles(token, repo.owner, repo.name, repo.defaultBranch);
 }
 
@@ -258,7 +258,7 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
     const user = await requireUser();
     const role = await decisionService.roleOf(workspaceId, user.id);
     if (!role) {
-      return { files: [], truncated: [], unreachable: [], unavailable: "You are not a member of this workspace." };
+      return { files: [], truncated: [], unreachable: [], unavailable: "Not a member of this workspace." };
     }
 
     // Browsing and linking are separate concerns. `DISABLE_GITHUB` stops the
@@ -331,7 +331,7 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
       unavailable:
         error instanceof DecisionError
           ? error.message
-          : "Could not load files from GitHub just now.",
+          : "Could not load files from GitHub.",
     };
   }
 }

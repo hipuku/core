@@ -46,7 +46,7 @@ export default async function SettingsPage({
         <div>
           <h1 className={styles.title}>Settings</h1>
           <p className={styles.sub}>
-            Manage this workspace, its members and repositories.
+            Name, key, members and connected repositories.
           </p>
         </div>
       </div>
@@ -164,7 +164,7 @@ export default async function SettingsPage({
 
       <section className={styles.section}>
         <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Danger zone</h2>
+          <h2 className={styles.sectionTitle}>Delete workspace</h2>
         </div>
         <DeleteWorkspaceModal workspaceId={workspaceId} name={workspace.name} />
       </section>

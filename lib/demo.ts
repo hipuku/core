@@ -30,7 +30,7 @@ export function isDemoAccount(email: string | null | undefined): boolean {
  * allowed, so the refusal doubles as a signpost.
  */
 export const DEMO_REFUSAL =
-  "This is a read-only demo. You can write and save drafts, but the decision log itself stays as it is.";
+  "Read-only demo: this account can save drafts but cannot change the decision log.";
 
 /** True when sign-up is closed: the public deployment, not local development. */
 export function signUpDisabled(): boolean {

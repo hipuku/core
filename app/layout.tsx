@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "core: decision log",
   description:
-    "A team decision log for architecture decision records, with a permission-gated lifecycle and full history.",
+    "A decision log for architecture decision records, with a permission-gated lifecycle, a history of each decision's text and a log of its status changes.",
 };
 
 // Typed explicitly rather than with Next's generated `LayoutProps`: that global

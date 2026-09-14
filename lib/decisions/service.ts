@@ -443,7 +443,7 @@ export class DecisionService {
       const existing = await this.store.listDrafts(workspaceId, authorId);
       if (existing.length >= MAX_DRAFTS_PER_AUTHOR) {
         throw new DecisionError(
-          `You already have ${MAX_DRAFTS_PER_AUTHOR} drafts in this workspace. Propose or discard one before starting another.`,
+          `An author can keep ${MAX_DRAFTS_PER_AUTHOR} drafts per workspace, and this workspace already has that many. Propose or discard one first.`,
         );
       }
     }

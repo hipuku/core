@@ -130,14 +130,14 @@ describe("DecisionEditor: leaving with unsaved work", () => {
     const cancel = screen.getByRole("link", { name: "Cancel" });
     expect(cancel).toHaveAttribute("href", "/app/ws-1");
     await user.click(cancel);
-    expect(screen.queryByText("You have unsaved work")).not.toBeInTheDocument();
+    expect(screen.queryByText("Unsaved changes")).not.toBeInTheDocument();
   });
 
   it("asks once something has been written", async () => {
     const { user } = setup();
     await user.type(decisionField(), "half a thought");
     await user.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(screen.getByText("You have unsaved work")).toBeInTheDocument();
+    expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
   });
 
   it("offers three ways out, and keep editing is not one that leaves", async () => {
@@ -149,7 +149,7 @@ describe("DecisionEditor: leaving with unsaved work", () => {
     expect(screen.getByRole("button", { name: /Save as draft/ })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Keep editing" }));
-    expect(screen.queryByText("You have unsaved work")).not.toBeInTheDocument();
+    expect(screen.queryByText("Unsaved changes")).not.toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
   });
 
@@ -192,7 +192,7 @@ describe("DecisionEditor: leaving with unsaved work", () => {
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     await user.keyboard("{Escape}");
 
-    expect(screen.queryByText("You have unsaved work")).not.toBeInTheDocument();
+    expect(screen.queryByText("Unsaved changes")).not.toBeInTheDocument();
     expect(decisionField().value).toBe("half a thought");
   });
 });

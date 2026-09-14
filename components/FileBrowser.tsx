@@ -131,8 +131,8 @@ export function FileBrowser({
 
       {unreachable.length > 0 && (
         <p className={styles.status}>
-          {unreachable.join(", ")} could not be read. Private repositories need
-          your own GitHub account linked.
+          {unreachable.join(", ")} could not be read. A private repository needs a
+          linked GitHub account with access to it.
         </p>
       )}
 
@@ -225,7 +225,7 @@ export function FileBrowser({
 
           {hidden > 0 && (
             <p className={styles.status}>
-              Showing {shown.length} of {matched.length}. Keep typing to narrow it down.
+              Showing {shown.length} of {matched.length}. A longer search narrows the list.
             </p>
           )}
         </>
