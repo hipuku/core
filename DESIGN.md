@@ -357,9 +357,6 @@ wrong throw before this was found.
 
 # Known trade-offs / next
 
-- **Screenshots are out of date.** They were taken on 2026-08-30, before the seed moved to the
-  `haus` workspace and before haus components replaced core's controls. `new-workspace-modal.png` is
-  not used by any document.
 - **`app/app/actions.ts` (751 lines) has no tests of its own.** It holds `requireUser` and the demo
   refusals. Its pure helpers are tested where they moved: `lib/attempt.ts` and
   `lib/decisions/form.ts`. `snapshotFile`, `attachCitedFiles` and `rebaselineOnAccept` need GitHub

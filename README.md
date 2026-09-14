@@ -7,7 +7,7 @@ React over Postgres.
 **[core.hipuku.dev](https://core.hipuku.dev)** is a read-only demo, with credentials on the
 sign-in page.
 
-![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status badge, above the connected repositories](./screenshots/decisions-list.png)
+![The haus workspace's decision list: a draft, then HAU-005 to HAU-001 with their status badges, above the connected repositories hipuku/haus and hipuku/drift](./screenshots/decisions-list.png)
 
 ## Features
 

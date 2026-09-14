@@ -2,14 +2,11 @@
 
 The screens of core and what each does. [DESIGN.md](./DESIGN.md) records why.
 
-The screenshots were taken on 2026-08-30, before the seed was changed to the `haus` workspace and
-before core moved onto haus components, so they show `VAU-*` keys and the earlier controls.
-
 ---
 
 ## Workspaces
 
-![The workspaces list, showing one workspace with its counts of decisions, members and connected repositories](./screenshots/home.png)
+![The workspaces list, showing the haus workspace with one decision awaiting review and its counts of decisions, members and connected repositories](./screenshots/home.png)
 
 A workspace has its own members, connected repositories and ADR numbering. Its key is derived
 from the name: initials for several words ("Platform team" is `PT`), the first three letters for
@@ -22,7 +19,7 @@ repositories.
 
 ## The decision log
 
-![A workspace's decision list: five decisions with keys VAU-001 to VAU-005, each showing a status badge, above the connected repositories](./screenshots/decisions-list.png)
+![The haus workspace's decision list: a draft, then HAU-005 to HAU-001 with their status badges, above the connected repositories hipuku/haus and hipuku/drift](./screenshots/decisions-list.png)
 
 Every decision, newest first, with its key and status. The line under the title names the
 signed-in person's role in the workspace.
@@ -64,7 +61,7 @@ Roles are lists of capabilities. An author is shown no lifecycle actions. Each c
 
 ## Reviewing a proposal
 
-![A proposed decision with Edit, Reject and Approve in the header, the dossier card showing status, owner and dates, and the activity drawer open on the status and content histories](./screenshots/decision-accept.png)
+![HAU-003, proposed by the author Priya, with Edit, Reject and Approve in the header and the dossier card showing status, owner, created and last-edited dates](./screenshots/decision-accept.png)
 
 A maintainer sees Edit, Reject and Approve on a proposed decision. Approve is green. Approve,
 Reject and Deprecate each open a confirmation whose primary button has the same tone as the button
@@ -90,7 +87,7 @@ there are, for example "Last activity 5 days ago · 3 events".
 
 ## Writing
 
-![The compose editor: a Write and Preview toggle, a markdown toolbar, and the document showing Context, Decision, Consequences and Referenced code as gutter-marked blocks](./screenshots/decision-writing.png)
+![The compose editor on a draft: the Write and Preview switch, the markdown toolbar, the title, and the Context and Decision sections marked by a left gutter rule](./screenshots/decision-writing.png)
 
 ### The editor
 
@@ -114,7 +111,7 @@ from text and selection to text and selection, tested without a DOM.
 
 ### Rendering
 
-![A decision body rendering a bold lead sentence, two inline file citations as chips, and a Mermaid flowchart of a token pipeline](./screenshots/decision-links-mermaid.png)
+![HAU-002's Decision section: a Mermaid diagram of haus's token layers, then a task list whose first item carries an inline file citation chip](./screenshots/decision-links-mermaid.png)
 
 GitHub-flavoured markdown (tables, task lists, blockquotes, fenced code) and Mermaid diagrams in
 ` ```mermaid ` fences, rendered in the browser with `securityLevel: "strict"`.
@@ -160,7 +157,7 @@ inserted from the reference list or typed. A token that does not resolve renders
 
 ### Drift
 
-![An accepted decision showing a tinted "Referenced code has changed" notice above the document, with the lineage row above it](./screenshots/decision-deprecate.png)
+![HAU-002, accepted, with the lineage row HAU-001 to HAU-002 and a tinted "Referenced code has changed" notice above the document](./screenshots/decision-deprecate.png)
 
 A file reference records the file's blob SHA and, for a range, the cited text.
 
@@ -179,7 +176,7 @@ not while composing it.
 
 ## Supersession and lineage
 
-![A superseded decision showing the lineage row: VAU-001 followed by an arrow to VAU-002, with VAU-002 as the current record](./screenshots/decision-supersede.png)
+![HAU-001, superseded, with the lineage row HAU-001 followed by an arrow to HAU-002, above the start of its body](./screenshots/decision-supersede.png)
 
 The lineage row shows every decision in the chain, before and after the current one.
 
