@@ -32,7 +32,7 @@
     "drizzle-orm": "^0.45.2",
     "haus-components": "^3.1.0",
     "haus-tokens": "^5.2.0",
-    "lucide-react": "^1.41.0",
+    "lucide-react": "^1.45.0",
     "matter-js": "^0.20.0",
     "mermaid": "^11.17.2",
     "next": "16.3.5",
