@@ -27,7 +27,9 @@ updates:
     ignore:
       # @types/node describes the runtime CI installs, currently 22, rather than
       # the newest release line. A major here typechecks the app against APIs
-      # the running Node does not have.
+      # the running Node does not have. The other half of that bargain is that
+      # this pin moves by hand when the runtime does: it sat at ^20 while CI ran
+      # 22, and vitest 5, which asks for ^22 || >=24, could not be installed.
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
       # TypeScript 7 is the native rewrite, deferred across every repo here so
