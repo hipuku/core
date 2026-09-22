@@ -18,10 +18,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const description =
+  "A decision log for architecture decision records, with a permission-gated lifecycle, a history of each decision's text and a log of its status changes.";
+
+// metadataBase makes the og:image that Next derives from app/opengraph-image.png
+// absolute, which link previews (LinkedIn, Slack) need.
 export const metadata: Metadata = {
+  metadataBase: new URL("https://core.hipuku.dev"),
   title: "core: decision log",
-  description:
-    "A decision log for architecture decision records, with a permission-gated lifecycle, a history of each decision's text and a log of its status changes.",
+  description,
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "core",
+    title: "core: decision log",
+    description,
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 // Typed explicitly rather than with Next's generated `LayoutProps`: that global
