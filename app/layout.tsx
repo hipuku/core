@@ -27,7 +27,7 @@ const description =
 // /sign-in, which is rendered per request and is the page that gets shared.
 const ogImage = {
   // Versioned, since platforms cache a preview by its URL.
-  url: "/og.png?v=2",
+  url: "/og.png?v=3",
   width: 1200,
   height: 630,
   alt: "core. Team decision log. Made by hipuku.",
