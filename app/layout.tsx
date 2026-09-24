@@ -41,6 +41,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "/sign-in",
     siteName: "core",
+    locale: "en_AU",
     title: "core: decision log",
     description,
     images: [ogImage],
@@ -117,7 +118,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-haus-theme="core" className={`${gabarito.variable} ${geistMono.variable}`}>
+    <html lang="en-AU" data-haus-theme="core" className={`${gabarito.variable} ${geistMono.variable}`}>
       <body>
         <script
           type="application/ld+json"
