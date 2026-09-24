@@ -21,8 +21,18 @@ const geistMono = Geist_Mono({
 const description =
   "A decision log for architecture decision records, with a permission-gated lifecycle, a history of each decision's text and a log of its status changes.";
 
-// metadataBase makes the og:image that Next derives from app/opengraph-image.png
-// absolute, which link previews (LinkedIn, Slack) need.
+// metadataBase makes the og:image absolute, which link previews (LinkedIn,
+// Slack) need. The card is declared here rather than as app/opengraph-image.png
+// because the file convention's alt text reached the static pages and not
+// /sign-in, which is rendered per request and is the page that gets shared.
+const ogImage = {
+  // Versioned, since platforms cache a preview by its URL.
+  url: "/og.png?v=2",
+  width: 1200,
+  height: 630,
+  alt: "core. Team decision log. Made by hipuku.",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://core.hipuku.dev"),
   title: "core: decision log",
@@ -33,8 +43,9 @@ export const metadata: Metadata = {
     siteName: "core",
     title: "core: decision log",
     description,
+    images: [ogImage],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: [ogImage] },
 };
 
 // What core is, for search engines: a free web app by hipuku, built from a
@@ -77,7 +88,7 @@ const structuredData = {
       "publisher": {
         "@id": "https://hipuku.dev/#person"
       },
-      "image": "https://core.hipuku.dev/opengraph-image.png",
+      "image": "https://core.hipuku.dev/og.png",
       "isBasedOn": {
         "@id": "https://github.com/hipuku/core"
       }
