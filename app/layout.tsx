@@ -29,12 +29,71 @@ export const metadata: Metadata = {
   description,
   openGraph: {
     type: "website",
-    url: "/",
+    url: "/sign-in",
     siteName: "core",
     title: "core: decision log",
     description,
   },
   twitter: { card: "summary_large_image" },
+};
+
+// What core is, for search engines: a free web app by hipuku, built from a
+// public repository. The same shape the hipuku tools declare, linked to the
+// person on hipuku.dev by @id.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://core.hipuku.dev/#website",
+      "name": "core",
+      "url": "https://core.hipuku.dev/",
+      "publisher": {
+        "@id": "https://hipuku.dev/#person"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://core.hipuku.dev/#app",
+      "name": "core",
+      "url": "https://core.hipuku.dev/sign-in",
+      "description": description,
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript.",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "license": "https://opensource.org/licenses/MIT",
+      "author": {
+        "@type": "Person",
+        "@id": "https://hipuku.dev/#person",
+        "name": "hipuku",
+        "url": "https://hipuku.dev"
+      },
+      "publisher": {
+        "@id": "https://hipuku.dev/#person"
+      },
+      "image": "https://core.hipuku.dev/opengraph-image.png",
+      "isBasedOn": {
+        "@id": "https://github.com/hipuku/core"
+      }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://github.com/hipuku/core",
+      "name": "core",
+      "codeRepository": "https://github.com/hipuku/core",
+      "programmingLanguage": "TypeScript",
+      "license": "https://opensource.org/licenses/MIT",
+      "author": {
+        "@id": "https://hipuku.dev/#person"
+      }
+    }
+  ]
 };
 
 // Typed explicitly rather than with Next's generated `LayoutProps`: that global
@@ -49,6 +108,12 @@ export default function RootLayout({
   return (
     <html lang="en" data-haus-theme="core" className={`${gabarito.variable} ${geistMono.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          // JSON.stringify escapes nothing HTML-significant here: every value is
+          // a fixed string written above.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         {children}
         {/* haus Toast draws the surface now, through lib/toast, so sonner's own
             styling is off: `richColors` and `closeButton` would paint a second

@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
 import { AuthShell } from "@/components/AuthShell";
 import { DemoCredentials } from "@/components/DemoCredentials";
 import { signUpDisabled } from "@/lib/demo";
 import { getSession } from "@/lib/session";
+
+// "/" redirects here, so this is the page search engines should hold.
+export const metadata: Metadata = {
+  alternates: { canonical: "/sign-in" },
+};
 
 export default async function SignInPage() {
   if (await getSession()) redirect("/app");
