@@ -187,6 +187,31 @@
   color: var(--text-faint);
 }
 
+/* A decision's key, such as HAU-003: an outlined chip on the decision page, the
+   list, the editor and the lineage row. Deleted by mistake with the .pill rules
+   in 830b793, which left seven keys as plain text (core#22). */
+.key-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: var(--haus-tracking-wide);
+  padding: 0.22rem 0.5rem;
+  border-radius: var(--r-full);
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid color-mix(in oklch, var(--text-faint) 45%, transparent);
+  white-space: nowrap;
+}
+
+/* A draft's key, before it is numbered: HAU-•••, in a filled slot. */
+.key-chip--pending {
+  border-color: transparent;
+  background: var(--surface-3);
+  color: var(--text-dim);
+  letter-spacing: var(--haus-tracking-wider);
+}
+
 /* Every ring here is a box-shadow, and forced-colors mode drops box-shadows
    entirely: without this, a Windows high-contrast user gets no focus indicator at
    all. `outline` survives, and `Highlight` is the system's own focus colour. */
