@@ -24,6 +24,8 @@ updates:
         patterns: ['eslint*', '@eslint/*', 'typescript-eslint', 'prettier*']
     commit-message:
       prefix: 'deps'
+    # Without this Dependabot adds its own dependencies and javascript labels instead.
+    labels: ['deps']
     ignore:
       # @types/node describes the runtime CI installs, currently 22, rather than
       # the newest release line. A major here typechecks the app against APIs
@@ -50,3 +52,4 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    labels: ['deps']
