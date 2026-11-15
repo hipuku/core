@@ -20,10 +20,7 @@ export function PasswordField({
 }) {
   const [reveal, setReveal] = useState(false);
   const id = useId();
-  const strength = useMemo(
-    () => (showMeter ? scorePassword(value) : null),
-    [showMeter, value],
-  );
+  const strength = useMemo(() => (showMeter ? scorePassword(value) : null), [showMeter, value]);
 
   return (
     <div className={styles.wrap}>
@@ -71,9 +68,7 @@ export function PasswordField({
             {value && (
               <>
                 <span className={styles.label}>{strength.label}</span>
-                {strength.hint && (
-                  <span className={styles.hint}> · {strength.hint}</span>
-                )}
+                {strength.hint && <span className={styles.hint}> · {strength.hint}</span>}
               </>
             )}
           </p>

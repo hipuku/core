@@ -41,9 +41,14 @@ describe("adrBody", () => {
   });
 
   it("takes the first value when a field is posted twice", () => {
-    expect(adrBody(form([["decision", "first"], ["decision", "second"]])).decision).toBe(
-      "first",
-    );
+    expect(
+      adrBody(
+        form([
+          ["decision", "first"],
+          ["decision", "second"],
+        ]),
+      ).decision,
+    ).toBe("first");
   });
 });
 
@@ -74,7 +79,14 @@ describe("citedRefs", () => {
   it("reads an empty line range as no range rather than an empty one", () => {
     // A whole-file citation posts an empty refLines. Storing "" would later
     // parse as a range of nothing, which never drifts.
-    expect(citedRefs(form([["refRepoId", "r1"], ["refLines", ""]]))[0].lines).toBeNull();
+    expect(
+      citedRefs(
+        form([
+          ["refRepoId", "r1"],
+          ["refLines", ""],
+        ]),
+      )[0].lines,
+    ).toBeNull();
   });
 
   it("lets refRepoId set the length", () => {

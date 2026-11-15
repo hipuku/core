@@ -32,8 +32,12 @@ describe("draftLabel", () => {
 
   it("strips markdown so a list does not fill with punctuation", () => {
     expect(draftLabel("", { ...EMPTY, decision: "## Adopt Drizzle" }).text).toBe("Adopt Drizzle");
-    expect(draftLabel("", { ...EMPTY, decision: "- [ ] Adopt Drizzle" }).text).toBe("Adopt Drizzle");
-    expect(draftLabel("", { ...EMPTY, decision: "> Adopt **Drizzle**" }).text).toBe("Adopt Drizzle");
+    expect(draftLabel("", { ...EMPTY, decision: "- [ ] Adopt Drizzle" }).text).toBe(
+      "Adopt Drizzle",
+    );
+    expect(draftLabel("", { ...EMPTY, decision: "> Adopt **Drizzle**" }).text).toBe(
+      "Adopt Drizzle",
+    );
     expect(draftLabel("", { ...EMPTY, decision: "1. Use `pnpm`" }).text).toBe("Use pnpm");
     expect(draftLabel("", { ...EMPTY, decision: "See [the RFC](http://x)" }).text).toBe(
       "See the RFC",
@@ -41,9 +45,9 @@ describe("draftLabel", () => {
   });
 
   it("drops citation tokens, which are not prose", () => {
-    expect(
-      draftLabel("", { ...EMPTY, decision: "Because {{a/b:x.ts#L1}} says so" }).text,
-    ).toBe("Because  says so");
+    expect(draftLabel("", { ...EMPTY, decision: "Because {{a/b:x.ts#L1}} says so" }).text).toBe(
+      "Because  says so",
+    );
   });
 
   it("truncates a long first line rather than breaking the row", () => {

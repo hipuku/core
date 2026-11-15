@@ -8,10 +8,7 @@ import type { Change, DocumentRecord, Json, Version } from "./types";
  * backed by the database in production. Same contract, two implementations.
  */
 export interface VersionStore {
-  createDocument(input: {
-    ownerId: string;
-    name: string;
-  }): Promise<DocumentRecord>;
+  createDocument(input: { ownerId: string; name: string }): Promise<DocumentRecord>;
   getDocument(id: string): Promise<DocumentRecord | null>;
   setHead(documentId: string, versionId: string): Promise<void>;
   appendVersion(version: Version): Promise<void>;
@@ -54,12 +51,7 @@ export class Versioning {
     initialState: Json = {},
   ): Promise<{ document: DocumentRecord; version: Version }> {
     const created = await this.store.createDocument({ ownerId, name });
-    const version = await this.commit(
-      created.id,
-      initialState,
-      ownerId,
-      "Created",
-    );
+    const version = await this.commit(created.id, initialState, ownerId, "Created");
     return { document: await this.requireDocument(created.id), version };
   }
 
@@ -92,11 +84,7 @@ export class Versioning {
    * not git reset, and it is the only choice that survives multiple users editing the
    * same document without one silently erasing another's history.
    */
-  async restore(
-    documentId: string,
-    versionId: string,
-    authorId: string,
-  ): Promise<Version> {
+  async restore(documentId: string, versionId: string, authorId: string): Promise<Version> {
     const target = await this.store.getVersion(versionId);
     if (!target || target.documentId !== documentId) {
       throw new VersioningError("version does not belong to this document");

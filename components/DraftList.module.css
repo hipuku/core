@@ -16,7 +16,9 @@
   align-items: center;
   gap: var(--haus-space-3);
   padding: var(--haus-space-3) var(--haus-space-4);
-  transition: box-shadow 0.14s ease, transform 0.14s ease;
+  transition:
+    box-shadow 0.14s ease,
+    transform 0.14s ease;
 }
 
 .cardLink {

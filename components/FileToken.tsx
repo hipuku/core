@@ -34,12 +34,7 @@ export function fileName(path: string): string {
 }
 
 /** Inline, in prose. */
-export function FileChip({
-  repo,
-  path,
-  lines,
-  href,
-}: FileTokenProps & { href?: string }) {
+export function FileChip({ repo, path, lines, href }: FileTokenProps & { href?: string }) {
   const label = lines ? `${fileName(path)} · ${lines}` : fileName(path);
   const title = `${repo} · ${path}`;
 
@@ -52,13 +47,7 @@ export function FileChip({
     );
   }
   return (
-    <a
-      className={styles.chip}
-      href={href}
-      title={title}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <a className={styles.chip} href={href} title={title} target="_blank" rel="noopener noreferrer">
       <FileCode2 size={13} aria-hidden="true" />
       {label}
     </a>

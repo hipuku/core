@@ -70,7 +70,12 @@ export function ConfirmAction({
         <ModalShell title={title} onClose={() => setOpen(false)}>
           <p className={styles.confirmBody}>{description}</p>
           <div className={styles.actions}>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)} disabled={pending}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setOpen(false)}
+              disabled={pending}
+            >
               Cancel
             </Button>
             <Button type="button" variant="primary" tone={tone} onClick={run} loading={pending}>

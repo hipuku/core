@@ -18,9 +18,15 @@
   line-height: var(--haus-leading-snug);
   margin: var(--haus-space-6) 0 var(--haus-space-2);
 }
-.prose h1 { font-size: var(--haus-text-24); }
-.prose h2 { font-size: var(--haus-text-20); }
-.prose h3 { font-size: var(--haus-text-16); }
+.prose h1 {
+  font-size: var(--haus-text-24);
+}
+.prose h2 {
+  font-size: var(--haus-text-20);
+}
+.prose h3 {
+  font-size: var(--haus-text-16);
+}
 
 .prose p {
   margin: var(--haus-space-3) 0;

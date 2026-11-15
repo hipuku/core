@@ -26,9 +26,7 @@ export default async function WorkspacePage({
 
   // Newest first: a decision log is read from the current state backwards, and
   // the number already carries the chronology, so no separate sort is needed.
-  const decisions = (await decisionService.listDecisions(workspaceId))
-    .slice()
-    .reverse();
+  const decisions = (await decisionService.listDecisions(workspaceId)).slice().reverse();
   const repos = await decisionService.listWorkspaceRepos(workspaceId);
   const drafts = await decisionService.listDrafts(workspaceId, user.id);
 
@@ -37,12 +35,9 @@ export default async function WorkspacePage({
       <div className={styles.pageHead}>
         <div>
           <h1 className={styles.title}>
-            {workspace.name}{" "}
-            <span className={styles.titleMuted}>Decisions</span>
+            {workspace.name} <span className={styles.titleMuted}>Decisions</span>
           </h1>
-          <p className={styles.sub}>
-            Role in this workspace: {role}
-          </p>
+          <p className={styles.sub}>Role in this workspace: {role}</p>
         </div>
         <div className={styles.headActions}>
           <Button asChild variant="primary">
@@ -79,10 +74,7 @@ export default async function WorkspacePage({
       />
 
       {decisions.length === 0 && drafts.length === 0 ? (
-        <EmptyState
-          title="No decisions yet"
-          description="Proposed decisions are listed here."
-        />
+        <EmptyState title="No decisions yet" description="Proposed decisions are listed here." />
       ) : decisions.length === 0 ? (
         <EmptyState
           title="Nothing proposed yet"
@@ -94,14 +86,14 @@ export default async function WorkspacePage({
             <li key={decision.id}>
               <Link href={`/app/${workspaceId}/${decision.id}`} className={styles.cardLink}>
                 <Card variant="elevated" padding={false} className={styles.card}>
-                <span className={styles.cardNum}>
-                  <span className="key-chip">
-                    {decisionLabel(workspace.key, decision.number)}
+                  <span className={styles.cardNum}>
+                    <span className="key-chip">
+                      {decisionLabel(workspace.key, decision.number)}
+                    </span>
                   </span>
-                </span>
-                <span className={styles.cardTitle}>{decision.title}</span>
-                <StatusBadge status={decision.status} />
-              </Card>
+                  <span className={styles.cardTitle}>{decision.title}</span>
+                  <StatusBadge status={decision.status} />
+                </Card>
               </Link>
             </li>
           ))}

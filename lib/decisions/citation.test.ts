@@ -109,7 +109,8 @@ describe("insertCitation", () => {
 });
 
 describe("untrackedCitations", () => {
-  const body = "We chose this because {{acme/api:src/auth.ts#L12-L40}} assumes it, " +
+  const body =
+    "We chose this because {{acme/api:src/auth.ts#L12-L40}} assumes it, " +
     "unlike {{acme/web:app/page.tsx}}.";
 
   it("finds citations no reference covers", () => {
@@ -121,9 +122,7 @@ describe("untrackedCitations", () => {
 
   it("ignores one that is already tracked", () => {
     const tracked = [{ repo: "acme/api", path: "src/auth.ts" }];
-    expect(untrackedCitations(body, tracked).map((c) => c.path)).toEqual([
-      "app/page.tsx",
-    ]);
+    expect(untrackedCitations(body, tracked).map((c) => c.path)).toEqual(["app/page.tsx"]);
   });
 
   it("matches on repo and path, so a range does not count as a different file", () => {

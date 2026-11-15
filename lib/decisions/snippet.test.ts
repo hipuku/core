@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  compareSnippet,
-  extractRange,
-  formatRange,
-  parseRange,
-} from "./snippet";
+import { compareSnippet, extractRange, formatRange, parseRange } from "./snippet";
 
 const FILE = ["one", "two", "three", "four", "five"].join("\n");
 
@@ -82,9 +77,7 @@ describe("compareSnippet", () => {
 
   it("does fire on changed indentation, which is a real change of scope", () => {
     const reindented = ["one", "  two", "  three", "four"].join("\n");
-    expect(compareSnippet({ baseline, content: reindented, range }).status).toBe(
-      "changed",
-    );
+    expect(compareSnippet({ baseline, content: reindented, range }).status).toBe("changed");
   });
 
   it("finds the first occurrence when the cited text repeats", () => {
@@ -96,9 +89,7 @@ describe("compareSnippet", () => {
   });
 
   it("treats an empty baseline as changed rather than matching everywhere", () => {
-    expect(
-      compareSnippet({ baseline: "", content: FILE, range }).status,
-    ).toBe("changed");
+    expect(compareSnippet({ baseline: "", content: FILE, range }).status).toBe("changed");
   });
 });
 

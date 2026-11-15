@@ -25,9 +25,7 @@ const BRAND_HUES: BrandHue[] = [
  * chip in those hues could be misread as carrying status meaning. Restricted to the
  * three hues the status palette doesn't use: iris, cobalt, teal.
  */
-const REPO_CHIP_HUES = BRAND_HUES.filter((h) =>
-  ["iris", "cobalt", "teal"].includes(h.name),
-);
+const REPO_CHIP_HUES = BRAND_HUES.filter((h) => ["iris", "cobalt", "teal"].includes(h.name));
 
 export function repoChipColor(index: number, lightness = 0.62): string {
   const h = REPO_CHIP_HUES[index % REPO_CHIP_HUES.length];

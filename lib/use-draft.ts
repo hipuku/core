@@ -109,11 +109,7 @@ export function useDraft<T>({
   const store = useMemo(() => createStore<T>(storageKey), [storageKey]);
   const cleared = useRef(false);
 
-  const found = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot,
-  );
+  const found = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
 
   // Persist on a short debounce: often enough that a crash costs a sentence,
   // rarely enough that it is a write per keystroke.

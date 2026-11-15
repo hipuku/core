@@ -58,67 +58,67 @@ const structuredData = {
     {
       "@type": "WebSite",
       "@id": "https://core.hipuku.dev/#website",
-      "name": "core",
-      "url": "https://core.hipuku.dev/",
-      "publisher": {
-        "@id": "https://hipuku.dev/#person"
-      }
+      name: "core",
+      url: "https://core.hipuku.dev/",
+      publisher: {
+        "@id": "https://hipuku.dev/#person",
+      },
     },
     {
       "@type": "WebApplication",
       "@id": "https://core.hipuku.dev/#app",
-      "name": "core",
-      "url": "https://core.hipuku.dev/sign-in",
-      "description": description,
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Any",
-      "browserRequirements": "Requires JavaScript.",
-      "isAccessibleForFree": true,
-      "offers": {
+      name: "core",
+      url: "https://core.hipuku.dev/sign-in",
+      description: description,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript.",
+      isAccessibleForFree: true,
+      offers: {
         "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
+        price: "0",
+        priceCurrency: "USD",
       },
-      "license": "https://opensource.org/licenses/MIT",
-      "author": {
+      license: "https://opensource.org/licenses/MIT",
+      author: {
         "@type": "Person",
         "@id": "https://hipuku.dev/#person",
-        "name": "hipuku",
-        "url": "https://hipuku.dev"
+        name: "hipuku",
+        url: "https://hipuku.dev",
       },
-      "publisher": {
-        "@id": "https://hipuku.dev/#person"
+      publisher: {
+        "@id": "https://hipuku.dev/#person",
       },
-      "image": "https://core.hipuku.dev/og.png",
-      "isBasedOn": {
-        "@id": "https://github.com/hipuku/core"
-      }
+      image: "https://core.hipuku.dev/og.png",
+      isBasedOn: {
+        "@id": "https://github.com/hipuku/core",
+      },
     },
     {
       "@type": "SoftwareSourceCode",
       "@id": "https://github.com/hipuku/core",
-      "name": "core",
-      "codeRepository": "https://github.com/hipuku/core",
-      "programmingLanguage": "TypeScript",
-      "license": "https://opensource.org/licenses/MIT",
-      "author": {
-        "@id": "https://hipuku.dev/#person"
-      }
-    }
-  ]
+      name: "core",
+      codeRepository: "https://github.com/hipuku/core",
+      programmingLanguage: "TypeScript",
+      license: "https://opensource.org/licenses/MIT",
+      author: {
+        "@id": "https://hipuku.dev/#person",
+      },
+    },
+  ],
 };
 
 // Typed explicitly rather than with Next's generated `LayoutProps`: that global
 // lives in `.next/types`, so `tsc --noEmit` on a clean checkout, which is what
 // CI does, cannot see it. The root layout takes no route params, so the
 // generated type was buying nothing.
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-AU" data-haus-theme="core" className={`${gabarito.variable} ${geistMono.variable}`}>
+    <html
+      lang="en-AU"
+      data-haus-theme="core"
+      className={`${gabarito.variable} ${geistMono.variable}`}
+    >
       <body>
         <script
           type="application/ld+json"

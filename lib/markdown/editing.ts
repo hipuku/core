@@ -32,8 +32,7 @@ interface ListItem {
   content: string;
 }
 
-const LIST_LINE =
-  /^(\s*)(?:([-*+])|(\d+)([.)]))\s+(?:(\[[ xX]\])\s+)?(.*)$/;
+const LIST_LINE = /^(\s*)(?:([-*+])|(\d+)([.)]))\s+(?:(\[[ xX]\])\s+)?(.*)$/;
 const QUOTE_LINE = /^(\s*)(>+)\s?(.*)$/;
 
 function lineBoundsAt(value: string, offset: number): [number, number] {
@@ -143,10 +142,7 @@ export function indent(state: EditState, direction: 1 | -1): EditState {
   });
 
   return {
-    value:
-      state.value.slice(0, blockStart) +
-      shifted.join("\n") +
-      state.value.slice(blockEnd),
+    value: state.value.slice(0, blockStart) + shifted.join("\n") + state.value.slice(blockEnd),
     start: Math.max(blockStart, state.start + firstDelta),
     end: Math.max(blockStart, state.end + totalDelta),
   };
@@ -167,18 +163,23 @@ export function wrap(state: EditState, marker: string): EditState {
 
   if (alreadyInside) {
     return {
-      value:
-        value.slice(0, start - marker.length) +
-        selected +
-        value.slice(end + marker.length),
+      value: value.slice(0, start - marker.length) + selected + value.slice(end + marker.length),
       start: start - marker.length,
       end: end - marker.length,
     };
   }
 
-  if (selected.startsWith(marker) && selected.endsWith(marker) && selected.length > marker.length * 2) {
+  if (
+    selected.startsWith(marker) &&
+    selected.endsWith(marker) &&
+    selected.length > marker.length * 2
+  ) {
     const inner = selected.slice(marker.length, -marker.length);
-    return { value: value.slice(0, start) + inner + value.slice(end), start, end: start + inner.length };
+    return {
+      value: value.slice(0, start) + inner + value.slice(end),
+      start,
+      end: start + inner.length,
+    };
   }
 
   const wrapped = marker + selected + marker;
@@ -246,8 +247,10 @@ export function insertFence(state: EditState, language: string, body = ""): Edit
   const before = state.value.slice(0, state.start);
   const after = state.value.slice(state.end);
 
-  const lead = before === "" || before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
-  const tail = after === "" || after.startsWith("\n\n") ? "" : after.startsWith("\n") ? "\n" : "\n\n";
+  const lead =
+    before === "" || before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
+  const tail =
+    after === "" || after.startsWith("\n\n") ? "" : after.startsWith("\n") ? "\n" : "\n\n";
 
   const opening = `${lead}\`\`\`${language}\n`;
   const text = `${opening}${body}\n\`\`\`${tail}`;

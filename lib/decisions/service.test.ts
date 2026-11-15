@@ -10,12 +10,7 @@ function makeService() {
   let seq = 0;
   const ids: IdGenerator = { next: () => `id_${String(++seq).padStart(4, "0")}` };
   const versioning = new Versioning(new MemoryVersionStore());
-  const service = new DecisionService(
-    new MemoryDecisionStore(),
-    versioning,
-    clock,
-    ids,
-  );
+  const service = new DecisionService(new MemoryDecisionStore(), versioning, clock, ids);
   return service;
 }
 
@@ -64,9 +59,9 @@ describe("DecisionService", () => {
 
   it("refuses a proposal from a non-member", async () => {
     const ws = await workspaceWithAuthor(service);
-    await expect(
-      service.propose(ws.id, STRANGER, { title: "x", body: {} }),
-    ).rejects.toBeInstanceOf(DecisionError);
+    await expect(service.propose(ws.id, STRANGER, { title: "x", body: {} })).rejects.toBeInstanceOf(
+      DecisionError,
+    );
   });
 
   it("lets a maintainer accept a proposal and logs the transition", async () => {
@@ -84,9 +79,9 @@ describe("DecisionService", () => {
   it("refuses an author without the accept capability", async () => {
     const ws = await workspaceWithAuthor(service);
     const decision = await service.propose(ws.id, AUTHOR, { title: "x", body: {} });
-    await expect(
-      service.changeStatus(decision.id, AUTHOR, "accepted"),
-    ).rejects.toThrow("requires the accept capability");
+    await expect(service.changeStatus(decision.id, AUTHOR, "accepted")).rejects.toThrow(
+      "requires the accept capability",
+    );
   });
 
   it("versions the body on revise and locks it once accepted", async () => {
@@ -101,9 +96,9 @@ describe("DecisionService", () => {
     expect(content).toHaveLength(2); // created + revised
 
     await service.changeStatus(decision.id, MAINTAINER, "accepted");
-    await expect(
-      service.revise(decision.id, AUTHOR, { context: "too late" }),
-    ).rejects.toThrow("immutable");
+    await expect(service.revise(decision.id, AUTHOR, { context: "too late" })).rejects.toThrow(
+      "immutable",
+    );
   });
 
   it("supersedes an accepted decision with another, linking the two", async () => {
@@ -126,9 +121,7 @@ describe("DecisionService", () => {
     const ws = await workspaceWithAuthor(service);
     await service.inviteMember(ws.id, MAINTAINER, "user_new", "maintainer");
     const members = await service.listMembers(ws.id);
-    expect(members.map((m) => m.userId).sort()).toEqual(
-      [MAINTAINER, AUTHOR, "user_new"].sort(),
-    );
+    expect(members.map((m) => m.userId).sort()).toEqual([MAINTAINER, AUTHOR, "user_new"].sort());
     expect(members.find((m) => m.userId === "user_new")?.role).toBe("maintainer");
   });
 
@@ -137,24 +130,24 @@ describe("DecisionService", () => {
     await service.removeMember(ws.id, MAINTAINER, AUTHOR);
     expect((await service.listMembers(ws.id)).map((m) => m.userId)).toEqual([MAINTAINER]);
     // MAINTAINER is the owner (created the workspace).
-    await expect(
-      service.removeMember(ws.id, MAINTAINER, MAINTAINER),
-    ).rejects.toThrow("owner cannot be removed");
+    await expect(service.removeMember(ws.id, MAINTAINER, MAINTAINER)).rejects.toThrow(
+      "owner cannot be removed",
+    );
   });
 
   it("refuses to let an author remove a member", async () => {
     const ws = await workspaceWithAuthor(service);
     await service.addMember(ws.id, "user_x", "author");
-    await expect(
-      service.removeMember(ws.id, AUTHOR, "user_x"),
-    ).rejects.toThrow("only a maintainer");
+    await expect(service.removeMember(ws.id, AUTHOR, "user_x")).rejects.toThrow(
+      "only a maintainer",
+    );
   });
 
   it("refuses to let an author invite a member", async () => {
     const ws = await workspaceWithAuthor(service);
-    await expect(
-      service.inviteMember(ws.id, AUTHOR, "user_new", "author"),
-    ).rejects.toThrow("only a maintainer");
+    await expect(service.inviteMember(ws.id, AUTHOR, "user_new", "author")).rejects.toThrow(
+      "only a maintainer",
+    );
   });
 
   it("lets any member add a reference and lists it", async () => {
@@ -167,7 +160,11 @@ describe("DecisionService", () => {
     });
     const refs = await service.listReferences(d.id);
     expect(refs).toHaveLength(1);
-    expect(refs[0]).toMatchObject({ kind: "link", url: "https://example.com/rfc", addedBy: AUTHOR });
+    expect(refs[0]).toMatchObject({
+      kind: "link",
+      url: "https://example.com/rfc",
+      addedBy: AUTHOR,
+    });
   });
 
   it("refuses a reference from a non-member", async () => {
@@ -182,9 +179,7 @@ describe("DecisionService", () => {
     const ws = await workspaceWithAuthor(service);
     const d = await service.propose(ws.id, AUTHOR, { title: "x", body: {} });
     const ref = await service.addReference(d.id, AUTHOR, { kind: "link", url: "https://x" });
-    await expect(
-      service.removeReference(ref.id, STRANGER),
-    ).rejects.toThrow("not a member");
+    await expect(service.removeReference(ref.id, STRANGER)).rejects.toThrow("not a member");
     await service.removeReference(ref.id, MAINTAINER);
     expect(await service.listReferences(d.id)).toHaveLength(0);
   });
@@ -194,9 +189,9 @@ describe("DecisionService", () => {
     await service.addMember(ws.id, "user_second", "author");
     const d = await service.propose(ws.id, AUTHOR, { title: "x", body: {} });
     const ref = await service.addReference(d.id, AUTHOR, { kind: "link", url: "https://x" });
-    await expect(
-      service.removeReference(ref.id, "user_second"),
-    ).rejects.toThrow("only the person who added it or a maintainer");
+    await expect(service.removeReference(ref.id, "user_second")).rejects.toThrow(
+      "only the person who added it or a maintainer",
+    );
   });
 
   it("lets a maintainer connect a repo but not an author", async () => {
@@ -232,8 +227,8 @@ describe("DecisionService", () => {
     const next = await service.propose(ws.id, AUTHOR, { title: "new", body: {} });
     await service.changeStatus(old.id, MAINTAINER, "accepted");
     // `next` is still only proposed.
-    await expect(
-      service.supersede(next.id, old.id, MAINTAINER),
-    ).rejects.toThrow("must be accepted first");
+    await expect(service.supersede(next.id, old.id, MAINTAINER)).rejects.toThrow(
+      "must be accepted first",
+    );
   });
 });

@@ -3,12 +3,7 @@ import { Versioning } from "@/lib/versioning/engine";
 import type { HistoryEntry } from "@/lib/versioning/engine";
 import type { Json } from "@/lib/versioning/types";
 import { decisionLabel, deriveWorkspaceKey, normalizeWorkspaceKey } from "./key";
-import {
-  canEditContent,
-  capabilitiesFor,
-  checkSupersede,
-  checkTransition,
-} from "./lifecycle";
+import { canEditContent, capabilitiesFor, checkSupersede, checkTransition } from "./lifecycle";
 import type {
   DecisionRecord,
   DecisionStore,
@@ -110,12 +105,7 @@ export class DecisionService {
    * act, distinct from the decision capabilities, which is why it is a direct role
    * check rather than one of the lifecycle guards.
    */
-  async inviteMember(
-    workspaceId: string,
-    actorId: string,
-    targetUserId: string,
-    role: Role,
-  ) {
+  async inviteMember(workspaceId: string, actorId: string, targetUserId: string, role: Role) {
     const actorRole = await this.roleOf(workspaceId, actorId);
     if (actorRole !== "maintainer") {
       throw new DecisionError("only a maintainer can manage members");
@@ -128,11 +118,7 @@ export class DecisionService {
   }
 
   /** Remove a member. Maintainer-only, and never the workspace owner. */
-  async removeMember(
-    workspaceId: string,
-    actorId: string,
-    targetUserId: string,
-  ) {
+  async removeMember(workspaceId: string, actorId: string, targetUserId: string) {
     const role = await this.roleOf(workspaceId, actorId);
     if (role !== "maintainer") {
       throw new DecisionError("only a maintainer can remove members");
@@ -196,11 +182,7 @@ export class DecisionService {
       throw new DecisionError("you do not have permission to propose decisions");
     }
 
-    const { document } = await this.versioning.create(
-      userId,
-      input.title,
-      input.body,
-    );
+    const { document } = await this.versioning.create(userId, input.title, input.body);
     const now = this.clock.now();
     const decisionId = this.ids.next();
 
@@ -224,11 +206,7 @@ export class DecisionService {
   async revise(decisionId: string, userId: string, body: Json): Promise<void> {
     const decision = await this.requireDecision(decisionId);
     const actor = await this.actor(decision.workspaceId, userId);
-    const guard = canEditContent(
-      decision.status,
-      actor,
-      decision.authorId === userId,
-    );
+    const guard = canEditContent(decision.status, actor, decision.authorId === userId);
     if (!guard.ok) throw new DecisionError(guard.reason);
     await this.versioning.commit(decision.documentId, body, userId, "Revised");
   }
@@ -361,11 +339,7 @@ export class DecisionService {
     );
   }
 
-  async updateWorkspace(
-    workspaceId: string,
-    userId: string,
-    patch: { name: string; key: string },
-  ) {
+  async updateWorkspace(workspaceId: string, userId: string, patch: { name: string; key: string }) {
     const role = await this.roleOf(workspaceId, userId);
     if (role !== "maintainer") {
       throw new DecisionError("only a maintainer can change workspace settings");

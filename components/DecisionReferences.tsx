@@ -47,15 +47,16 @@ export function DecisionReferences({ references }: { references: ReferenceView[]
   return (
     <ul className={styles.list}>
       {references.map((ref) => {
-        const badge = DRIFT_BADGE[
-          referenceDrift({
-            kind: ref.kind,
-            baselineSha: ref.baselineSha ?? null,
-            currentSha: ref.currentSha ?? null,
-            startLine: ref.startLine ?? null,
-            baselineSnippet: null,
-          })
-        ];
+        const badge =
+          DRIFT_BADGE[
+            referenceDrift({
+              kind: ref.kind,
+              baselineSha: ref.baselineSha ?? null,
+              currentSha: ref.currentSha ?? null,
+              startLine: ref.startLine ?? null,
+              baselineSnippet: null,
+            })
+          ];
 
         // A link reference has no repo or path to render as a file.
         if (ref.kind !== "file" || !ref.repo || !ref.path) {
@@ -75,12 +76,7 @@ export function DecisionReferences({ references }: { references: ReferenceView[]
 
         return (
           <li key={ref.id}>
-            <FileRow
-              repo={ref.repo}
-              path={ref.path}
-              lines={ref.lines}
-              href={ref.url ?? undefined}
-            >
+            <FileRow repo={ref.repo} path={ref.path} lines={ref.lines} href={ref.url ?? undefined}>
               {badge && <Badge tone={badge.tone}>{badge.label}</Badge>}
             </FileRow>
           </li>

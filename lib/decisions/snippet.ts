@@ -109,9 +109,7 @@ export function compareSnippet({
 
 /** `L47-L120`, or `L47` for a single line. The suffix GitHub itself understands. */
 export function formatRange(range: LineRange): string {
-  return range.start === range.end
-    ? `L${range.start}`
-    : `L${range.start}-L${range.end}`;
+  return range.start === range.end ? `L${range.start}` : `L${range.start}-L${range.end}`;
 }
 
 /** Parse `L47-L120` / `L47` / `47-120`. Returns null for anything else. */

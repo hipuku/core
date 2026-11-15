@@ -12,13 +12,7 @@ import { useUnsavedGuard } from "./use-unsaved-guard";
  * guard that swallows a ⌘-click or an external link feels broken rather than
  * protective.
  */
-function Harness({
-  when,
-  onBlocked,
-}: {
-  when: boolean;
-  onBlocked: (href: string) => void;
-}) {
+function Harness({ when, onBlocked }: { when: boolean; onBlocked: (href: string) => void }) {
   useUnsavedGuard({ when, onBlocked });
   // The guard listens in the capture phase, so it sees every click before this
   // does and `defaultPrevented` is still false when it decides. Preventing

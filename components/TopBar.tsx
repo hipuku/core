@@ -16,9 +16,7 @@ export function TopBar({
   const pathname = usePathname();
   const match = pathname.match(/^\/app\/([^/]+)(\/.*)?$/);
   const workspaceId = match?.[1];
-  const workspace = workspaceId
-    ? workspaces.find((w) => w.id === workspaceId)
-    : undefined;
+  const workspace = workspaceId ? workspaces.find((w) => w.id === workspaceId) : undefined;
   // Deeper than the workspace root (a decision, /new) → back to the workspace.
   const backHref = match?.[2] ? `/app/${workspaceId}` : "/app";
 

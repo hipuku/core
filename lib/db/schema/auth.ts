@@ -1,9 +1,4 @@
-import {
-  boolean,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 /**
  * The tables better-auth owns. Shape follows better-auth's core schema so its

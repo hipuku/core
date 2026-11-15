@@ -112,28 +112,30 @@ each run.
 and history, keyboard access, and signed-out access. It pushes the schema and seeds whatever
 `DATABASE_URL` points at, so that database must be disposable.
 
-CI runs on every push to `main` and every pull request. One job runs lint, `lint:prose`,
-`lint:css`, `lint:tokens`, typecheck and test, each step running even if an earlier one failed.
-A production build and the e2e tests (against a Postgres service container) run after it.
+CI runs on every push to `main` and every pull request, one job per check: `Lint` (ESLint,
+`lint:prose`, `lint:css`, `lint:tokens`), `Format`, `Typecheck` and `Test`. `Build` and
+`End to end` (against a Postgres service container) run once lint, typecheck and test pass.
 
 ## Scripts
 
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Next dev server |
-| `npm run build` | Production build |
-| `npm run start` | Serve the production build |
-| `npm run lint` | ESLint |
-| `npm run lint:prose` | Fails on a new em dash in a tracked file |
-| `npm run lint:css` | Stylelint, including the hardcoded-value rule |
-| `npm run lint:tokens` | Fails when the count of hardcoded declarations changes without its record |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest, both projects |
-| `npm run e2e` | Playwright, against a disposable database |
-| `npm run db:generate` | Generate a Drizzle migration |
-| `npm run db:push` | Push the Drizzle schema to the database |
-| `npm run db:seed` | Create the seeded `haus` workspace |
-| `npm run db:studio` | Drizzle Studio |
+| Script                 | What it does                                                              |
+| ---------------------- | ------------------------------------------------------------------------- |
+| `npm run dev`          | Next dev server                                                           |
+| `npm run build`        | Production build                                                          |
+| `npm run start`        | Serve the production build                                                |
+| `npm run lint`         | ESLint                                                                    |
+| `npm run lint:prose`   | Fails on a new em dash in a tracked file                                  |
+| `npm run lint:css`     | Stylelint, including the hardcoded-value rule                             |
+| `npm run lint:tokens`  | Fails when the count of hardcoded declarations changes without its record |
+| `npm run format`       | Prettier, writing                                                         |
+| `npm run format:check` | Prettier, checking only                                                   |
+| `npm run typecheck`    | `tsc --noEmit`                                                            |
+| `npm test`             | Vitest, both projects                                                     |
+| `npm run e2e`          | Playwright, against a disposable database                                 |
+| `npm run db:generate`  | Generate a Drizzle migration                                              |
+| `npm run db:push`      | Push the Drizzle schema to the database                                   |
+| `npm run db:seed`      | Create the seeded `haus` workspace                                        |
+| `npm run db:studio`    | Drizzle Studio                                                            |
 
 ## More
 

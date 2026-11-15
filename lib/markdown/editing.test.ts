@@ -18,8 +18,7 @@ function at(marked: string): EditState {
   const open = marked.indexOf("\u00ab");
   if (open !== -1) {
     const close = marked.indexOf("\u00bb");
-    const value =
-      marked.slice(0, open) + marked.slice(open + 1, close) + marked.slice(close + 1);
+    const value = marked.slice(0, open) + marked.slice(open + 1, close) + marked.slice(close + 1);
     return { value, start: open, end: close - 1 };
   }
   const caret = marked.indexOf("|");
@@ -99,7 +98,9 @@ describe("indent", () => {
 
 describe("wrap", () => {
   it("wraps a selection and keeps it selected", () => {
-    expect(show(wrap(at("make \u00abthis\u00bb bold"), "**"))).toBe("make **\u00abthis\u00bb** bold");
+    expect(show(wrap(at("make \u00abthis\u00bb bold"), "**"))).toBe(
+      "make **\u00abthis\u00bb** bold",
+    );
   });
 
   it("unwraps when the markers are just outside the selection", () => {
@@ -139,7 +140,9 @@ describe("toggleLinePrefix", () => {
 
 describe("insertLink", () => {
   it("makes the selection the label and puts the caret in the url", () => {
-    expect(show(insertLink(at("see \u00abthe docs\u00bb here")))).toBe("see [the docs](\u00aburl\u00bb) here");
+    expect(show(insertLink(at("see \u00abthe docs\u00bb here")))).toBe(
+      "see [the docs](\u00aburl\u00bb) here",
+    );
   });
 
   it("treats a selected url as the target, not the label", () => {

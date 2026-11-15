@@ -16,21 +16,15 @@ import { IconButton, Callout } from "haus-components";
  * text: these exist to be moved into the form immediately above them, and
  * selecting a password by dragging across it is a needless way to start.
  */
-export function DemoCredentials({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) {
+export function DemoCredentials({ email, password }: { email: string; password: string }) {
   return (
     // A Callout, not a Card. A tinted panel with a rule down one side and an
     // advisory message is what Callout is; it was drawn as a card because core
     // had no callout of its own to reach for.
     <Callout tone="info" className={styles.card}>
       <p className={styles.lead}>
-        <strong>Read-only demo.</strong> A shared account that can save drafts and
-        cannot change the decision log. Drafts are visible to every visitor.
+        <strong>Read-only demo.</strong> A shared account that can save drafts and cannot change the
+        decision log. Drafts are visible to every visitor.
       </p>
       <Field label="Email" value={email} />
       <Field label="Password" value={password} />

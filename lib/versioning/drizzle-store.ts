@@ -10,10 +10,7 @@ import type { DocumentRecord, Json, Version } from "./types";
  * changes where the data lives and nothing about how versioning behaves.
  */
 export class DrizzleVersionStore implements VersionStore {
-  async createDocument(input: {
-    ownerId: string;
-    name: string;
-  }): Promise<DocumentRecord> {
+  async createDocument(input: { ownerId: string; name: string }): Promise<DocumentRecord> {
     const [row] = await db
       .insert(documents)
       .values({ ownerId: input.ownerId, name: input.name })
@@ -22,11 +19,7 @@ export class DrizzleVersionStore implements VersionStore {
   }
 
   async getDocument(id: string): Promise<DocumentRecord | null> {
-    const [row] = await db
-      .select()
-      .from(documents)
-      .where(eq(documents.id, id))
-      .limit(1);
+    const [row] = await db.select().from(documents).where(eq(documents.id, id)).limit(1);
     return row ? toDocument(row) : null;
   }
 

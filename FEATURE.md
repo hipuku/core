@@ -49,10 +49,10 @@ writing a new one and superseding the old one with it; the new decision must alr
 
 ### Roles
 
-| | propose | edit | accept | reject | deprecate | supersede |
-|---|---|---|---|---|---|---|
-| **author** | ✓ | ✓ | | | | |
-| **maintainer** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+|                | propose | edit | accept | reject | deprecate | supersede |
+| -------------- | ------- | ---- | ------ | ------ | --------- | --------- |
+| **author**     | ✓       | ✓    |        |        |           |           |
+| **maintainer** | ✓       | ✓    | ✓      | ✓      | ✓         | ✓         |
 
 Roles are lists of capabilities. An author is shown no lifecycle actions. Each check returns
 `{ ok: false, reason }` when it refuses, so the interface can show the reason.

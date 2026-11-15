@@ -44,34 +44,31 @@ export function DraftList({
       {drafts.map((draft) => {
         const label = draftLabel(draft.title, draft.body);
         return (
-        <li key={draft.id}>
-          <Link
-            href={`/app/${workspaceId}/new?draft=${draft.id}`}
-            className={styles.cardLink}
-          >
-            <Card variant="elevated" padding={false} className={styles.card}>
-              <span className={styles.cardNum}>
-                <span
-                  className="key-chip key-chip--pending"
-                  title="Draft: numbered when proposed"
-                >
-                  {workspaceKey}-&bull;&bull;&bull;
+          <li key={draft.id}>
+            <Link href={`/app/${workspaceId}/new?draft=${draft.id}`} className={styles.cardLink}>
+              <Card variant="elevated" padding={false} className={styles.card}>
+                <span className={styles.cardNum}>
+                  <span
+                    className="key-chip key-chip--pending"
+                    title="Draft: numbered when proposed"
+                  >
+                    {workspaceKey}-&bull;&bull;&bull;
+                  </span>
                 </span>
-              </span>
-              <span className={label.derived ? styles.derived : styles.cardTitle}>
-                {label.text}
-              </span>
-              <span className={styles.when}>
-                edited {timeAgo(new Date(draft.updatedAt).getTime())}
-              </span>
-              {/* The tag sits where every other row carries its status, so the
+                <span className={label.derived ? styles.derived : styles.cardTitle}>
+                  {label.text}
+                </span>
+                <span className={styles.when}>
+                  edited {timeAgo(new Date(draft.updatedAt).getTime())}
+                </span>
+                {/* The tag sits where every other row carries its status, so the
                   column scans top to bottom without a gap. */}
-              <span title="Visible only to its author">
-                <StatusBadge status="draft" />
-              </span>
-            </Card>
-          </Link>
-        </li>
+                <span title="Visible only to its author">
+                  <StatusBadge status="draft" />
+                </span>
+              </Card>
+            </Link>
+          </li>
         );
       })}
     </ul>

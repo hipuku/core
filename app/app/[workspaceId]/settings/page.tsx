@@ -10,11 +10,7 @@ import { getGithubToken } from "@/lib/github";
 import { githubDisabled } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { usersById } from "@/lib/users";
-import {
-  disconnectRepo,
-  removeMember,
-  updateWorkspaceGeneral,
-} from "../../actions";
+import { disconnectRepo, removeMember, updateWorkspaceGeneral } from "../../actions";
 import styles from "../../app.module.css";
 import { Badge, Input } from "haus-components";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -45,9 +41,7 @@ export default async function SettingsPage({
       <div className={styles.pageHead}>
         <div>
           <h1 className={styles.title}>Settings</h1>
-          <p className={styles.sub}>
-            Name, key, members and connected repositories.
-          </p>
+          <p className={styles.sub}>Name, key, members and connected repositories.</p>
         </div>
       </div>
 
@@ -55,16 +49,8 @@ export default async function SettingsPage({
         <div className={styles.sectionHead}>
           <h2 className={styles.sectionTitle}>General</h2>
         </div>
-        <ToastForm
-          action={updateWorkspaceGeneral.bind(null, workspaceId)}
-          className={styles.form}
-        >
-          <Input
-            label="Workspace name"
-            name="name"
-            defaultValue={workspace.name}
-            required
-          />
+        <ToastForm action={updateWorkspaceGeneral.bind(null, workspaceId)} className={styles.form}>
+          <Input label="Workspace name" name="name" defaultValue={workspace.name} required />
           <Input
             label="Decision key"
             name="key"
@@ -103,17 +89,15 @@ export default async function SettingsPage({
                     maintain", which decision 0021 names as the misuse that a
                     domain palette invites. Both are neutral now and the weight
                     carries the difference. */}
-                <Badge tone="neutral" appearance={member.role === "maintainer" ? "solid" : "subtle"}>
+                <Badge
+                  tone="neutral"
+                  appearance={member.role === "maintainer" ? "solid" : "subtle"}
+                >
                   {member.role}
                 </Badge>
                 {!isOwner && (
                   <ToastForm action={removeMember.bind(null, workspaceId, member.userId)}>
-                    <SubmitIconButton
-                      icon="×"
-                      label="Remove member"
-                      variant="ghost"
-                      tone="error"
-                    />
+                    <SubmitIconButton icon="×" label="Remove member" variant="ghost" tone="error" />
                   </ToastForm>
                 )}
               </li>

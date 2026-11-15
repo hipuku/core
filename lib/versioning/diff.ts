@@ -18,10 +18,7 @@ export function equal(a: Json, b: Json): boolean {
   if (isObject(a) && isObject(b)) {
     const keysA = Object.keys(a);
     const keysB = Object.keys(b);
-    return (
-      keysA.length === keysB.length &&
-      keysA.every((k) => k in b && equal(a[k], b[k]))
-    );
+    return keysA.length === keysB.length && keysA.every((k) => k in b && equal(a[k], b[k]));
   }
   return false;
 }

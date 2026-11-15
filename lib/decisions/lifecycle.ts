@@ -1,11 +1,4 @@
-import type {
-  Actor,
-  Capability,
-  DecisionStatus,
-  Guard,
-  Role,
-  TransitionRule,
-} from "./types";
+import type { Actor, Capability, DecisionStatus, Guard, Role, TransitionRule } from "./types";
 
 /**
  * The whole state machine as data. Every legal move and the capability it demands
@@ -50,11 +43,7 @@ export function isTerminal(status: DecisionStatus): boolean {
  * Can this actor move a decision from `from` to `to`? Refuses with a reason when the
  * edge does not exist or the actor lacks the capability it requires.
  */
-export function checkTransition(
-  from: DecisionStatus,
-  to: DecisionStatus,
-  actor: Actor,
-): Guard {
+export function checkTransition(from: DecisionStatus, to: DecisionStatus, actor: Actor): Guard {
   const rule = TRANSITIONS.find((r) => r.from === from && r.to === to);
   if (!rule) {
     return { ok: false, reason: `no transition from ${from} to ${to}` };
@@ -71,11 +60,7 @@ export function checkTransition(
  * quietly rewritten. Content is therefore editable only while `proposed`, and only by
  * its author or an actor holding the `edit` capability.
  */
-export function canEditContent(
-  status: DecisionStatus,
-  actor: Actor,
-  isAuthor: boolean,
-): Guard {
+export function canEditContent(status: DecisionStatus, actor: Actor, isAuthor: boolean): Guard {
   if (status !== "proposed") {
     return {
       ok: false,

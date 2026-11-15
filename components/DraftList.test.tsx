@@ -26,15 +26,17 @@ function draft(over: Partial<DraftSummary> = {}): DraftSummary {
 
 describe("DraftList", () => {
   it("renders nothing when there are no drafts", () => {
-    const { container } = render(
-      <DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[]} />,
-    );
+    const { container } = render(<DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it("shows the workspace key with no number, since a draft has none yet", () => {
     render(
-      <DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[draft({ title: "Use Postgres" })]} />,
+      <DraftList
+        workspaceId="ws-1"
+        workspaceKey="VAU"
+        drafts={[draft({ title: "Use Postgres" })]}
+      />,
     );
     expect(screen.getByText("VAU-•••")).toBeInTheDocument();
   });
@@ -46,7 +48,11 @@ describe("DraftList", () => {
 
   it("uses a typed title when there is one", () => {
     render(
-      <DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[draft({ title: "Use Postgres" })]} />,
+      <DraftList
+        workspaceId="ws-1"
+        workspaceKey="VAU"
+        drafts={[draft({ title: "Use Postgres" })]}
+      />,
     );
     expect(screen.getByText("Use Postgres")).toBeInTheDocument();
   });
@@ -64,13 +70,8 @@ describe("DraftList", () => {
   });
 
   it("links to the draft's own compose screen", () => {
-    render(
-      <DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[draft({ id: "abc" })]} />,
-    );
-    expect(screen.getByRole("link")).toHaveAttribute(
-      "href",
-      "/app/ws-1/new?draft=abc",
-    );
+    render(<DraftList workspaceId="ws-1" workspaceKey="VAU" drafts={[draft({ id: "abc" })]} />);
+    expect(screen.getByRole("link")).toHaveAttribute("href", "/app/ws-1/new?draft=abc");
   });
 
   it("offers no delete control; discarding happens where the text is readable", () => {

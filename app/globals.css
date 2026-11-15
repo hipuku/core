@@ -23,7 +23,7 @@
    were all correct. A blanket reset is an accidental override of the entire
    design system, and layering it is what makes it a floor instead of a
    ceiling. */
-@import url('./layers.css');
+@import url("./layers.css");
 
 /* haus-tokens, the full role stack under core's own brand. C2.
 
@@ -40,12 +40,12 @@
    its own @layer core.reset, declared first in the order in layers.css, so haus's
    layered component styles win over it rather than being beaten by an unlayered
    reset, which is the defect the layering fixed. */
-@import url('haus-tokens/layers.css');
-@import url('haus-tokens/primitives.css');
-@import url('haus-tokens/brand.css');
-@import url('haus-tokens/brands/core.css');
-@import url('haus-tokens/motion.css');
-@import url('haus-tokens/semantics.css');
+@import url("haus-tokens/layers.css");
+@import url("haus-tokens/primitives.css");
+@import url("haus-tokens/brand.css");
+@import url("haus-tokens/brands/core.css");
+@import url("haus-tokens/motion.css");
+@import url("haus-tokens/semantics.css");
 :root {
   /* neutrals, a warm paper ramp. The page is a light-grey "desk"; white cards sit
      on it and separate by fill, not by borders. */
@@ -163,10 +163,12 @@
     text-decoration: none;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     letter-spacing: var(--haus-tracking-tighter);
   }
-
 }
 
 ::selection {
@@ -221,4 +223,3 @@
     outline-offset: 2px;
   }
 }
-

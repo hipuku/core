@@ -48,10 +48,7 @@ describe("referenceDrift", () => {
 describe("isStale", () => {
   it("is stale if any file reference has drifted", () => {
     expect(
-      isStale([
-        ref({ currentSha: "abc" }),
-        ref({ baselineSha: "abc", currentSha: "def" }),
-      ]),
+      isStale([ref({ currentSha: "abc" }), ref({ baselineSha: "abc", currentSha: "def" })]),
     ).toBe(true);
   });
 
@@ -60,8 +57,8 @@ describe("isStale", () => {
   });
 
   it("is not stale when everything is in sync or a link", () => {
-    expect(
-      isStale([ref({ currentSha: "abc" }), ref({ kind: "link", baselineSha: null })]),
-    ).toBe(false);
+    expect(isStale([ref({ currentSha: "abc" }), ref({ kind: "link", baselineSha: null })])).toBe(
+      false,
+    );
   });
 });

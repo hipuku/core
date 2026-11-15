@@ -101,10 +101,9 @@ export async function listRepoFiles(
   const hit = treeCache.get(key);
   if (hit && Date.now() - hit.at < TREE_TTL_MS) return hit.value;
 
-  const res = await fetch(
-    `${API}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
-    { headers: headers(token) },
-  );
+  const res = await fetch(`${API}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`, {
+    headers: headers(token),
+  });
   if (!res.ok) throw new Error(`GitHub tree failed (${res.status})`);
   const data = (await res.json()) as TreeResponse;
   const value = {
@@ -142,10 +141,9 @@ export async function getFileContent(
   branch: string,
 ): Promise<{ content: string; sha: string } | null> {
   const encoded = path.split("/").map(encodeURIComponent).join("/");
-  const res = await fetch(
-    `${API}/repos/${owner}/${repo}/contents/${encoded}?ref=${branch}`,
-    { headers: headers(token) },
-  );
+  const res = await fetch(`${API}/repos/${owner}/${repo}/contents/${encoded}?ref=${branch}`, {
+    headers: headers(token),
+  });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`GitHub file lookup failed (${res.status})`);
 
@@ -175,10 +173,9 @@ export async function getFileSha(
   branch: string,
 ): Promise<string | null> {
   const encoded = path.split("/").map(encodeURIComponent).join("/");
-  const res = await fetch(
-    `${API}/repos/${owner}/${repo}/contents/${encoded}?ref=${branch}`,
-    { headers: headers(token) },
-  );
+  const res = await fetch(`${API}/repos/${owner}/${repo}/contents/${encoded}?ref=${branch}`, {
+    headers: headers(token),
+  });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`GitHub file lookup failed (${res.status})`);
   const data = (await res.json()) as { sha: string };

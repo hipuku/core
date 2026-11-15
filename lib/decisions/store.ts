@@ -103,10 +103,7 @@ export interface DecisionStore {
     createdAt: Date;
   }): Promise<WorkspaceRecord>;
   addMember(input: MembershipRecord): Promise<MembershipRecord>;
-  getMembership(
-    workspaceId: string,
-    userId: string,
-  ): Promise<MembershipRecord | null>;
+  getMembership(workspaceId: string, userId: string): Promise<MembershipRecord | null>;
   listMembers(workspaceId: string): Promise<MembershipRecord[]>;
   removeMember(workspaceId: string, userId: string): Promise<void>;
 
