@@ -47,7 +47,16 @@ export function ConfirmAction({
 
   async function run() {
     setPending(true);
-    const result = await action();
+    let result: ActionResult;
+    try {
+      result = await action();
+    } catch {
+      // A rejected action (the network dropped, the server failed) would
+      // otherwise leave the button spinning with no word on what happened.
+      toast.error("Could not reach the server. Try again.");
+      setPending(false);
+      return;
+    }
     if (result.error) {
       toast.error(result.error);
       setPending(false);
@@ -78,7 +87,13 @@ export function ConfirmAction({
             >
               Cancel
             </Button>
-            <Button type="button" variant="primary" tone={tone} onClick={run} loading={pending}>
+            <Button
+              type="button"
+              variant="primary"
+              tone={tone}
+              onClick={() => void run()}
+              loading={pending}
+            >
               {pending ? pendingLabel : confirmLabel}
             </Button>
           </div>

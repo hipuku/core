@@ -64,7 +64,7 @@ function Field({ label, value }: { label: string; value: string }) {
         title={copied ? "Copied" : "Copy"}
         variant="ghost"
         size="sm"
-        onClick={copy}
+        onClick={() => void copy()}
       />
     </div>
   );

@@ -781,19 +781,21 @@ export function DecisionEditor({
               variant="secondary"
               tone="error"
               loading={discarding}
-              onClick={async () => {
-                setDiscarding(true);
-                try {
-                  // A parked draft has to go from the server as well, or
-                  // "discard" would leave it sitting in the decisions list.
-                  if (draftId && onDiscardDraft) await onDiscardDraft(draftId);
-                  draft.clear();
-                  router.push(pendingHref ?? cancelHref);
-                } catch {
-                  setDiscarding(false);
-                  toast.error("Could not discard that draft.");
-                }
-              }}
+              onClick={() =>
+                void (async () => {
+                  setDiscarding(true);
+                  try {
+                    // A parked draft has to go from the server as well, or
+                    // "discard" would leave it sitting in the decisions list.
+                    if (draftId && onDiscardDraft) await onDiscardDraft(draftId);
+                    draft.clear();
+                    router.push(pendingHref ?? cancelHref);
+                  } catch {
+                    setDiscarding(false);
+                    toast.error("Could not discard that draft.");
+                  }
+                })()
+              }
             >
               <Trash2 size={15} />
               Discard

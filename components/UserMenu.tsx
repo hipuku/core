@@ -4,12 +4,26 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, Popover } from "haus-components";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@/lib/toast";
 import styles from "@/app/app/shell.module.css";
 
 export function UserMenu({ user }: { user: { name: string; email: string } }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+
+  async function signOut() {
+    try {
+      // better-auth reports some failures as a returned error, not a rejection.
+      const { error } = await authClient.signOut();
+      if (error) throw new Error(error.message);
+    } catch {
+      toast.error("Could not sign out. Try again.");
+      return;
+    }
+    router.push("/sign-in");
+    router.refresh();
+  }
 
   return (
     <div className={styles.userWrap}>
@@ -45,11 +59,7 @@ export function UserMenu({ user }: { user: { name: string; email: string } }) {
           type="button"
           className={styles.menuItem}
           role="menuitem"
-          onClick={async () => {
-            await authClient.signOut();
-            router.push("/sign-in");
-            router.refresh();
-          }}
+          onClick={() => void signOut()}
         >
           Sign out
         </button>

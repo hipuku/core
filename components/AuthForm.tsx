@@ -30,9 +30,16 @@ export function AuthForm({
     setPending(true);
     setError(null);
 
-    const result = isSignUp
-      ? await signUp.email({ name, email, password })
-      : await signIn.email({ email, password });
+    let result: Awaited<ReturnType<typeof signIn.email>>;
+    try {
+      result = isSignUp
+        ? await signUp.email({ name, email, password })
+        : await signIn.email({ email, password });
+    } catch {
+      setError("Could not reach the server. Try again.");
+      setPending(false);
+      return;
+    }
 
     if (result.error) {
       setError(result.error.message ?? "Something went wrong.");
@@ -44,7 +51,7 @@ export function AuthForm({
   }
 
   return (
-    <form className={styles.form} onSubmit={onSubmit}>
+    <form className={styles.form} onSubmit={(event) => void onSubmit(event)}>
       <div className={styles.head}>
         <h2 className={styles.title}>{isSignUp ? "Create an account" : "Sign in"}</h2>
         <p className={styles.subtitle}>

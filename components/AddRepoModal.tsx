@@ -33,7 +33,7 @@ export function AddRepoModal({ workspaceId }: { workspaceId: string }) {
 
   return (
     <>
-      <Button type="button" variant="secondary" onClick={openModal}>
+      <Button type="button" variant="secondary" onClick={() => void openModal()}>
         <Plus size={16} />
         Connect a repository
       </Button>

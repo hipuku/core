@@ -13,6 +13,7 @@ import { Button, type ButtonProps } from "haus-components";
  */
 type ButtonOwnProps = Extract<ButtonProps, { asChild?: false }>;
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@/lib/toast";
 import { GithubMark } from "@/components/icons/GithubMark";
 
 export function ConnectGithubButton({
@@ -23,12 +24,15 @@ export function ConnectGithubButton({
     <Button
       {...rest}
       type="button"
-      onClick={() =>
-        authClient.linkSocial({
-          provider: "github",
-          callbackURL: window.location.href,
-        })
-      }
+      onClick={() => {
+        const failed = () => toast.error("Could not start the GitHub connection. Try again.");
+        authClient
+          .linkSocial({ provider: "github", callbackURL: window.location.href })
+          .then(({ error }) => {
+            if (error) failed();
+          })
+          .catch(failed);
+      }}
     >
       <GithubMark />
       {label}
