@@ -269,7 +269,8 @@ npm run lint && npm run typecheck && npm test
 
 Vitest runs two projects. `domain` runs `lib/**/*.test.ts` in Node. `ui` runs the `.test.tsx`
 suites in jsdom: draft autosave and recovery, the unsaved-changes guard, the compose editor's
-keystrokes, the draft list and the modal shell. 342 tests in 23 files.
+keystrokes, the draft list, the modal shell, the confirmation dialog's failure path and a
+Mermaid diagram's recovery. 345 tests in 25 files.
 
 ### What the tests prove about the Postgres store
 
