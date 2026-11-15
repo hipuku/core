@@ -1,6 +1,7 @@
 # Features
 
-The screens of core and what each does. [DESIGN.md](./DESIGN.md) records why.
+The screens of core and what each does. [DESIGN.md](./DESIGN.md) and
+[ARCHITECTURE.md](./ARCHITECTURE.md) record why.
 
 ---
 
