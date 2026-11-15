@@ -14,7 +14,9 @@ export function UserMenu({ user }: { user: { name: string; email: string } }) {
 
   async function signOut() {
     try {
-      await authClient.signOut();
+      // better-auth reports some failures as a returned error, not a rejection.
+      const { error } = await authClient.signOut();
+      if (error) throw new Error(error.message);
     } catch {
       toast.error("Could not sign out. Try again.");
       return;

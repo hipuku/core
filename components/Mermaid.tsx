@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Markdown.module.css";
 
 let initialized = false;
@@ -12,8 +12,9 @@ let initialized = false;
  * the page.
  */
 export function Mermaid({ chart }: { chart: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState(false);
+  // The result is kept with the chart it came from, so a new chart is always
+  // tried afresh: a failure on one source does not stick to the next.
+  const [rendered, setRendered] = useState<{ chart: string; svg: string | null } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,9 +33,9 @@ export function Mermaid({ chart }: { chart: string }) {
         }
         const id = `mmd-${Math.random().toString(36).slice(2)}`;
         const { svg } = await mermaid.render(id, chart);
-        if (!cancelled && ref.current) ref.current.innerHTML = svg;
+        if (!cancelled) setRendered({ chart, svg });
       } catch {
-        if (!cancelled) setError(true);
+        if (!cancelled) setRendered({ chart, svg: null });
       }
     })();
     return () => {
@@ -42,8 +43,12 @@ export function Mermaid({ chart }: { chart: string }) {
     };
   }, [chart]);
 
-  if (error) {
+  const current = rendered?.chart === chart ? rendered : null;
+  if (current && current.svg === null) {
     return <pre className={styles.pre}>{chart}</pre>;
   }
-  return <div ref={ref} className={styles.mermaid} />;
+  // Mermaid renders with securityLevel "strict", which sanitises the SVG.
+  return (
+    <div className={styles.mermaid} dangerouslySetInnerHTML={{ __html: current?.svg ?? "" }} />
+  );
 }

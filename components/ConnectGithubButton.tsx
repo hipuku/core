@@ -25,9 +25,13 @@ export function ConnectGithubButton({
       {...rest}
       type="button"
       onClick={() => {
+        const failed = () => toast.error("Could not start the GitHub connection. Try again.");
         authClient
           .linkSocial({ provider: "github", callbackURL: window.location.href })
-          .catch(() => toast.error("Could not start the GitHub connection. Try again."));
+          .then(({ error }) => {
+            if (error) failed();
+          })
+          .catch(failed);
       }}
     >
       <GithubMark />
