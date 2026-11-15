@@ -41,7 +41,6 @@ export function AddMemberModal({ workspaceId }: { workspaceId: string }) {
               type="email"
               name="email"
               required
-              autoFocus
               placeholder="teammate@example.com"
             />
             <Select
