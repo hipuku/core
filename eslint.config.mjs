@@ -16,6 +16,52 @@ const eslintConfig = defineConfig([
     "_to_delete/**",
   ]),
   {
+    // An effect or callback that reads a value it does not list goes stale
+    // silently, so a missing dependency fails rather than warns.
+    rules: { "react-hooks/exhaustive-deps": "error" },
+  },
+  {
+    // lib/ is the domain and its helpers. It does not reach up into pages,
+    // server actions or components, so it can be tested in Node on its own.
+    files: ["lib/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*", "@/components/*", "**/app/*", "**/components/*"],
+              message: "lib/ does not import pages, server actions or components.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The decision and versioning engines depend on their store ports. Only
+    // the Drizzle stores touch the database (ARCHITECTURE.md, Storage is a port).
+    files: ["lib/decisions/**/*.ts", "lib/versioning/**/*.ts"],
+    ignores: ["**/drizzle-store.ts", "**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/lib/db", "@/lib/db/*", "drizzle-orm", "drizzle-orm/*", "postgres"],
+              message: "Go through the store port; only drizzle-store.ts touches the database.",
+            },
+            {
+              group: ["@/app/*", "@/components/*", "**/app/*", "**/components/*"],
+              message: "lib/ does not import pages, server actions or components.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Tests render raw `<a>` elements deliberately: the unsaved-navigation
     // guard exists to intercept ordinary anchor clicks, and swapping them for
     // `<Link>` would test next/link rather than the guard.
