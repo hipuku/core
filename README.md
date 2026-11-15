@@ -22,7 +22,8 @@ The demo is read-only, with credentials on the sign-in page.
   about decisions. [DESIGN § Design system](DESIGN.md#design-system)
 - **Storage is a port**, with a memory and a Postgres store held to one contract suite.
   [ARCHITECTURE § Postgres store tests](ARCHITECTURE.md#postgres-store-tests)
-- **A public read-only demo** with sign-up, writes and GitHub linking switched off.
+- **A public demo** with sign-up and GitHub linking switched off. Visitors can save drafts but
+  cannot change the decision log.
   [ARCHITECTURE § Demo restrictions](ARCHITECTURE.md#demo-restrictions)
 
 ## Documentation
