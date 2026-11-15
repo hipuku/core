@@ -91,7 +91,12 @@ type DraftShape = { title: string; body: Body; cited: Cited[] };
  * block to run it against.
  */
 const TOOLS = [
-  { icon: Heading, label: "Heading", hint: null, edit: (s: EditState) => toggleLinePrefix(s, "## ") },
+  {
+    icon: Heading,
+    label: "Heading",
+    hint: null,
+    edit: (s: EditState) => toggleLinePrefix(s, "## "),
+  },
   { icon: Bold, label: "Bold", hint: "B", edit: (s: EditState) => wrap(s, "**") },
   { icon: Italic, label: "Italic", hint: "I", edit: (s: EditState) => wrap(s, "_") },
   { icon: Link2, label: "Link", hint: "K", edit: insertLink },
@@ -479,9 +484,7 @@ export function DecisionEditor({
           <div className={styles.props}>
             <span className="key-chip">{headingKey}</span>
             {status && <StatusBadge status={status} />}
-            {headingTitle && (
-              <span className={styles.headingTitle}>{headingTitle}</span>
-            )}
+            {headingTitle && <span className={styles.headingTitle}>{headingTitle}</span>}
           </div>
         )
       )}
@@ -498,8 +501,24 @@ export function DecisionEditor({
             value={tab}
             onValueChange={(v) => setTab(v as "write" | "preview")}
             items={[
-              { value: "write", label: <span className={styles.tabLabel}><PenLine size={14} />Write</span> },
-              { value: "preview", label: <span className={styles.tabLabel}><Eye size={14} />Preview</span> },
+              {
+                value: "write",
+                label: (
+                  <span className={styles.tabLabel}>
+                    <PenLine size={14} />
+                    Write
+                  </span>
+                ),
+              },
+              {
+                value: "preview",
+                label: (
+                  <span className={styles.tabLabel}>
+                    <Eye size={14} />
+                    Preview
+                  </span>
+                ),
+              },
             ]}
           />
 
@@ -553,17 +572,14 @@ export function DecisionEditor({
         <div className={styles.recovered} role="status">
           <RotateCcw size={16} className={styles.recoveredIcon} />
           <span>
-            An unsent draft from <strong>{timeAgo(recoverable.savedAt)}</strong> is saved in this browser.
+            An unsent draft from <strong>{timeAgo(recoverable.savedAt)}</strong> is saved in this
+            browser.
           </span>
           <span className={styles.recoveredActions}>
             <Button type="button" variant="secondary" onClick={restore}>
               Restore
             </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => draft.clear()}
-            >
+            <Button type="button" variant="secondary" onClick={() => draft.clear()}>
               Discard
             </Button>
           </span>
@@ -615,16 +631,15 @@ export function DecisionEditor({
               <legend className={styles.blockLabel}>Referenced code</legend>
               {/* Without this hint the field reads as a place to file links. */}
               <p className={styles.blockHint}>
-                Files this decision governs. Their current state is recorded, and the
-                decision page reports when the cited code changes. A line range
-                changes only when those lines do; a whole file changes on any edit.
+                Files this decision governs. Their current state is recorded, and the decision page
+                reports when the cited code changes. A line range changes only when those lines do;
+                a whole file changes on any edit.
               </p>
               {/* The slot comes from a server component, so it cannot be
                   handed a callback: context reaches it where props cannot. */}
               <CitationInsertProvider
                 value={{
-                  insert: (citable) =>
-                    format((state) => insertCitation(state, citable)),
+                  insert: (citable) => format((state) => insertCitation(state, citable)),
                   untracked,
                 }}
               >
@@ -645,9 +660,7 @@ export function DecisionEditor({
                     setCited((list) =>
                       list.some(
                         (x) =>
-                          x.repoId === file.repoId &&
-                          x.path === file.path &&
-                          x.lines === lines,
+                          x.repoId === file.repoId && x.path === file.path && x.lines === lines,
                       )
                         ? list
                         : [
@@ -663,19 +676,21 @@ export function DecisionEditor({
                   }
                   onRemove={(chip) =>
                     setCited((list) =>
-                      list.filter(
-                        (x) => `${x.repoId}:${x.path}:${x.lines ?? ""}` !== chip.key,
-                      ),
+                      list.filter((x) => `${x.repoId}:${x.path}:${x.lines ?? ""}` !== chip.key),
                     )
                   }
                   untracked={untracked}
                   onTrack={(file, lines) =>
                     setCited((list) =>
                       list.some(
-                        (x) => x.repoId === file.repoId && x.path === file.path && x.lines === lines,
+                        (x) =>
+                          x.repoId === file.repoId && x.path === file.path && x.lines === lines,
                       )
                         ? list
-                        : [...list, { repoId: file.repoId, repo: file.repo, path: file.path, lines }],
+                        : [
+                            ...list,
+                            { repoId: file.repoId, repo: file.repo, path: file.path, lines },
+                          ],
                     )
                   }
                   onInsert={(chip) =>

@@ -53,7 +53,9 @@
   align-items: center;
   gap: var(--haus-space-3);
   padding: var(--haus-space-3) var(--haus-space-4);
-  transition: box-shadow 0.14s ease, transform 0.14s ease;
+  transition:
+    box-shadow 0.14s ease,
+    transform 0.14s ease;
 }
 
 /* The anchor around the card. A card cannot be the anchor: haus Card's `as` is
@@ -85,7 +87,9 @@
   justify-content: space-between;
   gap: var(--haus-space-5);
   padding: var(--haus-space-4) var(--haus-space-5);
-  transition: box-shadow 0.14s ease, transform 0.14s ease;
+  transition:
+    box-shadow 0.14s ease,
+    transform 0.14s ease;
 }
 
 .wsLink {
@@ -401,9 +405,15 @@
 /* A diff operation is feedback, not a decision state. These read haus's roles
    directly now: the ink haus already publishes for text on a tinted surface,
    rather than a colour-mix toward black that only approximated one. */
-.opAdd { color: var(--haus-color-success-on-subtle); }
-.opRemove { color: var(--haus-color-error-on-subtle); }
-.opReplace { color: var(--haus-color-warning-on-subtle); }
+.opAdd {
+  color: var(--haus-color-success-on-subtle);
+}
+.opRemove {
+  color: var(--haus-color-error-on-subtle);
+}
+.opReplace {
+  color: var(--haus-color-warning-on-subtle);
+}
 
 /* ---- references -------------------------------------------------------- */
 .refList {

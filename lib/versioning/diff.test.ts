@@ -22,9 +22,7 @@ describe("diff", () => {
   });
 
   it("reports a replaced primitive at its pointer", () => {
-    expect(diff({ a: 1 }, { a: 2 })).toEqual([
-      { op: "replace", path: "/a", before: 1, after: 2 },
-    ]);
+    expect(diff({ a: 1 }, { a: 2 })).toEqual([{ op: "replace", path: "/a", before: 1, after: 2 }]);
   });
 
   it("reports added and removed keys distinctly, in sorted key order", () => {
@@ -56,14 +54,10 @@ describe("diff", () => {
   });
 
   it("diffs arrays by index, reporting appends as adds", () => {
-    expect(diff([1, 2], [1, 2, 3])).toEqual([
-      { op: "add", path: "/2", after: 3 },
-    ]);
+    expect(diff([1, 2], [1, 2, 3])).toEqual([{ op: "add", path: "/2", after: 3 }]);
   });
 
   it("reports a shortened array as removals at the tail", () => {
-    expect(diff([1, 2, 3], [1, 2])).toEqual([
-      { op: "remove", path: "/2", before: 3 },
-    ]);
+    expect(diff([1, 2, 3], [1, 2])).toEqual([{ op: "remove", path: "/2", before: 3 }]);
   });
 });

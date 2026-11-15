@@ -44,8 +44,8 @@ export function SupersedeModal({
       {open && (
         <ModalShell title="Supersede this decision" onClose={close}>
           <p className={styles.text}>
-            Pick the decision that replaces this one. This decision stays in the
-            log, marked superseded and linked to its replacement.
+            Pick the decision that replaces this one. This decision stays in the log, marked
+            superseded and linked to its replacement.
           </p>
           <ToastForm action={action}>
             {/* The key leads and the title is the hint: a reader scans for

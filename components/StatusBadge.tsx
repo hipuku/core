@@ -49,10 +49,6 @@ const LABEL: Record<DecisionStatus | "draft", string> = {
   superseded: "Superseded",
 };
 
-export function StatusBadge({
-  status,
-}: {
-  status: DecisionStatus | "draft";
-}) {
+export function StatusBadge({ status }: { status: DecisionStatus | "draft" }) {
   return <Badge tone={TONE[status]}>{LABEL[status]}</Badge>;
 }

@@ -45,10 +45,7 @@ interface Harness {
 let pg: TestDb | null = null;
 
 const HARNESSES: [string, () => Promise<Harness>][] = [
-  [
-    "MemoryDecisionStore",
-    async () => ({ store: new MemoryDecisionStore(), seed: async () => {} }),
-  ],
+  ["MemoryDecisionStore", async () => ({ store: new MemoryDecisionStore(), seed: async () => {} })],
   [
     "DrizzleDecisionStore",
     async () => {
@@ -58,9 +55,9 @@ const HARNESSES: [string, () => Promise<Harness>][] = [
       return {
         store: new DrizzleDecisionStore(db),
         async seed({ users, documents: docs }) {
-          await db.insert(user).values(
-            users.map((id) => ({ id, name: id, email: `${id}@example.test` })),
-          );
+          await db
+            .insert(user)
+            .values(users.map((id) => ({ id, name: id, email: `${id}@example.test` })));
           await db
             .insert(documents)
             .values(docs.map((id) => ({ id, ownerId: users[0]!, name: id })));
@@ -95,10 +92,7 @@ describe.each(HARNESSES)("%s", (_name, makeHarness) => {
     };
   }
 
-  function transition(
-    decisionId: string,
-    over: Partial<TransitionRecord> = {},
-  ): TransitionRecord {
+  function transition(decisionId: string, over: Partial<TransitionRecord> = {}): TransitionRecord {
     return {
       id: randomUUID(),
       decisionId,
@@ -152,10 +146,7 @@ describe.each(HARNESSES)("%s", (_name, makeHarness) => {
     it("lists members oldest first", async () => {
       await store.addMember({ workspaceId, userId: OTHER, role: "author", createdAt: at(5) });
       await store.addMember({ workspaceId, userId: AUTHOR, role: "maintainer", createdAt: at(1) });
-      expect((await store.listMembers(workspaceId)).map((m) => m.userId)).toEqual([
-        AUTHOR,
-        OTHER,
-      ]);
+      expect((await store.listMembers(workspaceId)).map((m) => m.userId)).toEqual([AUTHOR, OTHER]);
     });
 
     it("scopes membership lookup to the workspace", async () => {
@@ -186,7 +177,12 @@ describe.each(HARNESSES)("%s", (_name, makeHarness) => {
         ownerId: AUTHOR,
         createdAt: at(-10),
       });
-      await store.addMember({ workspaceId: older, userId: OTHER, role: "author", createdAt: at(2) });
+      await store.addMember({
+        workspaceId: older,
+        userId: OTHER,
+        role: "author",
+        createdAt: at(2),
+      });
       await store.addMember({ workspaceId, userId: OTHER, role: "author", createdAt: at(1) });
       // The membership rows are added in the opposite order to the workspaces,
       // so a store returning insertion order gets this backwards.

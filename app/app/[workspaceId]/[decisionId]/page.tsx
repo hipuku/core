@@ -69,15 +69,14 @@ export default async function DecisionPage({
   const decision = found;
 
   const actor = { id: user.id, capabilities: capabilitiesFor(role) };
-  const [content, transitions, all, references, repos, workspace] =
-    await Promise.all([
-      decisionService.contentHistory(decisionId),
-      decisionService.statusHistory(decisionId),
-      decisionService.listDecisions(workspaceId),
-      decisionService.listReferences(decisionId),
-      decisionService.listWorkspaceRepos(workspaceId),
-      decisionService.getWorkspace(workspaceId),
-    ]);
+  const [content, transitions, all, references, repos, workspace] = await Promise.all([
+    decisionService.contentHistory(decisionId),
+    decisionService.statusHistory(decisionId),
+    decisionService.listDecisions(workspaceId),
+    decisionService.listReferences(decisionId),
+    decisionService.listWorkspaceRepos(workspaceId),
+    decisionService.getWorkspace(workspaceId),
+  ]);
   const key = workspace?.key ?? "ADR";
   // What inline `{{repo:path}}` citations in the body can resolve against.
   const citable = repos.map((r) => ({
@@ -85,21 +84,14 @@ export default async function DecisionPage({
     branch: r.defaultBranch,
   }));
 
-  const people = await usersById([
-    decision.authorId,
-    ...transitions.map((t) => t.actorId),
-  ]);
+  const people = await usersById([decision.authorId, ...transitions.map((t) => t.actorId)]);
   const nameOf = (id: string) => people.get(id)?.name ?? "someone";
 
   const body = content.at(-1)?.state ?? {};
   // The first version is the proposal itself, so "last edited" only exists once
   // there has been a revision. Otherwise created and edited would always match.
   const lastEdited = content.length > 1 ? content.at(-1)!.createdAt : null;
-  const editable = canEditContent(
-    decision.status,
-    actor,
-    decision.authorId === user.id,
-  );
+  const editable = canEditContent(decision.status, actor, decision.authorId === user.id);
 
   const canAccept = actor.capabilities.includes("accept") && decision.status === "proposed";
   const canReject = actor.capabilities.includes("reject") && decision.status === "proposed";
@@ -217,61 +209,63 @@ export default async function DecisionPage({
         count={transitions.length + content.length}
         lastActivity={lastActivity}
         activity={
-            <div className={styles.activity}>
-              <section className={styles.activityGroup}>
-                <h2>Status history</h2>
-                <div className={styles.timeline}>
-                  {transitions.map((t) => (
-                    <div key={t.id} className={styles.tlItem}>
-                      <div className={styles.tlHead}>
-                        <StatusBadge status={t.toStatus} />
-                        <span className={styles.tlMsg}>
-                          {t.fromStatus ? `from ${t.fromStatus}` : "proposed"} by {nameOf(t.actorId)}
-                        </span>
-                      </div>
-                      <div className={styles.tlMeta}>{when(t.createdAt)}</div>
+          <div className={styles.activity}>
+            <section className={styles.activityGroup}>
+              <h2>Status history</h2>
+              <div className={styles.timeline}>
+                {transitions.map((t) => (
+                  <div key={t.id} className={styles.tlItem}>
+                    <div className={styles.tlHead}>
+                      <StatusBadge status={t.toStatus} />
+                      <span className={styles.tlMsg}>
+                        {t.fromStatus ? `from ${t.fromStatus}` : "proposed"} by {nameOf(t.actorId)}
+                      </span>
                     </div>
-                  ))}
-                </div>
-              </section>
+                    <div className={styles.tlMeta}>{when(t.createdAt)}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-              <section className={styles.activityGroup}>
-                <h2>Content history</h2>
-                <div className={styles.timeline}>
-                  {content.map((version) => (
-                    <div key={version.id} className={styles.tlItem}>
-                      <div className={styles.tlHead}>
-                        <span className={styles.tlMsg}>{version.message}</span>
-                      </div>
-                      <div className={styles.tlMeta}>{when(version.createdAt)}</div>
-                      {version.changes.length > 0 && (
-                        <ul className={styles.changes}>
-                          {version.changes.map((change, i) => (
-                            <li
-                              key={i}
-                              className={
-                                change.op === "add"
-                                  ? styles.opAdd
-                                  : change.op === "remove"
-                                    ? styles.opRemove
-                                    : styles.opReplace
-                              }
-                            >
-                              {describe(change)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+            <section className={styles.activityGroup}>
+              <h2>Content history</h2>
+              <div className={styles.timeline}>
+                {content.map((version) => (
+                  <div key={version.id} className={styles.tlItem}>
+                    <div className={styles.tlHead}>
+                      <span className={styles.tlMsg}>{version.message}</span>
                     </div>
-                  ))}
-                </div>
-              </section>
-            </div>
+                    <div className={styles.tlMeta}>{when(version.createdAt)}</div>
+                    {version.changes.length > 0 && (
+                      <ul className={styles.changes}>
+                        {version.changes.map((change, i) => (
+                          <li
+                            key={i}
+                            className={
+                              change.op === "add"
+                                ? styles.opAdd
+                                : change.op === "remove"
+                                  ? styles.opRemove
+                                  : styles.opReplace
+                            }
+                          >
+                            {describe(change)}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
         }
       >
         <div className={styles.prop}>
           <span className={styles.propLabel}>Status</span>
-          <span className={styles.propValue}><StatusBadge status={decision.status} /></span>
+          <span className={styles.propValue}>
+            <StatusBadge status={decision.status} />
+          </span>
         </div>
         <div className={styles.prop}>
           <span className={styles.propLabel}>Owner</span>
@@ -309,7 +303,6 @@ export default async function DecisionPage({
             </span>
           </div>
         )}
-
       </DecisionMeta>
 
       <Lineage workspaceId={workspaceId} workspaceKey={key} chain={lineage} />
@@ -319,79 +312,74 @@ export default async function DecisionPage({
           <div className={styles.noticeText}>
             <span className={styles.noticeTitle}>Referenced code has changed</span>
             <span className={styles.noticeSub}>
-              Cited code has changed since its baseline, so this decision may be
-              out of date. See References below.
+              Cited code has changed since its baseline, so this decision may be out of date. See
+              References below.
             </span>
           </div>
         </div>
       )}
 
       <div className={styles.sheet}>
-          <article className={styles.doc}>
-            {(["context", "decision", "consequences"] as const).map((block) => {
-              const text = field(body, block);
-              return (
-                <section
-                  key={block}
-                  className={`${styles.docBlock} ${
-                    block === "decision" ? styles.docBlockLead : ""
-                  }`}
-                >
-                  <h2 className={styles.docLabel}>{block}</h2>
-                  {text ? (
-                    <Markdown citable={citable}>{text}</Markdown>
-                  ) : (
-                    <p className={styles.docEmpty}>Not yet written.</p>
-                  )}
-                </section>
-              );
-            })}
-          </article>
+        <article className={styles.doc}>
+          {(["context", "decision", "consequences"] as const).map((block) => {
+            const text = field(body, block);
+            return (
+              <section
+                key={block}
+                className={`${styles.docBlock} ${block === "decision" ? styles.docBlockLead : ""}`}
+              >
+                <h2 className={styles.docLabel}>{block}</h2>
+                {text ? (
+                  <Markdown citable={citable}>{text}</Markdown>
+                ) : (
+                  <p className={styles.docEmpty}>Not yet written.</p>
+                )}
+              </section>
+            );
+          })}
+        </article>
 
-          {/* On the same paper, below a rule: references belong to this
+        {/* On the same paper, below a rule: references belong to this
               document, so giving them a card of their own added a surface
               without adding a distinction. */}
-          <section className={styles.docFooter}>
-            <div className={styles.docFooterHead}>
-              <h2 className={styles.docFooterTitle}>References</h2>
-              {hasFileRefs && (
-                <ToastForm action={checkReferenceDrift.bind(null, workspaceId, decisionId)}>
-                  <span className={styles.syncRow}>
-                    <span className={styles.syncWhen}>
-                      {lastChecked
-                        ? `checked ${timeAgo(lastChecked.getTime())}`
-                        : "never checked"}
-                    </span>
-                    <SubmitIconButton
-                      icon={<RefreshCw size={14} />}
-                      label="Check for drift"
-                      title="Check whether the cited code has changed"
-                      variant="ghost"
-                    />
+        <section className={styles.docFooter}>
+          <div className={styles.docFooterHead}>
+            <h2 className={styles.docFooterTitle}>References</h2>
+            {hasFileRefs && (
+              <ToastForm action={checkReferenceDrift.bind(null, workspaceId, decisionId)}>
+                <span className={styles.syncRow}>
+                  <span className={styles.syncWhen}>
+                    {lastChecked ? `checked ${timeAgo(lastChecked.getTime())}` : "never checked"}
                   </span>
-                </ToastForm>
-              )}
-            </div>
-            <DecisionReferences
-              references={references.map((r) => ({
-                id: r.id,
-                kind: r.kind,
-                label: r.label,
-                url: r.url,
-                repo: r.repo,
-                path: r.path,
-                lines:
-                  r.startLine && r.endLine
-                    ? formatRange({ start: r.startLine, end: r.endLine })
-                    : null,
-                startLine: r.startLine,
-                baselineSha: r.baselineSha,
-                currentSha: r.currentSha,
-              }))}
-            />
-          </section>
-        </div>
+                  <SubmitIconButton
+                    icon={<RefreshCw size={14} />}
+                    label="Check for drift"
+                    title="Check whether the cited code has changed"
+                    variant="ghost"
+                  />
+                </span>
+              </ToastForm>
+            )}
+          </div>
+          <DecisionReferences
+            references={references.map((r) => ({
+              id: r.id,
+              kind: r.kind,
+              label: r.label,
+              url: r.url,
+              repo: r.repo,
+              path: r.path,
+              lines:
+                r.startLine && r.endLine
+                  ? formatRange({ start: r.startLine, end: r.endLine })
+                  : null,
+              startLine: r.startLine,
+              baselineSha: r.baselineSha,
+              currentSha: r.currentSha,
+            }))}
+          />
+        </section>
+      </div>
     </div>
   );
-
 }

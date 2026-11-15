@@ -74,9 +74,7 @@ export function FileBrowser({
     const needle = query.trim().toLowerCase();
     if (!needle) return [];
     return files.filter(
-      (f) =>
-        f.path.toLowerCase().includes(needle) ||
-        f.repo.toLowerCase().includes(needle),
+      (f) => f.path.toLowerCase().includes(needle) || f.repo.toLowerCase().includes(needle),
     );
   }, [files, query]);
 
@@ -111,9 +109,7 @@ export function FileBrowser({
         <Search size={15} className={styles.searchIcon} />
         <input
           className={styles.search}
-          placeholder={
-            files ? "Search files across connected repositories…" : "Loading files…"
-          }
+          placeholder={files ? "Search files across connected repositories…" : "Loading files…"}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           disabled={!files}
@@ -124,15 +120,15 @@ export function FileBrowser({
 
       {partial.length > 0 && (
         <p className={styles.status}>
-          Showing part of {partial.join(", ")}. The repository is large enough
-          that GitHub truncates its file list.
+          Showing part of {partial.join(", ")}. The repository is large enough that GitHub truncates
+          its file list.
         </p>
       )}
 
       {unreachable.length > 0 && (
         <p className={styles.status}>
-          {unreachable.join(", ")} could not be read. A private repository needs a
-          linked GitHub account with access to it.
+          {unreachable.join(", ")} could not be read. A private repository needs a linked GitHub
+          account with access to it.
         </p>
       )}
 

@@ -36,7 +36,9 @@
   height: 32px;
   border-radius: var(--r-sm);
   color: var(--text-dim);
-  transition: background 0.12s ease, color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
 }
 .backBtn:hover {
   background: var(--surface-3);

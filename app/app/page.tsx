@@ -16,9 +16,7 @@ export default async function WorkspacesPage() {
       <div className={styles.pageHead}>
         <div>
           <h1 className={styles.title}>Workspaces</h1>
-          <p className={styles.sub}>
-            Each workspace is a team with its own decision log.
-          </p>
+          <p className={styles.sub}>Each workspace is a team with its own decision log.</p>
         </div>
         <NewWorkspaceModal />
       </div>
@@ -30,43 +28,36 @@ export default async function WorkspacesPage() {
         />
       ) : (
         <ul className={styles.list}>
-          {summaries.map(
-            ({ workspace, decisionCount, proposedCount, memberCount, repos }) => (
-              <li key={workspace.id}>
-                <Link href={`/app/${workspace.id}`} className={styles.wsLink}>
-                  <Card variant="elevated" padding={false} className={styles.wsCard}>
-                    <span className={styles.wsName}>{workspace.name}</span>
-                    <div className={styles.wsMeta}>
-                      {proposedCount > 0 && (
-                        <span className={styles.wsPending}>
-                          {proposedCount} awaiting review
-                        </span>
-                      )}
-                      <span className={styles.wsMetaItem} title={`${decisionCount} decisions`}>
-                        <FileText size={14} aria-hidden />
-                        {decisionCount}
+          {summaries.map(({ workspace, decisionCount, proposedCount, memberCount, repos }) => (
+            <li key={workspace.id}>
+              <Link href={`/app/${workspace.id}`} className={styles.wsLink}>
+                <Card variant="elevated" padding={false} className={styles.wsCard}>
+                  <span className={styles.wsName}>{workspace.name}</span>
+                  <div className={styles.wsMeta}>
+                    {proposedCount > 0 && (
+                      <span className={styles.wsPending}>{proposedCount} awaiting review</span>
+                    )}
+                    <span className={styles.wsMetaItem} title={`${decisionCount} decisions`}>
+                      <FileText size={14} aria-hidden />
+                      {decisionCount}
+                    </span>
+                    <span className={styles.wsMetaItem} title={`${memberCount} members`}>
+                      <Users size={14} aria-hidden />
+                      {memberCount}
+                    </span>
+                    {repos.length > 0 ? (
+                      <span className={styles.wsMetaItem} title={repos.join(", ")}>
+                        <GithubMark size={14} />
+                        {repos.length}
                       </span>
-                      <span className={styles.wsMetaItem} title={`${memberCount} members`}>
-                        <Users size={14} aria-hidden />
-                        {memberCount}
-                      </span>
-                      {repos.length > 0 ? (
-                        <span
-                          className={styles.wsMetaItem}
-                          title={repos.join(", ")}
-                        >
-                          <GithubMark size={14} />
-                          {repos.length}
-                        </span>
-                      ) : (
-                        <span className={styles.wsMetaItem}>no repo connected</span>
-                      )}
-                    </div>
-                  </Card>
-                </Link>
-              </li>
-            ),
-          )}
+                    ) : (
+                      <span className={styles.wsMetaItem}>no repo connected</span>
+                    )}
+                  </div>
+                </Card>
+              </Link>
+            </li>
+          ))}
         </ul>
       )}
     </div>

@@ -47,10 +47,7 @@ export class MemoryDecisionStore implements DecisionStore {
     return { ...input };
   }
 
-  async getMembership(
-    workspaceId: string,
-    userId: string,
-  ): Promise<MembershipRecord | null> {
+  async getMembership(workspaceId: string, userId: string): Promise<MembershipRecord | null> {
     const record = this.members.get(this.memberKey(workspaceId, userId));
     return record ? { ...record } : null;
   }
@@ -128,9 +125,7 @@ export class MemoryDecisionStore implements DecisionStore {
 
   async listWorkspacesForUser(userId: string): Promise<WorkspaceRecord[]> {
     const workspaceIds = new Set(
-      [...this.members.values()]
-        .filter((m) => m.userId === userId)
-        .map((m) => m.workspaceId),
+      [...this.members.values()].filter((m) => m.userId === userId).map((m) => m.workspaceId),
     );
     return [...this.workspaces.values()]
       .filter((w) => workspaceIds.has(w.id))
@@ -151,9 +146,7 @@ export class MemoryDecisionStore implements DecisionStore {
   }
 
   async countDecisions(workspaceId: string): Promise<number> {
-    return [...this.decisions.values()].filter(
-      (d) => d.workspaceId === workspaceId,
-    ).length;
+    return [...this.decisions.values()].filter((d) => d.workspaceId === workspaceId).length;
   }
 
   async countProposed(workspaceId: string): Promise<number> {
@@ -162,10 +155,7 @@ export class MemoryDecisionStore implements DecisionStore {
     ).length;
   }
 
-  async updateWorkspace(
-    id: string,
-    patch: { name: string; key: string },
-  ): Promise<void> {
+  async updateWorkspace(id: string, patch: { name: string; key: string }): Promise<void> {
     const ws = this.workspaces.get(id);
     if (ws) {
       ws.name = patch.name;

@@ -79,9 +79,7 @@ describe("ModalShell", () => {
         </ModalShell>
       </>,
     );
-    expect(document.activeElement).toBe(
-      screen.getByRole("button", { name: "confirm" }),
-    );
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "confirm" }));
 
     rerender(
       <>

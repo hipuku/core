@@ -3,13 +3,7 @@
  * diff and restore arbitrary JSON state, and nothing about what that state means.
  * Whatever core turns out to be, the entity it versions is a `Json` blob here.
  */
-export type Json =
-  | null
-  | boolean
-  | number
-  | string
-  | Json[]
-  | { [key: string]: Json };
+export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 
 /** A named, owned container whose state moves forward one immutable version at a time. */
 export interface DocumentRecord {

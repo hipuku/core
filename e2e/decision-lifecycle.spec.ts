@@ -36,7 +36,9 @@ test("signs in and reaches the decision log", async ({ page }) => {
   await openLog(page);
 
   // The seed builds haus's real decisions, so these are the titles that exist.
-  await expect(page.getByRole("link", { name: /Split the brand out of the role layer/ })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Split the brand out of the role layer/ }),
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: /New decision/ })).toBeVisible();
 });
 
@@ -44,7 +46,9 @@ test("opens a decision and shows its status and history", async ({ page }) => {
   await openLog(page);
   await page.getByRole("link", { name: /Split the brand out of the role layer/ }).click();
 
-  await expect(page.getByRole("heading", { name: /Split the brand out of the role layer/ })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /Split the brand out of the role layer/ }),
+  ).toBeVisible();
 
   // A decision without its status is a document; the status is what makes it a
   // decision log. One of the five the lifecycle defines has to be on the page.

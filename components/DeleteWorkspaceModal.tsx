@@ -9,13 +9,7 @@ import { deleteWorkspace } from "@/app/app/actions";
 import { ModalShell } from "./ModalShell";
 import styles from "./Modal.module.css";
 
-export function DeleteWorkspaceModal({
-  workspaceId,
-  name,
-}: {
-  workspaceId: string;
-  name: string;
-}) {
+export function DeleteWorkspaceModal({ workspaceId, name }: { workspaceId: string; name: string }) {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const router = useRouter();
@@ -35,12 +29,7 @@ export function DeleteWorkspaceModal({
 
   return (
     <>
-      <Button
-        type="button"
-        variant="secondary"
-        tone="error"
-        onClick={() => setOpen(true)}
-      >
+      <Button type="button" variant="secondary" tone="error" onClick={() => setOpen(true)}>
         <Trash2 size={15} />
         Delete workspace
       </Button>
@@ -48,9 +37,8 @@ export function DeleteWorkspaceModal({
       {open && (
         <ModalShell title="Delete workspace" onClose={() => setOpen(false)}>
           <p style={{ color: "var(--text-dim)", lineHeight: 1.6, marginBottom: "1.4rem" }}>
-            <strong style={{ color: "var(--text)" }}>{name}</strong> and all its
-            decisions, history and references will be permanently deleted. This
-            cannot be undone.
+            <strong style={{ color: "var(--text)" }}>{name}</strong> and all its decisions, history
+            and references will be permanently deleted. This cannot be undone.
           </p>
           <div className={styles.actions}>
             <Button

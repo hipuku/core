@@ -3,11 +3,7 @@ import { decisionService } from "@/lib/decisions";
 import { requireUser } from "@/lib/session";
 import styles from "./shell.module.css";
 
-export default async function AppLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
   const workspaces = await decisionService.listWorkspaces(user.id);
   return (

@@ -19,10 +19,7 @@ import type { ActionResult } from "./action-result";
  * exported from that module would put the decisions graph, and postgres with
  * it, one careless import away from a browser bundle.
  */
-export async function attempt(
-  run: () => Promise<void>,
-  ok: string,
-): Promise<ActionResult> {
+export async function attempt(run: () => Promise<void>, ok: string): Promise<ActionResult> {
   try {
     await run();
   } catch (e) {

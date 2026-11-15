@@ -5,25 +5,14 @@
  * by lib/versioning. This file governs the orthogonal question of a decision's
  * *status* over time.
  */
-export type DecisionStatus =
-  | "proposed"
-  | "accepted"
-  | "rejected"
-  | "deprecated"
-  | "superseded";
+export type DecisionStatus = "proposed" | "accepted" | "rejected" | "deprecated" | "superseded";
 
 /**
  * Capabilities, not roles, gate every action. Roles are just named bundles of
  * these (see ROLE_CAPABILITIES), which keeps the state machine's guards readable and
  * lets the role model change without touching a single transition rule.
  */
-export type Capability =
-  | "propose"
-  | "edit"
-  | "accept"
-  | "reject"
-  | "deprecate"
-  | "supersede";
+export type Capability = "propose" | "edit" | "accept" | "reject" | "deprecate" | "supersede";
 
 export type Role = "author" | "maintainer";
 

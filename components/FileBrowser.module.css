@@ -16,7 +16,9 @@
   border-radius: var(--r-sm);
   background: var(--surface-2);
   border: 1px solid transparent;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
 }
 .searchRow:focus-within {
   border-color: var(--accent);
@@ -99,7 +101,10 @@
   color: var(--text-faint);
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.12s ease, color 0.12s ease, background 0.12s ease;
+  transition:
+    opacity 0.12s ease,
+    color 0.12s ease,
+    background 0.12s ease;
 }
 .result:hover .lines,
 .lines:focus-visible {

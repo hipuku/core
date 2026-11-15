@@ -80,19 +80,11 @@ export class DrizzleDecisionStore implements DecisionStore {
     return row;
   }
 
-  async getMembership(
-    workspaceId: string,
-    userId: string,
-  ): Promise<MembershipRecord | null> {
+  async getMembership(workspaceId: string, userId: string): Promise<MembershipRecord | null> {
     const [row] = await this.db
       .select()
       .from(memberships)
-      .where(
-        and(
-          eq(memberships.workspaceId, workspaceId),
-          eq(memberships.userId, userId),
-        ),
-      )
+      .where(and(eq(memberships.workspaceId, workspaceId), eq(memberships.userId, userId)))
       .limit(1);
     return row ?? null;
   }
@@ -108,12 +100,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   async removeMember(workspaceId: string, userId: string): Promise<void> {
     await this.db
       .delete(memberships)
-      .where(
-        and(
-          eq(memberships.workspaceId, workspaceId),
-          eq(memberships.userId, userId),
-        ),
-      );
+      .where(and(eq(memberships.workspaceId, workspaceId), eq(memberships.userId, userId)));
   }
 
   /**
@@ -183,10 +170,7 @@ export class DrizzleDecisionStore implements DecisionStore {
       .select()
       .from(decisionDrafts)
       .where(
-        and(
-          eq(decisionDrafts.workspaceId, workspaceId),
-          eq(decisionDrafts.authorId, authorId),
-        ),
+        and(eq(decisionDrafts.workspaceId, workspaceId), eq(decisionDrafts.authorId, authorId)),
       )
       .orderBy(desc(decisionDrafts.updatedAt));
     return rows.map(toDraft);
@@ -199,12 +183,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   async deleteDraftsBefore(authorId: string, before: Date): Promise<number> {
     const removed = await this.db
       .delete(decisionDrafts)
-      .where(
-        and(
-          eq(decisionDrafts.authorId, authorId),
-          lt(decisionDrafts.updatedAt, before),
-        ),
-      )
+      .where(and(eq(decisionDrafts.authorId, authorId), lt(decisionDrafts.updatedAt, before)))
       .returning({ id: decisionDrafts.id });
     return removed.length;
   }
@@ -218,11 +197,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async getWorkspace(id: string): Promise<WorkspaceRecord | null> {
-    const [row] = await this.db
-      .select()
-      .from(workspaces)
-      .where(eq(workspaces.id, id))
-      .limit(1);
+    const [row] = await this.db.select().from(workspaces).where(eq(workspaces.id, id)).limit(1);
     return row ?? null;
   }
 
@@ -242,11 +217,7 @@ export class DrizzleDecisionStore implements DecisionStore {
   }
 
   async getDecision(id: string): Promise<DecisionRecord | null> {
-    const [row] = await this.db
-      .select()
-      .from(decisions)
-      .where(eq(decisions.id, id))
-      .limit(1);
+    const [row] = await this.db.select().from(decisions).where(eq(decisions.id, id)).limit(1);
     return row ? toDecision(row) : null;
   }
 
@@ -271,19 +242,11 @@ export class DrizzleDecisionStore implements DecisionStore {
     const [row] = await this.db
       .select({ c: count() })
       .from(decisions)
-      .where(
-        and(
-          eq(decisions.workspaceId, workspaceId),
-          eq(decisions.status, "proposed"),
-        ),
-      );
+      .where(and(eq(decisions.workspaceId, workspaceId), eq(decisions.status, "proposed")));
     return row?.c ?? 0;
   }
 
-  async updateWorkspace(
-    id: string,
-    patch: { name: string; key: string },
-  ): Promise<void> {
+  async updateWorkspace(id: string, patch: { name: string; key: string }): Promise<void> {
     await this.db.update(workspaces).set(patch).where(eq(workspaces.id, id));
   }
 
@@ -304,9 +267,7 @@ export class DrizzleDecisionStore implements DecisionStore {
         .set({
           status: input.toStatus,
           updatedAt: input.updatedAt,
-          ...(input.supersededById !== undefined
-            ? { supersededById: input.supersededById }
-            : {}),
+          ...(input.supersededById !== undefined ? { supersededById: input.supersededById } : {}),
         })
         .where(eq(decisions.id, input.decisionId));
       await tx.insert(decisionTransitions).values(input.transition);

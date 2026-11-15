@@ -56,8 +56,7 @@ export function ChipPit() {
 
     import("matter-js").then((Matter) => {
       if (cancelled || !stageRef.current) return;
-      const { Engine, Runner, Bodies, Body, Composite, Mouse, MouseConstraint } =
-        Matter;
+      const { Engine, Runner, Bodies, Body, Composite, Mouse, MouseConstraint } = Matter;
 
       const width = stage.clientWidth;
       const height = stage.clientHeight;

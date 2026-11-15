@@ -1,11 +1,7 @@
 "use client";
 
 import { toast } from "@/lib/toast";
-import {
-  addFileReference,
-  removeReference,
-  type WorkspaceFile,
-} from "@/app/app/actions";
+import { addFileReference, removeReference, type WorkspaceFile } from "@/app/app/actions";
 import { useEditorCitations } from "@/components/CitationInsert";
 import { ReferenceField, type ReferenceChip } from "@/components/ReferenceField";
 
@@ -57,8 +53,7 @@ export function LiveReferenceField({
       onRemove={remove}
       onInsert={
         editor
-          ? (chip) =>
-              editor.insert({ repo: chip.repo, path: chip.path, lines: chip.lines })
+          ? (chip) => editor.insert({ repo: chip.repo, path: chip.path, lines: chip.lines })
           : undefined
       }
       untracked={editor?.untracked ?? []}

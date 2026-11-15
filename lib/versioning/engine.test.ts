@@ -58,9 +58,7 @@ describe("Versioning", () => {
 
     const history = await engine.history(document.id);
     expect(history[0].changes).toEqual([{ op: "add", path: "/n", after: 1 }]);
-    expect(history[1].changes).toEqual([
-      { op: "add", path: "/extra", after: true },
-    ]);
+    expect(history[1].changes).toEqual([{ op: "add", path: "/extra", after: true }]);
   });
 
   it("diffs any two versions of the same document", async () => {
@@ -76,22 +74,22 @@ describe("Versioning", () => {
   it("refuses to restore a version from a different document", async () => {
     const a = await engine.create("user_a", "a", { n: 1 });
     const b = await engine.create("user_a", "b", { n: 2 });
-    await expect(
-      engine.restore(a.document.id, b.version.id, "user_a"),
-    ).rejects.toBeInstanceOf(VersioningError);
+    await expect(engine.restore(a.document.id, b.version.id, "user_a")).rejects.toBeInstanceOf(
+      VersioningError,
+    );
   });
 
   it("refuses to diff versions across documents", async () => {
     const a = await engine.create("user_a", "a", { n: 1 });
     const b = await engine.create("user_a", "b", { n: 2 });
-    await expect(
-      engine.diffVersions(a.version.id, b.version.id),
-    ).rejects.toBeInstanceOf(VersioningError);
+    await expect(engine.diffVersions(a.version.id, b.version.id)).rejects.toBeInstanceOf(
+      VersioningError,
+    );
   });
 
   it("throws when committing to a document that does not exist", async () => {
-    await expect(
-      engine.commit("nope", { n: 1 }, "user_a", "x"),
-    ).rejects.toBeInstanceOf(VersioningError);
+    await expect(engine.commit("nope", { n: 1 }, "user_a", "x")).rejects.toBeInstanceOf(
+      VersioningError,
+    );
   });
 });

@@ -46,9 +46,7 @@ export function AuthForm({
   return (
     <form className={styles.form} onSubmit={onSubmit}>
       <div className={styles.head}>
-        <h2 className={styles.title}>
-          {isSignUp ? "Create an account" : "Sign in"}
-        </h2>
+        <h2 className={styles.title}>{isSignUp ? "Create an account" : "Sign in"}</h2>
         <p className={styles.subtitle}>
           {isSignUp
             ? "An account can create workspaces and propose decisions."

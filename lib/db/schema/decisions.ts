@@ -112,9 +112,7 @@ export const workspaceRepos = pgTable(
       .references(() => user.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
-  (table) => [
-    unique("workspace_repos_key").on(table.workspaceId, table.owner, table.name),
-  ],
+  (table) => [unique("workspace_repos_key").on(table.workspaceId, table.owner, table.name)],
 );
 
 /**

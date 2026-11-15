@@ -7,7 +7,10 @@ export function deriveWorkspaceKey(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
   let key =
     words.length >= 2
-      ? words.slice(0, 4).map((w) => w[0]).join("")
+      ? words
+          .slice(0, 4)
+          .map((w) => w[0])
+          .join("")
       : (words[0] ?? "").slice(0, 3);
   key = key.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
   if (key.length < 2) {
@@ -18,7 +21,10 @@ export function deriveWorkspaceKey(name: string): string {
 
 /** Coerce user-typed key input into a valid key (uppercase alphanumeric, 2–6). */
 export function normalizeWorkspaceKey(input: string): string {
-  const cleaned = input.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6);
+  const cleaned = input
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toUpperCase()
+    .slice(0, 6);
   return cleaned.length >= 2 ? cleaned : "WS";
 }
 

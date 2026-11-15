@@ -75,9 +75,7 @@ export async function updateWorkspaceGeneral(
   }, "Settings saved.");
 }
 
-export async function deleteWorkspace(
-  workspaceId: string,
-): Promise<ActionResult> {
+export async function deleteWorkspace(workspaceId: string): Promise<ActionResult> {
   const user = await requireUser();
   const refused = refuseDemo(user);
   if (refused) return refused;
@@ -86,22 +84,19 @@ export async function deleteWorkspace(
   }, "Workspace deleted.");
 }
 
-export async function inviteMember(
-  workspaceId: string,
-  formData: FormData,
-): Promise<ActionResult> {
+export async function inviteMember(workspaceId: string, formData: FormData): Promise<ActionResult> {
   const user = await requireUser();
   const refused = refuseDemo(user);
   if (refused) return refused;
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
   const role = (String(formData.get("role") ?? "author") as Role) ?? "author";
   if (!email) return { error: "An email is required." };
   return attempt(async () => {
     const target = await findUserByEmail(email);
     if (!target) {
-      throw new DecisionError(
-        `No account with the email ${email}. They need to sign up first.`,
-      );
+      throw new DecisionError(`No account with the email ${email}. They need to sign up first.`);
     }
     await decisionService.inviteMember(workspaceId, user.id, target.id, role);
     revalidatePath(`/app/${workspaceId}`);
@@ -171,10 +166,7 @@ export async function listMyGithubRepos() {
   return listRepos(token);
 }
 
-export async function connectRepo(
-  workspaceId: string,
-  formData: FormData,
-): Promise<ActionResult> {
+export async function connectRepo(workspaceId: string, formData: FormData): Promise<ActionResult> {
   const user = await requireUser();
   const refused = refuseDemo(user);
   if (refused) return refused;
@@ -198,10 +190,7 @@ export async function connectRepo(
   }, `Connected ${parsed.owner}/${parsed.name}.`);
 }
 
-export async function disconnectRepo(
-  workspaceId: string,
-  repoId: string,
-): Promise<ActionResult> {
+export async function disconnectRepo(workspaceId: string, repoId: string): Promise<ActionResult> {
   const user = await requireUser();
   const refused = refuseDemo(user);
   if (refused) return refused;
@@ -258,7 +247,12 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
     const user = await requireUser();
     const role = await decisionService.roleOf(workspaceId, user.id);
     if (!role) {
-      return { files: [], truncated: [], unreachable: [], unavailable: "Not a member of this workspace." };
+      return {
+        files: [],
+        truncated: [],
+        unreachable: [],
+        unavailable: "Not a member of this workspace.",
+      };
     }
 
     // Browsing and linking are separate concerns. `DISABLE_GITHUB` stops the
@@ -313,15 +307,11 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
           path,
         })),
       ),
-      truncated: results
-        .filter((r) => r.truncated)
-        .map((r) => `${r.repo.owner}/${r.repo.name}`),
+      truncated: results.filter((r) => r.truncated).map((r) => `${r.repo.owner}/${r.repo.name}`),
       // Told apart from truncation on purpose: a repo the deployment's public
       // token cannot see is a *private* one, and "showing part of it" would be
       // the wrong story.
-      unreachable: results
-        .filter((r) => r.failed)
-        .map((r) => `${r.repo.owner}/${r.repo.name}`),
+      unreachable: results.filter((r) => r.failed).map((r) => `${r.repo.owner}/${r.repo.name}`),
     };
   } catch (error) {
     return {
@@ -329,9 +319,7 @@ export async function listWorkspaceFiles(workspaceId: string): Promise<{
       truncated: [],
       unreachable: [],
       unavailable:
-        error instanceof DecisionError
-          ? error.message
-          : "Could not load files from GitHub.",
+        error instanceof DecisionError ? error.message : "Could not load files from GitHub.",
     };
   }
 }
@@ -356,23 +344,11 @@ async function snapshotFile(
   range: LineRange | null;
 }> {
   if (!range) {
-    const baselineSha = await getFileSha(
-      token,
-      repo.owner,
-      repo.name,
-      path,
-      repo.defaultBranch,
-    );
+    const baselineSha = await getFileSha(token, repo.owner, repo.name, path, repo.defaultBranch);
     return { baselineSha, baselineSnippet: null, range: null };
   }
 
-  const file = await getFileContent(
-    token,
-    repo.owner,
-    repo.name,
-    path,
-    repo.defaultBranch,
-  );
+  const file = await getFileContent(token, repo.owner, repo.name, path, repo.defaultBranch);
   // Missing, or too large to inline. Fall back to whole-file citation.
   if (!file) {
     return { baselineSha: null, baselineSnippet: null, range: null };
@@ -460,8 +436,7 @@ export async function checkReferenceDrift(
       if (!repo || !owner || !name) continue;
       checked += 1;
 
-      const ranged =
-        ref.startLine !== null && ref.endLine !== null && ref.baselineSnippet !== null;
+      const ranged = ref.startLine !== null && ref.endLine !== null && ref.baselineSnippet !== null;
 
       // A whole-file reference only needs the SHA, so there is no reason to pull contents.
       if (!ranged) {
@@ -525,10 +500,7 @@ export async function checkReferenceDrift(
  * Park an unsent decision. Nothing is validated: an empty draft is legitimate,
  * which is precisely what distinguishes a draft from a proposal.
  */
-export async function saveDraft(
-  workspaceId: string,
-  formData: FormData,
-): Promise<ActionResult> {
+export async function saveDraft(workspaceId: string, formData: FormData): Promise<ActionResult> {
   const user = await requireUser();
   const id = String(formData.get("draftId") ?? "") || undefined;
 
@@ -735,11 +707,7 @@ async function rebaselineOnAccept(
   }
 }
 
-export async function supersede(
-  workspaceId: string,
-  supersedingId: string,
-  formData: FormData,
-) {
+export async function supersede(workspaceId: string, supersedingId: string, formData: FormData) {
   const user = await requireUser();
   const refused = refuseDemo(user);
   if (refused) return refused;

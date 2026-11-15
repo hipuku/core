@@ -11,45 +11,45 @@ updates:
     open-pull-requests-limit: 5
     groups:
       next:
-        patterns: ['next', 'eslint-config-next', '@next/*']
+        patterns: ["next", "eslint-config-next", "@next/*"]
       react:
-        patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
       database:
-        patterns: ['drizzle-orm', 'drizzle-kit', 'postgres']
+        patterns: ["drizzle-orm", "drizzle-kit", "postgres"]
       # The test runner and its environments are their own group. Grouped with
       # the linters, one vitest or jsdom major holds every lint patch behind it.
       test:
-        patterns: ['vitest', '@vitest/*', '@vitejs/*', 'jsdom', '@testing-library/*']
+        patterns: ["vitest", "@vitest/*", "@vitejs/*", "jsdom", "@testing-library/*"]
       tooling:
-        patterns: ['eslint*', '@eslint/*', 'typescript-eslint', 'prettier*']
+        patterns: ["eslint*", "@eslint/*", "typescript-eslint", "prettier*"]
     commit-message:
-      prefix: 'deps'
+      prefix: "deps"
     # Without this Dependabot adds its own dependencies and javascript labels instead.
-    labels: ['deps']
+    labels: ["deps"]
     ignore:
       # @types/node describes the runtime CI installs, currently 22, rather than
       # the newest release line. A major here typechecks the app against APIs
       # the running Node does not have. The other half of that bargain is that
       # this pin moves by hand when the runtime does: it sat at ^20 while CI ran
       # 22, and vitest 5, which asks for ^22 || >=24, could not be installed.
-      - dependency-name: '@types/node'
-        update-types: ['version-update:semver-major']
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
       # TypeScript 7 is the native rewrite, deferred across every repo here so
       # they move together. Recorded rather than closed: a closed pull request
       # comes back on the next run and says nothing about why it was refused.
-      - dependency-name: 'typescript'
-        update-types: ['version-update:semver-major']
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
       # ESLint 10 is blocked upstream, not here. eslint-config-next 16.3.3
       # bundles eslint-plugin-react, whose react/display-name rule calls
       # context.getFilename(), removed in 10, so `npm run lint` dies at rule
       # load with "contextOrFilename.getFilename is not a function" before it
       # reads a single file. Nothing in this repo's flat config can reach it.
       # Lift this when eslint-config-next ships plugins declaring eslint 10.
-      - dependency-name: 'eslint'
-        update-types: ['version-update:semver-major']
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
-    labels: ['deps']
+    labels: ["deps"]

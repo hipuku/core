@@ -13,7 +13,9 @@
   background: none;
   color: var(--text-dim);
   cursor: pointer;
-  transition: color 0.12s ease, background 0.12s ease;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
 }
 .check:hover:not(:disabled) {
   color: var(--accent);

@@ -282,8 +282,7 @@ async function main() {
       decision:
         "Publish `haus`, a sixth package, pinning the other five at exact " +
         "versions and re-exporting nothing.",
-      consequences:
-        "One version line for consumers. A sixth package on the release path.",
+      consequences: "One version line for consumers. A sixth package on the release path.",
     },
   });
   // Proposed by the author, rejected by the owner: the author role has no reject

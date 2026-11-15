@@ -61,9 +61,7 @@ export function DecisionMeta({
             <span className={styles.summary}>
               {lastActivity !== null && (
                 <>
-                  <span className={styles.when}>
-                    Last activity {timeAgo(lastActivity)}
-                  </span>
+                  <span className={styles.when}>Last activity {timeAgo(lastActivity)}</span>
                   <span className={styles.dot} aria-hidden="true">
                     ·
                   </span>

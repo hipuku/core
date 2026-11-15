@@ -12,10 +12,7 @@ export class MemoryVersionStore implements VersionStore {
   private versions = new Map<string, Version>();
   private idSeq = 0;
 
-  async createDocument(input: {
-    ownerId: string;
-    name: string;
-  }): Promise<DocumentRecord> {
+  async createDocument(input: { ownerId: string; name: string }): Promise<DocumentRecord> {
     const now = new Date();
     const document: DocumentRecord = {
       id: `doc_${++this.idSeq}`,

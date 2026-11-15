@@ -34,9 +34,7 @@ export function Lineage({
           <li key={decision.id} className={styles.step}>
             {current ? (
               <span className={`${styles.node} ${styles.here}`} aria-current="step">
-                <span className="key-chip">
-                  {decisionLabel(workspaceKey, decision.number)}
-                </span>
+                <span className="key-chip">{decisionLabel(workspaceKey, decision.number)}</span>
                 <span className={styles.title}>{decision.title}</span>
               </span>
             ) : (
@@ -45,9 +43,7 @@ export function Lineage({
                 className={styles.node}
                 title={decision.title}
               >
-                <span className="key-chip">
-                  {decisionLabel(workspaceKey, decision.number)}
-                </span>
+                <span className="key-chip">{decisionLabel(workspaceKey, decision.number)}</span>
                 <span className={styles.title}>{decision.title}</span>
               </Link>
             )}

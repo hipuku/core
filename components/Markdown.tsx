@@ -66,9 +66,10 @@ export function Markdown({
           a({ children, href }) {
             // A link into a repo blob came from a citation, and renders as the
             // shared file chip rather than as prose-coloured link text.
-            const blob = /^https:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/[^/]+\/(.+?)(?:#(.+))?$/.exec(
-              href ?? "",
-            );
+            const blob =
+              /^https:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/[^/]+\/(.+?)(?:#(.+))?$/.exec(
+                href ?? "",
+              );
             if (blob) {
               return (
                 <FileChip

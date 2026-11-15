@@ -92,9 +92,7 @@ export default async function EditDecisionPage({
           repo: r.repo!,
           path: r.path!,
           lines:
-            r.startLine && r.endLine
-              ? formatRange({ start: r.startLine, end: r.endLine })
-              : null,
+            r.startLine && r.endLine ? formatRange({ start: r.startLine, end: r.endLine }) : null,
         }))}
       referencesSlot={
         <LiveReferenceField
@@ -105,9 +103,7 @@ export default async function EditDecisionPage({
             repo: r.repo ?? "",
             path: r.path ?? r.label ?? r.url ?? "",
             lines:
-              r.startLine && r.endLine
-                ? formatRange({ start: r.startLine, end: r.endLine })
-                : null,
+              r.startLine && r.endLine ? formatRange({ start: r.startLine, end: r.endLine }) : null,
           }))}
         />
       }

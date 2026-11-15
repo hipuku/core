@@ -77,17 +77,17 @@ failed there: it accepts one connection at a time, and Next.js with better-auth 
 
 ## Data model
 
-| Table | Holds |
-|---|---|
-| `workspaces` | Name and key (`HAU`) |
-| `memberships` | User, workspace, role (`author` or `maintainer`) |
-| `decisions` | Workspace, number, title, status, author, `supersededById`, the versioned document's id. Unique on workspace and number |
-| `decision_transitions` | From, to, actor, time, reason. Append-only |
-| `decision_references` | File or link references: label, URL, repository, path, line range, cited text, baseline and current blob SHA, when last checked |
-| `decision_drafts` | Author, workspace, title, body, cited references. No number |
-| `workspace_repos` | Connected repositories. Unique on workspace, owner and name |
-| `documents`, `document_versions` | The versioning engine's documents and commits |
-| `user`, `session`, `account`, `verification` | better-auth. `account` holds linked GitHub tokens |
+| Table                                        | Holds                                                                                                                           |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `workspaces`                                 | Name and key (`HAU`)                                                                                                            |
+| `memberships`                                | User, workspace, role (`author` or `maintainer`)                                                                                |
+| `decisions`                                  | Workspace, number, title, status, author, `supersededById`, the versioned document's id. Unique on workspace and number         |
+| `decision_transitions`                       | From, to, actor, time, reason. Append-only                                                                                      |
+| `decision_references`                        | File or link references: label, URL, repository, path, line range, cited text, baseline and current blob SHA, when last checked |
+| `decision_drafts`                            | Author, workspace, title, body, cited references. No number                                                                     |
+| `workspace_repos`                            | Connected repositories. Unique on workspace, owner and name                                                                     |
+| `documents`, `document_versions`             | The versioning engine's documents and commits                                                                                   |
+| `user`, `session`, `account`, `verification` | better-auth. `account` holds linked GitHub tokens                                                                               |
 
 ---
 
