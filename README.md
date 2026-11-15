@@ -15,15 +15,15 @@ The demo is read-only, with credentials on the sign-in page.
 - **A lifecycle as data.** Transitions are rows in a table, each gated by a capability, and an
   accepted decision cannot be edited. [ARCHITECTURE § The lifecycle](ARCHITECTURE.md#the-lifecycle)
 - **Two audit trails.** Text revisions are commits; status changes are append-only rows.
-  [ARCHITECTURE § Two audit trails](ARCHITECTURE.md#two-audit-trails)
+  [ARCHITECTURE § Audit trails](ARCHITECTURE.md#audit-trails)
 - **Drift checks on cited code.** A cited line range is followed if it moves and reported if it
   changes. [ARCHITECTURE § Code references and drift](ARCHITECTURE.md#code-references-and-drift)
 - **Built on haus.** Thirteen haus components and the `core` brand, with core keeping only what is
   about decisions. [DESIGN § Design system](DESIGN.md#design-system)
 - **Storage is a port**, with a memory and a Postgres store held to one contract suite.
-  [ARCHITECTURE § What the tests prove](ARCHITECTURE.md#what-the-tests-prove-about-the-postgres-store)
+  [ARCHITECTURE § Postgres store tests](ARCHITECTURE.md#postgres-store-tests)
 - **A public read-only demo** with sign-up, writes and GitHub linking switched off.
-  [ARCHITECTURE § What the demo switches off](ARCHITECTURE.md#what-the-demo-switches-off)
+  [ARCHITECTURE § Demo restrictions](ARCHITECTURE.md#demo-restrictions)
 
 ## Documentation
 
@@ -90,8 +90,9 @@ DISABLE_GITHUB=1
 `DISABLE_SIGNUP` makes `/sign-up` a 404 and removes its link. `DEMO_USER_*` names the account
 `db:seed` creates. `DISABLE_GITHUB` hides Connect GitHub.
 
-**Tests.** `npm run lint && npm run typecheck && npm test` runs the checks CI runs first;
-`npm run e2e` needs a disposable database. [ARCHITECTURE § Testing and CI](ARCHITECTURE.md#testing-and-ci)
+**Tests.** The `Lint`, `Typecheck` and `Test` jobs run `lint`, `lint:prose`, `lint:css`,
+`lint:tokens`, `typecheck` and `test` from the table below; `npm run e2e` needs a disposable
+database. [ARCHITECTURE § Testing and CI](ARCHITECTURE.md#testing-and-ci)
 
 ## Scripts
 

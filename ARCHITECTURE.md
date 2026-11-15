@@ -80,7 +80,7 @@ components and tokens core takes and what it keeps.
 | `documents`, `document_versions`             | The versioning engine's documents and commits                                                                                   |
 | `user`, `session`, `account`, `verification` | better-auth. `account` holds linked GitHub tokens                                                                               |
 
-### Storage is a port
+### Storage ports
 
 **Decision.** `DecisionService` and `Versioning` depend on store interfaces, with a memory and a
 Drizzle implementation of each. Two writes that must succeed or fail together are each one store
@@ -99,7 +99,7 @@ demo account, and lifecycle actions are gated by capability (see [The lifecycle]
 Outbound requests go to GitHub only: the REST API from `lib/github.ts` (repository trees, file
 contents and blob SHAs), and better-auth's OAuth exchange when GitHub linking is on.
 
-### Server actions return errors
+### Server action errors
 
 **Decision.** Every failure the file picker can meet (not a member, GitHub off, no linked account,
 no connected repositories, GitHub unreachable) is returned as a message, not thrown.
@@ -113,11 +113,12 @@ production builds.
 
 **Decision.** `getReadToken` uses the signed-in person's linked account when there is one, and
 `GITHUB_PUBLIC_TOKEN` otherwise: a token of the deployment owner's, read-only and limited to public
-repositories. Connecting a repository always needs the person's own account. Repository trees are
-cached per server instance for five minutes.
+repositories. The repository picker lists repositories with the person's own account, so it needs a
+linked one; `connectRepo` stores the repository it is given. Repository trees are cached per server
+instance for five minutes.
 
 **Reason.** A linked account can reach private repositories. Listing repositories with the
-deployment's token would show the owner's repositories to whoever is signed in. The file picker
+deployment's token in the picker would show the owner's repositories to whoever is signed in. The file picker
 requests every connected repository's tree on each mount, and without the cache a few visitors
 would use up the hourly GitHub API allowance.
 
@@ -127,21 +128,21 @@ The four transitions are rows in a table in `lib/decisions/lifecycle.ts`, each g
 capability; roles are lists of capabilities. [FEATURE § The lifecycle](FEATURE.md#the-lifecycle)
 shows the states and the role table.
 
-### Guards return a reason
+### Lifecycle guards
 
 **Decision.** Every lifecycle check returns `{ ok: true }` or `{ ok: false, reason }`, for example
 "requires the accept capability" or "a decision is immutable once it leaves 'proposed'".
 
 **Reason.** The interface can tell a missing permission from a decision that has already moved on.
 
-### Accepted decisions are immutable
+### Immutability after acceptance
 
 **Decision.** `canEditContent` refuses any decision not in `proposed`. To change an accepted
 decision, a new one is accepted and supersedes it.
 
 **Reason.** The accepted text stays as it was agreed.
 
-### Two audit trails
+### Audit trails
 
 **Decision.** Text revisions are commits in the versioning engine. Status changes are rows in the
 append-only `decision_transitions` table.
@@ -149,18 +150,20 @@ append-only `decision_transitions` table.
 **Reason.** One asks how the text changed, the other when and by whom the decision moved, and a
 single timeline would mix edits with approvals.
 
-### Restore is a forward commit
+### Restoring a version
 
-**Decision.** Restoring a version writes a new commit whose content equals it, as `git revert` does.
+**Decision.** Restoring a version writes a new commit whose content equals that version. The commits
+made after it stay in the history; their changes are not in the restored document.
 
-**Reason.** The restore leaves a record, and nothing committed after the restored version is lost.
+**Reason.** The restore leaves a record, and nothing committed after the restored version is lost
+from the history.
 
 **Alternatives.** Moving the head back. It removes commits, so a restore would erase work committed
 after the restored version and leave no record of itself.
 
 ## Drafts
 
-### A draft is not a status
+### Draft storage
 
 **Decision.** A draft is stored in `decision_drafts`, not `decisions`. It has no ADR number, no
 transitions and no required title (a missing title is derived from the first line written,
@@ -186,7 +189,7 @@ list is where it will be found.
 A reference to a file records its blob SHA and, for a line range, the text of those lines. A check
 reports whether the cited lines changed, moved or disappeared.
 
-### A citation names a range
+### Line ranges
 
 **Decision.** A reference can cite a line range, not only a whole file.
 
@@ -194,7 +197,7 @@ reports whether the cited lines changed, moved or disappeared.
 unrelated function, and the larger the file the more often that happens. A line range is marked
 changed only when those lines change.
 
-### A moved block is not a change
+### Moved blocks
 
 **Decision.** When the cited text is no longer at its lines, the file is searched for it before the
 reference is marked drifted. Trailing whitespace is removed before comparing; leading indentation is
@@ -203,7 +206,7 @@ kept.
 **Reason.** Twenty lines inserted above a block move it without changing it, and reformatting is not
 a change. A block that changed indentation changed scope.
 
-### The baseline moves on acceptance
+### Baselines
 
 **Decision.** On acceptance, each reference's baseline moves to the code at that moment, following a
 block that moved during review to its new lines. Re-baselining is best-effort: a GitHub failure does
@@ -213,7 +216,7 @@ not undo the acceptance.
 in review while its code changed should not be drifted the moment it is accepted. The acceptance is
 already recorded when re-baselining runs.
 
-### Drift is checked when reading
+### When drift is checked
 
 **Decision.** Drift is not checked while composing or editing. The status is shown on the decision
 page, and a re-check records each reference's current SHA.
@@ -221,7 +224,7 @@ page, and a re-check records each reference's current SHA.
 **Reason.** A file cited seconds ago can only be in sync. The decision page is where someone decides
 whether the decision needs revisiting.
 
-### Citations are plain text
+### The citation token
 
 **Decision.** A citation is the token `{{owner/repo:path#L47-L120}}`. Tokens become ordinary markdown
 links before parsing, so react-markdown renders them with no plugin and its escaping applies. A token
@@ -237,7 +240,7 @@ would not survive the copy.
 queries in sequence (session, membership, data), and with the functions in Vercel's default US
 region each one crossed the Pacific.
 
-### What the demo switches off
+### Demo restrictions
 
 **Decision.** The public demo sets three switches:
 
@@ -272,7 +275,7 @@ suites in jsdom: draft autosave and recovery, the unsaved-changes guard, the com
 keystrokes, the draft list, the modal shell, the confirmation dialog's failure path and a
 Mermaid diagram's recovery. 345 tests in 25 files.
 
-### What the tests prove about the Postgres store
+### Postgres store tests
 
 **Decision.** Every domain test uses the memory store, and two suites check the Postgres store
 against it. `store-parity.test.ts` checks that both stores implement the port's 32 methods, listed in
@@ -280,8 +283,8 @@ the test rather than read from either store. `store-contract.test.ts` runs 43 ca
 stores with the same assertions. The Postgres side runs on PGlite, Postgres compiled to WebAssembly
 and run in the test process, with tables created from the Drizzle schema by `test/pg.ts` on each run.
 
-**Reason.** A method removed from the interface and both classes still typechecks while the service
-calls it, which the parity suite catches; it checks no behaviour. The contract suite catches the
+**Reason.** TypeScript does not object to a method one store has and the other lacks when the
+interface lacks it too, which the parity suite's own list catches; it checks no behaviour. The contract suite catches the
 rest, such as an order that only holds because a `Map` keeps insertion order, or a null stored
 differently. PGlite behaves as Postgres for constraints, types and transactions with no Docker,
 service container or `DATABASE_URL`.

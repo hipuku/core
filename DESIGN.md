@@ -17,7 +17,7 @@ and tokens it takes, the `core` brand, and what it keeps as its own.
 
 **Decision.** An off-white page, white cards separated by fill instead of borders, and accent
 colours from a print-like palette of vermilion, mustard, teal and cobalt, at the saturation and
-lightness of printed ink. The values are haus's `core` brand (`brands/core.css` in `haus-tokens`).
+lightness of printed ink. The colours are declared in `app/globals.css`.
 Notices are tinted, not raised, and the drift warning is the only one; status and authorship, which
 used to be banners, are properties.
 
@@ -43,24 +43,25 @@ harder to scan than one that fills under the pointer.
 
 **Reason.** Visual choices, made by eye.
 
-### Write and Preview use the same type
+### Write and Preview type
 
 **Decision.** The compose editor has no field backgrounds or borders, and its type metrics match the
 rendered markdown. Each ADR section is marked by a left gutter rule that takes the accent colour on
 focus.
 
-**Reason.** Text does not reflow between Write and Preview.
+**Reason.** Prose keeps its line breaks between Write and Preview. Rendered elements, such as a
+long link, can still wrap differently.
 
 ## Layout and interaction
 
-### Editing is its own page
+### Editing page
 
 **Decision.** Editing an existing decision uses the same page as composing a new one.
 
 **Reason.** Inline editing left the properties, notices and tabs above the editor, with two Edit
 buttons visible at once.
 
-### One sheet on the decision page
+### Decision page layout
 
 **Decision.** The document is the one white sheet. Properties, notices and tabs sit on the page
 background, and every region shares the sheet's width. The dossier card is the exception: it holds
@@ -69,7 +70,7 @@ status, owner and dates, and the activity history opens inside it.
 **Reason.** The page had five cards at three widths, on two backgrounds and two elevations. The
 dossier's dates summarise the history, so the history opens where they are.
 
-### Irreversible transitions ask first
+### Confirmations
 
 **Decision.** Approve, Reject and Deprecate each open a confirmation (`ConfirmAction`, over haus
 `Modal`) whose primary button has the tone of the button that opened it. Supersede has its own
@@ -98,8 +99,9 @@ covers where each copy lives.
 ### Tokens
 
 **Decision.** core takes `haus-tokens`: the primitives, the semantic roles and its own brand,
-`brands/core.css`. `app/globals.css` declares a few short aliases over haus roles (`--r-sm` reads
-`--haus-radius-control`), and component styles read those or `--haus-*` properties. Status badges
+`brands/core.css`. `app/globals.css` declares core's own colour names as literal values (`--bg`, `--surface`,
+`--text`, `--accent` and others) and short aliases over haus roles (`--r-sm` reads
+`--haus-radius-control`); component styles read those or `--haus-*` properties. Status badges
 use haus `Badge` tones (haus decision 0021) and the strength meter, timeline and diff colours read
 haus's feedback roles; core's six `--st-*` status tokens are deleted.
 
@@ -160,7 +162,8 @@ label the same way.
 
 ### Enforcement
 
-**Decision.** Stylelint flags every declaration that bypasses the token layer, and
+**Decision.** Stylelint flags declarations that bypass the token layer, apart from the values its
+config exempts (`0`, `1px`, `50%` and an off-scale list in `stylelint.config.mjs`), and
 `scripts/check-token-debt.mjs` holds the count: it fails when the number moves in either direction
 without `scripts/token-debt.json` moving with it. CodeRabbit's rules for this repo flag a raw value
 in a CSS module and a local component that duplicates a haus one.
