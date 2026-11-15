@@ -33,7 +33,7 @@ valid until it was replaced.
 
 ## The lifecycle
 
-```
+```text
 proposed ──accept──▶ accepted ──deprecate──▶ deprecated
    │                    │
  reject             supersede

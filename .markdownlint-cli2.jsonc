@@ -1,0 +1,21 @@
+{
+  // Structure only. Prettier owns wrapping and spacing, and the docs standard
+  // owns voice, so the rules that overlap with either are off.
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD033": {
+      "allowed_elements": ["picture", "source", "img", "br", "details", "summary", "kbd"],
+    },
+    "MD024": { "siblings_only": true },
+    "MD041": false,
+  },
+  "globs": ["**/*.md"],
+  "ignores": [
+    "**/node_modules/**",
+    ".next/**",
+    "test-results/**",
+    "playwright-report/**",
+    "DEPLOYMENT.md",
+  ],
+}
