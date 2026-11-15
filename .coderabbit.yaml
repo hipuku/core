@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit reviews every pull request. It is not a required check: each comment is
+# applied as a normal commit or answered and resolved. The path instructions below are
+# the rules from DESIGN.md that a reviewer should hold this repo to.
+language: en-AU
+reviews:
+  profile: chill
+  high_level_summary: true
+  poem: false
+  request_changes_workflow: false
+  collapse_walkthrough: true
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!**/package-lock.json"
+    - "!.next/**"
+    - "!scripts/punctuation-baseline.json"
+    - "!scripts/token-debt.json"
+  path_instructions:
+    - path: "**/*.module.css"
+      instructions: >-
+        Component styles read tokens only: haus's --haus-* custom properties under the core
+        brand, or the aliases app/globals.css declares over them. Flag any new raw colour, length, radius, shadow, z-index or font value; the token
+        debt ratchet in scripts/check-token-debt.mjs counts the ones that remain.
+    - path: "{components,app}/**/*.tsx"
+      instructions: >-
+        core builds on haus-components. Flag a local component that duplicates one haus ships
+        (Button, IconButton, Modal, Input, Select, Badge, Card, Callout, EmptyState, Tabs,
+        Popover, Avatar, Toast). Flag interactive elements with no accessible name, no keyboard
+        handling, or a click handler on an element that cannot take focus.
+    - path: "lib/{decisions,versioning}/**"
+      instructions: >-
+        Domain code depends on the DecisionStore and VersionStore ports, not on Drizzle; only
+        the drizzle-store files touch the database. A decision with its opening transition, and
+        a status change with its transition row, are each one store method in one transaction.
+        Lifecycle guards return { ok: true } or { ok: false, reason }, never a bare boolean.
+    - path: "app/**/actions.ts"
+      instructions: >-
+        Server actions return failures as messages rather than throwing: React strips a thrown
+        action's message in production. Flag a throw on a path a user can reach.
+    - path: "**/*.md"
+      instructions: >-
+        Australian English. No em dashes and no spaced hyphens. Headings are topic labels, not
+        claims. No marketing language. Flag any statement the code does not support.
+chat:
+  auto_reply: true

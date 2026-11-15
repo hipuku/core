@@ -1,0 +1,30 @@
+name: Bug
+description: core does something it should not, or does not do something it should.
+labels: [fix]
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: What it should do, and what it does
+      description: The line in README, FEATURE or DESIGN it contradicts, if there is one.
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to see it
+      description: The workspace, the decision and the steps. A screenshot helps.
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The commit, or the live demo.
+      placeholder: core.hipuku.dev
+    validations: { required: true }
+  - type: input
+    id: where
+    attributes:
+      label: Where it ran
+      description: The browser and platform, or your own deployment with the Node version.
+      placeholder: Chrome 142, macOS
+    validations: { required: true }
