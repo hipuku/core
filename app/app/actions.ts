@@ -116,27 +116,6 @@ export async function removeMember(
   }, "Member removed.");
 }
 
-export async function addReference(
-  workspaceId: string,
-  decisionId: string,
-  formData: FormData,
-): Promise<ActionResult> {
-  const user = await requireUser();
-  const refused = refuseDemo(user);
-  if (refused) return refused;
-  const url = String(formData.get("url") ?? "").trim();
-  if (!url) return { error: "A URL is required." };
-  const label = String(formData.get("label") ?? "").trim() || null;
-  return attempt(async () => {
-    await decisionService.addReference(decisionId, user.id, {
-      kind: "link",
-      label,
-      url,
-    });
-    revalidatePath(`/app/${workspaceId}/${decisionId}`);
-  }, "Reference added.");
-}
-
 export async function removeReference(
   workspaceId: string,
   decisionId: string,
@@ -198,18 +177,6 @@ export async function disconnectRepo(workspaceId: string, repoId: string): Promi
     await decisionService.disconnectRepo(repoId, user.id);
     revalidatePath(`/app/${workspaceId}`);
   }, "Repository disconnected.");
-}
-
-/** Every file path in a connected repo, for the file picker. */
-export async function listConnectedRepoFiles(repoId: string) {
-  const user = await requireUser();
-  const repo = await decisionService.getWorkspaceRepo(repoId);
-  if (!repo) throw new DecisionError("repository not found");
-  const role = await decisionService.roleOf(repo.workspaceId, user.id);
-  if (!role) throw new DecisionError("you are not a member of this workspace");
-  const token = await getReadToken(user.id);
-  if (!token) throw new DecisionError("Link a GitHub account first.");
-  return listRepoFiles(token, repo.owner, repo.name, repo.defaultBranch);
 }
 
 export interface WorkspaceFile {

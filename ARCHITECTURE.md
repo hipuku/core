@@ -246,10 +246,10 @@ region each one crossed the Pacific.
 
 - **`DISABLE_SIGNUP=1`.** `/sign-up` is a 404, and there is one seeded account.
 - **The demo account (`DEMO_USER_EMAIL`) may not change the decision log.** It may save and discard
-  drafts; fifteen actions refuse it (creating, editing and deleting workspaces, inviting and removing
+  drafts; fourteen actions refuse it (creating, editing and deleting workspaces, inviting and removing
   members, connecting and disconnecting repositories, adding and removing references, proposing,
   revising, changing status, superseding, re-checking drift). The refusal is in the action layer.
-  Three actions that only read from GitHub need no refusal.
+  Two actions that only read from GitHub need no refusal.
 - **`DISABLE_GITHUB=1`.** Connect GitHub is hidden.
 
 Every visitor signs in as that account, so its drafts are shared. `/api/cron/prune-drafts` runs
@@ -296,7 +296,7 @@ time, and Next.js with better-auth opens several, so that suite runs against a r
 and history, keyboard access, and signed-out access. It pushes the schema and seeds whatever
 `DATABASE_URL` points at, so that database must be disposable.
 
-CI runs one job per check: `Lint` (ESLint, prose, CSS, markdown and the token-debt ratchet),
+CI runs one job per check: `Lint` (ESLint, prose, CSS, markdown, knip and the token-debt ratchet),
 `Links`, `Format`, `Typecheck` and `Test`. `Build` and `End to end` start once `Lint`, `Typecheck`
 and `Test` pass, and `End to end` runs against a Postgres service container.
 [WORKFLOW.md](WORKFLOW.md) lists the checks the `main` ruleset requires.

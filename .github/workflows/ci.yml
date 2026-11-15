@@ -62,6 +62,11 @@ jobs:
         if: always()
         run: npm run lint:md
 
+      # Unused files, exports and dependencies.
+      - name: Knip
+        if: always()
+        run: npm run knip
+
   # Every relative link and heading anchor in the markdown resolves. Offline,
   # so the check never fails because an outside site is slow. Its own job on
   # Linux, because the action only downloads a Linux build of lychee.

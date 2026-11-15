@@ -27,15 +27,15 @@ resolved conversations and a linear history, and it applies to the owner too.
 
 ## Checks
 
-| Check      | Workflow | Runs                                                                                                                                                                            | Required |
-| ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| Lint       | `ci.yml` | `npm run lint` (ESLint: the `lib/` boundaries, JSX accessibility, type-checked promises), `lint:prose`, `lint:css` (Stylelint), `lint:tokens` (the token ratchet) and `lint:md` | Yes      |
-| Links      | `ci.yml` | lychee, offline: every relative link and heading anchor in the Markdown resolves                                                                                                | Yes      |
-| Format     | `ci.yml` | `npm run format:check`                                                                                                                                                          | Yes      |
-| Typecheck  | `ci.yml` | `npm run typecheck`                                                                                                                                                             | Yes      |
-| Test       | `ci.yml` | `npm test`, both Vitest projects                                                                                                                                                | Yes      |
-| Build      | `ci.yml` | `npm run build`, after Lint, Typecheck and Test pass                                                                                                                            | Yes      |
-| End to end | `ci.yml` | `npm run e2e` against a Postgres service container, after Lint, Typecheck and Test pass                                                                                         | Yes      |
+| Check      | Workflow | Runs                                                                                                                                                                                    | Required |
+| ---------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Lint       | `ci.yml` | `npm run lint` (ESLint: the `lib/` boundaries, JSX accessibility, type-checked promises), `lint:prose`, `lint:css` (Stylelint), `lint:tokens` (the token ratchet), `lint:md` and `knip` | Yes      |
+| Links      | `ci.yml` | lychee, offline: every relative link and heading anchor in the Markdown resolves                                                                                                        | Yes      |
+| Format     | `ci.yml` | `npm run format:check`                                                                                                                                                                  | Yes      |
+| Typecheck  | `ci.yml` | `npm run typecheck`                                                                                                                                                                     | Yes      |
+| Test       | `ci.yml` | `npm test`, both Vitest projects                                                                                                                                                        | Yes      |
+| Build      | `ci.yml` | `npm run build`, after Lint, Typecheck and Test pass                                                                                                                                    | Yes      |
+| End to end | `ci.yml` | `npm run e2e` against a Postgres service container, after Lint, Typecheck and Test pass                                                                                                 | Yes      |
 
 Vercel builds a preview of every pull request as well; it is not a required check. What each suite
 covers is in [ARCHITECTURE.md § Testing and CI](./ARCHITECTURE.md#testing-and-ci).
