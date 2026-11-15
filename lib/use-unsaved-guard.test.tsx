@@ -19,6 +19,9 @@ function Harness({ when, onBlocked }: { when: boolean; onBlocked: (href: string)
   // default here only stops jsdom logging "Not implemented: navigation" for the
   // clicks the guard deliberately lets through.
   return (
+    // A test wrapper, never rendered to a person: it only stops jsdom logging the
+    // navigations the guard lets through.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div onClick={(e) => e.preventDefault()}>
       <a href="/app/ws-1">internal</a>
       <a href="/app/ws-1?tab=x">internal with query</a>

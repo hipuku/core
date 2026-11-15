@@ -22,7 +22,7 @@ export function NewWorkspaceModal() {
       {open && (
         <ModalShell title="New workspace" onClose={() => setOpen(false)}>
           <ToastForm action={createWorkspace} className={styles.form}>
-            <Input label="Name" name="name" required autoFocus placeholder="Platform team" />
+            <Input label="Name" name="name" required placeholder="Platform team" />
             <div className={styles.actions}>
               <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                 Cancel
