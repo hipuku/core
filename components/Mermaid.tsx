@@ -17,18 +17,19 @@ export function Mermaid({ chart }: { chart: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      const mermaid = (await import("mermaid")).default;
-      if (!initialized) {
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: "neutral",
-          securityLevel: "strict",
-          fontFamily: "var(--font-sans)",
-        });
-        initialized = true;
-      }
+    void (async () => {
       try {
+        // Inside the try, so a failed load shows the error state too.
+        const mermaid = (await import("mermaid")).default;
+        if (!initialized) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: "neutral",
+            securityLevel: "strict",
+            fontFamily: "var(--font-sans)",
+          });
+          initialized = true;
+        }
         const id = `mmd-${Math.random().toString(36).slice(2)}`;
         const { svg } = await mermaid.render(id, chart);
         if (!cancelled && ref.current) ref.current.innerHTML = svg;

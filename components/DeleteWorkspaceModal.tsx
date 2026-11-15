@@ -16,7 +16,14 @@ export function DeleteWorkspaceModal({ workspaceId, name }: { workspaceId: strin
 
   async function onDelete() {
     setPending(true);
-    const result = await deleteWorkspace(workspaceId);
+    let result: Awaited<ReturnType<typeof deleteWorkspace>>;
+    try {
+      result = await deleteWorkspace(workspaceId);
+    } catch {
+      toast.error("Could not reach the server. Try again.");
+      setPending(false);
+      return;
+    }
     if (result.error) {
       toast.error(result.error);
       setPending(false);
@@ -53,7 +60,7 @@ export function DeleteWorkspaceModal({ workspaceId, name }: { workspaceId: strin
               type="button"
               variant="primary"
               tone="error"
-              onClick={onDelete}
+              onClick={() => void onDelete()}
               loading={pending}
             >
               <Trash2 size={15} />

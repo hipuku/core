@@ -22,6 +22,19 @@ const eslintConfig = defineConfig([
     rules: jsxA11y.flatConfigs.recommended.rules,
   },
   {
+    // Promises, checked with type information. A server action or a fetch whose
+    // promise is dropped fails silently, and an async function passed where a
+    // void callback is expected (an onClick, a form action) swallows its rejection.
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+    },
+    rules: {
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+    },
+  },
+  {
     // An effect or callback that reads a value it does not list goes stale
     // silently, so a missing dependency fails rather than warns.
     rules: { "react-hooks/exhaustive-deps": "error" },
