@@ -36,6 +36,15 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
+      // no-restricted-imports reads static imports only; this catches import().
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "ImportExpression[source.value=/^(@\\/(app|components)|(\\.\\.\\/)+(app|components))(\\/|$)/]",
+          message: "lib/ does not import pages, server actions or components.",
+        },
+      ],
     },
   },
   {
@@ -49,7 +58,15 @@ const eslintConfig = defineConfig([
         {
           patterns: [
             {
-              group: ["@/lib/db", "@/lib/db/*", "drizzle-orm", "drizzle-orm/*", "postgres"],
+              group: [
+                "@/lib/db",
+                "@/lib/db/*",
+                "**/db",
+                "**/db/*",
+                "drizzle-orm",
+                "drizzle-orm/*",
+                "postgres",
+              ],
               message: "Go through the store port; only drizzle-store.ts touches the database.",
             },
             {
@@ -57,6 +74,19 @@ const eslintConfig = defineConfig([
               message: "lib/ does not import pages, server actions or components.",
             },
           ],
+        },
+      ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "ImportExpression[source.value=/^(@\\/lib\\/db|drizzle-orm|postgres|(\\.\\.\\/)+db)(\\/|$)/]",
+          message: "Go through the store port; only drizzle-store.ts touches the database.",
+        },
+        {
+          selector:
+            "ImportExpression[source.value=/^(@\\/(app|components)|(\\.\\.\\/)+(app|components))(\\/|$)/]",
+          message: "lib/ does not import pages, server actions or components.",
         },
       ],
     },
