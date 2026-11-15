@@ -92,7 +92,7 @@ DISABLE_GITHUB=1
 `db:seed` creates. `DISABLE_GITHUB` hides Connect GitHub.
 
 **Tests.** The `Lint`, `Typecheck` and `Test` jobs run `lint`, `lint:prose`, `lint:css`,
-`lint:tokens`, `typecheck` and `test` from the table below; `npm run e2e` needs a disposable
+`lint:tokens`, `lint:md`, `typecheck` and `test` from the table below; `npm run e2e` needs a disposable
 database. [ARCHITECTURE § Testing and CI](ARCHITECTURE.md#testing-and-ci)
 
 ## Scripts
