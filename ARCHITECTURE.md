@@ -297,8 +297,8 @@ and history, keyboard access, and signed-out access. It pushes the schema and se
 `DATABASE_URL` points at, so that database must be disposable.
 
 CI runs one job per check: `Lint` (ESLint, prose, CSS, markdown and the token-debt ratchet),
-`Links`, `Format`, `Typecheck`, `Test`, then `Build` and `End to end` against a Postgres service
-container.
+`Links`, `Format`, `Typecheck` and `Test`. `Build` and `End to end` start once `Lint`, `Typecheck`
+and `Test` pass, and `End to end` runs against a Postgres service container.
 [WORKFLOW.md](WORKFLOW.md) lists the checks the `main` ruleset requires.
 
 ## Platform and stack

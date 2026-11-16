@@ -104,7 +104,7 @@ database. [ARCHITECTURE § Testing and CI](ARCHITECTURE.md#testing-and-ci)
 | `npm run start`        | Serve the production build                                                |
 | `npm run lint`         | ESLint                                                                    |
 | `npm run lint:prose`   | Fails on a new em dash in a tracked file                                  |
-| `npm run lint:md`      | markdownlint on every markdown file                                       |
+| `npm run lint:md`      | markdownlint on the Markdown files `.markdownlint-cli2.jsonc` selects     |
 | `npm run lint:css`     | Stylelint, including the hardcoded-value rule                             |
 | `npm run lint:tokens`  | Fails when the count of hardcoded declarations changes without its record |
 | `npm run format`       | Prettier, writing                                                         |
