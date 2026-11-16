@@ -63,8 +63,12 @@ jobs:
         run: npm run lint:md
 
       # Unused files, exports and dependencies.
+      # Knip loads drizzle.config.ts, which throws without DATABASE_URL. Nothing
+      # connects, so a fake value like the Build job's is enough.
       - name: Knip
         if: always()
+        env:
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
         run: npm run knip
 
   # Every relative link and heading anchor in the markdown resolves. Offline,
