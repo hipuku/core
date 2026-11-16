@@ -325,3 +325,6 @@ markdown renderer.
   replaced.
 - **Email verification is off, and there is no rate limiting** beyond the draft limits. Neither
   matters while sign-up is closed. Both are needed before it opens.
+- **`drizzle-kit`'s audit findings are left.** Four moderate advisories come from the deprecated
+  `@esbuild-kit` loader it uses, in development dependencies only. npm's fix downgrades
+  `drizzle-kit`.
