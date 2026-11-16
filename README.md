@@ -92,7 +92,7 @@ DISABLE_GITHUB=1
 `db:seed` creates. `DISABLE_GITHUB` hides Connect GitHub.
 
 **Tests.** The `Lint`, `Typecheck` and `Test` jobs run `lint`, `lint:prose`, `lint:css`,
-`lint:tokens`, `lint:md`, `typecheck` and `test` from the table below; `npm run e2e` needs a disposable
+`lint:tokens`, `lint:md`, `knip`, `typecheck` and `test` from the table below; `npm run e2e` needs a disposable
 database. [ARCHITECTURE § Testing and CI](ARCHITECTURE.md#testing-and-ci)
 
 ## Scripts
@@ -105,6 +105,7 @@ database. [ARCHITECTURE § Testing and CI](ARCHITECTURE.md#testing-and-ci)
 | `npm run lint`         | ESLint                                                                    |
 | `npm run lint:prose`   | Fails on a new em dash in a tracked file                                  |
 | `npm run lint:md`      | markdownlint on the Markdown files `.markdownlint-cli2.jsonc` selects     |
+| `npm run knip`         | Unused files, exports and dependencies                                    |
 | `npm run lint:css`     | Stylelint, including the hardcoded-value rule                             |
 | `npm run lint:tokens`  | Fails when the count of hardcoded declarations changes without its record |
 | `npm run format`       | Prettier, writing                                                         |

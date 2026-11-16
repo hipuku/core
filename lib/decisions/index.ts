@@ -4,25 +4,12 @@ import { DrizzleDecisionStore } from "./drizzle-store";
 
 export * from "./types";
 export * from "./lifecycle";
-export { referenceDrift, isStale, type DriftStatus } from "./drift";
-export { supersessionChain, type Lineal, type LineageEntry } from "./lineage";
+export { isStale } from "./drift";
+export { supersessionChain } from "./lineage";
 export { compareSnippet, extractRange, formatRange, parseRange, type LineRange } from "./snippet";
-export { decisionLabel, deriveWorkspaceKey } from "./key";
-export type {
-  DecisionRecord,
-  DecisionStore,
-  DraftRecord,
-  MembershipRecord,
-  ReferenceKind,
-  ReferenceRecord,
-  RepoRecord,
-  TransitionRecord,
-  WorkspaceRecord,
-} from "./store";
-export { adrBody, citedRefs, referenceLabel, type CitedRef } from "./form";
-export { DecisionError, DecisionService } from "./service";
-export { MemoryDecisionStore } from "./memory-store";
-export { DrizzleDecisionStore } from "./drizzle-store";
+export { decisionLabel } from "./key";
+export { adrBody, citedRefs, referenceLabel } from "./form";
+export { DecisionError } from "./service";
 
 /** The application's decision service, backed by Postgres. */
 export const decisionService = new DecisionService(new DrizzleDecisionStore(), versioning);
